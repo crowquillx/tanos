@@ -119,6 +119,8 @@ in with lib; {
       exec-once = waybar
       exec-once = swaync
       exec-once = wallsetter
+      exec-once = vesktop
+      exec-once = spotify
       exec-once = nm-applet --indicator
       exec-once = swayidle -w timeout 720 'swaylock -f' timeout 800 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'swaylock -f -c 000000'
       dwindle {
@@ -195,6 +197,8 @@ in with lib; {
       bind = ,XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
       bind = ,XF86MonBrightnessDown,exec,brightnessctl set 5%-
       bind = ,XF86MonBrightnessUp,exec,brightnessctl set +5%
+      windowrule = workspace 2, ^(Spotify)$
+      windowrule = workspace 3, ^(vesktop)$
     '' ];
   };
 }
