@@ -197,7 +197,7 @@ in with lib; {
       bind = ,XF86AudioLowerVolume,exec,wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
       bind = ,XF86MonBrightnessDown,exec,brightnessctl set 5%-
       bind = ,XF86MonBrightnessUp,exec,brightnessctl set +5%
-      windowrule = workspace 2, ^(Spotify)$
+      windowrulev2 = workspace 2, title:^(Spotify)(.*)$
       windowrule = workspace 3, ^(vesktop)$
     '' ];
   };
