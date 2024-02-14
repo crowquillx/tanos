@@ -146,6 +146,7 @@ in with lib; {
       bind = ${modifier},Q,killactive,
       bind = ${modifier},P,pseudo,
       bind = ${modifier}SHIFT,I,togglesplit,
+      bind = ${modifier},L,exec,swaylock -f
       bind = ${modifier},F,fullscreen,
       bind = ${modifier}SHIFT,F,togglefloating,
       bind = ${modifier}SHIFT,C,exit,

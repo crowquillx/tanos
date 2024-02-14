@@ -21,6 +21,7 @@
     pulse.enable = true;
     jack.enable = true;
   };
+  services.teamviewer.enable = true;
   hardware.pulseaudio.enable = false;
   sound.enable = true;
   security.rtkit.enable = true;
