@@ -103,7 +103,7 @@ in with lib; {
             size = 5
             passes = 3
             new_optimizations = on
-            ignore_opacity = on
+            ignore_opacity = false
         }
       }
       plugin {
@@ -200,6 +200,14 @@ in with lib; {
       bind = ,XF86MonBrightnessUp,exec,brightnessctl set +5%
       windowrulev2 = workspace 2, title:^(Spotify)(.*)$
       windowrule = workspace 3, ^(vesktop)$
+      windowrule=opacity 0.90 override 0.83 override,thunar
+      windowrule=opacity 0.92,Nautilus
+      windowrule=opacity 0.96 0.89,discord
+      windowrule=opacity 0.96,armcord
+      windowrule=opacity 0.96,webcord
+      windowrule=opacity 0.96 0.89,vesktop
+      windowrulev2=opacity 0.89 override 0.5 override,title:^(Spotify)(.*)$
+      windowrule=opacity 1 override 1 override,firefox
     '' ];
   };
 }
