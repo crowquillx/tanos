@@ -13,7 +13,7 @@ in {
   slickbar = true;
   borderAnim = true;
   browser = "firefox";
-  wallpaperGit = "https://gitlab.com/Zaney/my-wallpapers.git";
+  wallpaperGit = "git@github.com:crowquillx/wallpapers.git";
   wallpaperDir = "${userHome}/Pictures/Wallpapers";
   flakeDir = "${userHome}/tanos";
   screenshotDir = "${userHome}/Pictures/Screenshots";
