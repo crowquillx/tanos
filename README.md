@@ -1,14 +1,4 @@
-# ZaneyOS 🟰 Best ❄️ NixOS Configs
-
-ZaneyOS is a way of reproducing my configuration on any NixOS system. This includes the wallpaper, scripts, applications, config files, and more. *Please remember to change username and hostname in flake.nix.*
-
-![](./config/home/files/media/demo.jpg)
-
-## READ THE WIKI
-
-If you want to learn more about my system, [this project has a Wiki](https://gitlab.com/Zaney/zaneyos/-/wikis/home) that explains a ton. It even explains what NixOS is why you may want to choose it and so much more.
-
-# Install / Steps To Reproduce My System
+# Install
 
 - Enable flakes, and the Hyprland cache so you don't have to build it, in your default configuration.nix by adding this:
 
