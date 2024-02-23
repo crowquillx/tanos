@@ -206,7 +206,7 @@ in with lib; {
       windowrule=opacity 0.96,armcord
       windowrule=opacity 0.96,webcord
       windowrule=opacity 0.96 0.89,vesktop
-      windowrulev2=opacity 0.89 override 0.5 override,title:^(Spotify)(.*)$
+      windowrulev2=opacity 0.89 override 0.5 override,initialTitle:^(Spotify)(.*)$
       windowrule=opacity 1 override 1 override,firefox
     '' ];
   };

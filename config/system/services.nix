@@ -21,6 +21,9 @@
     pulse.enable = true;
     jack.enable = true;
   };
+  nixpkgs.config.permittedInsecurePackages = [
+    "freeimage-unstable-2021-11-01"
+    ];
   services.teamviewer.enable = true;
   hardware.pulseaudio.enable = false;
   sound.enable = true;

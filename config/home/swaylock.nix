@@ -11,6 +11,7 @@ in {
     indicator-radius=150
     screenshots
     clock
+    indicator
     effect-blur=7x5
     ring-color=${palette.base0D}
     key-hl-color=${palette.base0F}
