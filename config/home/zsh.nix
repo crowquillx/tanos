@@ -53,6 +53,7 @@ lib.mkIf (theShell == "zsh") {
       ll="lsd -l";
       la="lsd -a";
       lal="lsd -al";
+      onlytans="ssh -p 1993 tan@saltbox.tanime.online";
       ".."="cd ..";
     };
   };

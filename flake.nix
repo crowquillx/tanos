@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    lanzaboote.url = "github:nix-community/lanzaboote";
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-colors.url = "github:misterio77/nix-colors";
@@ -17,7 +18,7 @@
     };
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, ... }:
+  outputs = inputs@{ nixpkgs, home-manager, lanzaboote, ... }:
   let
     system = "x86_64-linux";
     username = "tan";
@@ -38,6 +39,7 @@
         };
 	modules = [ 
 	  ./system.nix
+    lanzaboote.nixosModules.lanzaboote
           home-manager.nixosModules.home-manager {
 	    home-manager.extraSpecialArgs = {
 	      inherit username; inherit inputs;

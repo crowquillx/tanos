@@ -139,6 +139,7 @@ in with lib; {
       '' else ''
 	bind = ${modifier},W,exec,${browser}
       ''}
+      bind = ${modifier},Escape,exec,wlogout
       bind = ${modifier},S,exec,screenshootin
       bind = ${modifier},D,exec,rofi-launcher
       bind = ${modifier},E,exec,thunar
