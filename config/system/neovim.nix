@@ -5,7 +5,7 @@ let
   inherit (import ../../options.nix) theme;
 in {
   programs.nixvim = {
-    enable = true;
+    enable = false;
 
     plugins = {
       telescope.enable = true;
@@ -50,7 +50,7 @@ in {
       treesitter.enable = true;
       nvim-cmp = {
 	enable = true;
-	autoEnableSources = true;
+#	autoEnableSources = false;
 	sources = [
 	  { name = "nvim_lsp"; }
 	  { name = "path"; }
