@@ -14,7 +14,7 @@ in with lib; {
     xwayland.enable = true;
     systemd.enable = true;
     plugins = [
-      hyprplugins.hyprtrails
+  #    hyprplugins.hyprtrails
     ];
     extraConfig = let
       modifier = "SUPER";
