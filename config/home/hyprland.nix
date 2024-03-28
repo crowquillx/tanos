@@ -22,6 +22,7 @@ in with lib; {
       monitor=DP-1,2560x1440@165,2560x0,auto
       monitor=DP-2,2560x1440@144,0x0,auto
       monitor=DP-3,1920x1080@144,5120x0,auto
+      monitor=HDMI-A-1,disable
       windowrule = float, ^(steam)$
       windowrule = center, ^(steam)$
       windowrule = size 1080 900, ^(steam)$
