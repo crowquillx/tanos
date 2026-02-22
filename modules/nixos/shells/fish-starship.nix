@@ -13,8 +13,6 @@ in
 
     programs.starship = {
       enable = starshipEnable;
-      enableFishIntegration = fishEnable;
-      enableBashIntegration = true;
     };
   };
 }
