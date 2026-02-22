@@ -13,18 +13,4 @@ in
     ++ lib.optionals (builtins.pathExists generatedHardwareFile) [ generatedHardwareFile ];
 
   networking.hostName = get [ "host" "name" ] "tandesk";
-
-  fileSystems."/" = lib.mkDefault {
-    device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
-  };
-
-  fileSystems."/boot" = lib.mkDefault {
-    device = "/dev/disk/by-label/boot";
-    fsType = "vfat";
-  };
-
-  swapDevices = lib.mkDefault [
-    { device = "/dev/disk/by-label/swap"; }
-  ];
 }

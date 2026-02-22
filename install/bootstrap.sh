@@ -103,7 +103,13 @@ fi
 
 echo "Running nixos-rebuild for ${HOST}"
 cd "${REPO_ROOT}"
-nixos-rebuild switch --flake "${FLAKE_REF}"
+REBUILD_ACTION="switch"
+if ! findmnt -rn /boot >/dev/null 2>&1; then
+  REBUILD_ACTION="test"
+  echo "/boot is not mounted; using nixos-rebuild test to avoid bootloader install failure."
+  echo "Fix boot mounts, then run: sudo nixos-rebuild switch --flake ${FLAKE_REF}"
+fi
+nixos-rebuild "${REBUILD_ACTION}" --flake "${FLAKE_REF}"
 
 echo
 echo "Bootstrap complete."
