@@ -43,6 +43,11 @@
       url = "github:FKouhai/helium2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    danksearch = {
+      url = "github:dankmaterialshell/danksearch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, ... }:

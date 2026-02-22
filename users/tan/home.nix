@@ -4,6 +4,7 @@ let
   get = path: default: lib.attrByPath path default v;
   shell = get [ "desktop" "shell" ] "none";
   dmsHmModule = inputs.dms.homeModules.dankMaterialShell.default or null;
+  dsearchHmModule = inputs.danksearch.homeModules.default or null;
   noctaliaHmModule = inputs.noctalia.homeModules.default or null;
 in
 {
@@ -14,6 +15,7 @@ in
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
+    ++ lib.optionals (dsearchHmModule != null) [ dsearchHmModule ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];
 

@@ -1,7 +1,8 @@
-{ lib, pkgs, vars ? { }, inputs, ... }:
+{ lib, pkgs, vars ? { }, inputs, options, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
+  dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
   browserDefault = get [ "desktop" "browser" "default" ] "firefox";
   firefoxEnabled = get [ "desktop" "browser" "firefox" "enable" ] true;
   zenEnabled = get [ "desktop" "browser" "zen" "enable" ] false;
@@ -53,7 +54,7 @@ let
       value = browserDesktopFile;
     }) browserMimeTypes);
 in
-{
+({
   assertions = [
     {
       assertion = builtins.elem browserDefault allowedBrowsers;
@@ -138,3 +139,6 @@ in
     enable = true;
   };
 }
+// lib.optionalAttrs (options ? programs.dsearch.enable) {
+  programs.dsearch.enable = dsearchEnabled;
+})

@@ -38,6 +38,7 @@ All hosts use username `tan`.
 - `desktop.enable = true | false`
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
+- `features.danksearch.enable = true | false` (defaults to true; installs/enables DankSearch HM module)
 - `features.laptop.enable = true | false`
 - `features.laptop.tlp.enable = true | false`
 - `features.laptop.thermald.enable = true | false`
@@ -156,6 +157,17 @@ Enabled browsers are installed via Home Manager. `desktop.browser.default` sets 
 - `application/xhtml+xml`
 - `x-scheme-handler/http`
 - `x-scheme-handler/https`
+
+## DankSearch
+
+DankSearch is installed/enabled via Home Manager by default.
+
+Optional toggle:
+
+```nix
+features.danksearch.enable = true;
+# features.danksearch.enable = false;
+```
 
 ## Session Runtime (Polkit, Keyring, Idle Lock)
 
