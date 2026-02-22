@@ -11,7 +11,8 @@ let
   noctaliaPkg = inputs.noctalia.packages.${pkgs.system}.default or null;
 in
 {
-  imports = lib.optionals (enabled && noctaliaModule != null) [ noctaliaModule ];
+  # `imports` must not depend on `config` (via `enabled`) or evaluation recurses.
+  imports = lib.optionals (noctaliaModule != null) [ noctaliaModule ];
 
   config = lib.mkIf enabled (
     {

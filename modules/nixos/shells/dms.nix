@@ -11,7 +11,8 @@ let
   dmsPkg = inputs.dms.packages.${pkgs.system}.default or (pkgs.dms-shell or null);
 in
 {
-  imports = lib.optionals (enabled && dmsModule != null) [ dmsModule ];
+  # `imports` must not depend on `config` (via `enabled`) or evaluation recurses.
+  imports = lib.optionals (dmsModule != null) [ dmsModule ];
 
   config = lib.mkIf enabled (
     {

@@ -45,6 +45,7 @@ HOST_DIR="${REPO_ROOT}/hosts/${HOST}"
 HW_FILE="${HOST_DIR}/hardware-configuration.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
+FLAKE_REF="path:${REPO_ROOT}#${HOST}"
 
 if [[ ! -d "${HOST_DIR}" ]]; then
   echo "Unknown host '${HOST}'. Expected one of: tandesk, tanvm."
@@ -91,10 +92,10 @@ fi
 echo "Running nixos-rebuild for ${HOST}"
 cd "${REPO_ROOT}"
 nixos-rebuild --extra-experimental-features "${NIX_EXPERIMENTAL_FEATURES}" \
-  switch --flake ".#${HOST}"
+  switch --flake "${FLAKE_REF}"
 
 echo
 echo "Bootstrap complete."
 echo "Next:"
 echo "1) Add encrypted secrets under ./secrets and update .sops.yaml recipients."
-echo "2) Re-run: sudo nixos-rebuild switch --flake .#${HOST}"
+echo "2) Re-run: sudo nixos-rebuild switch --flake ${FLAKE_REF}"
