@@ -45,7 +45,7 @@
     };
 
     danksearch = {
-      url = "github:dankmaterialshell/danksearch";
+      url = "github:AvengeMedia/danksearch";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
