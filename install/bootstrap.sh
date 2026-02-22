@@ -43,7 +43,6 @@ done
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST_DIR="${REPO_ROOT}/hosts/${HOST}"
 HW_FILE="${HOST_DIR}/hardware-configuration.nix"
-GENERATED_HW_FILE="${REPO_ROOT}/.local/hardware-configuration-${HOST}.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 FLAKE_REF="path:${REPO_ROOT}#${HOST}"
@@ -69,16 +68,14 @@ echo "Using experimental features for this run: ${NIX_EXPERIMENTAL_FEATURES}"
 if command -v nixos-generate-config >/dev/null 2>&1; then
   TMP_HW="$(mktemp)"
   nixos-generate-config --show-hardware-config > "${TMP_HW}"
-  mkdir -p "$(dirname "${GENERATED_HW_FILE}")"
-  cp "${TMP_HW}" "${GENERATED_HW_FILE}"
-  echo "Updated runtime hardware config at ${GENERATED_HW_FILE}."
-  if [[ -n "${SUDO_UID-}" ]] && [[ -n "${SUDO_GID-}" ]]; then
-    chown "${SUDO_UID}:${SUDO_GID}" "${GENERATED_HW_FILE}"
-  fi
 
-  if [[ "${UPDATE_HARDWARE}" == "true" ]]; then
+  if [[ "${UPDATE_HARDWARE}" == "true" ]] || ! grep -q 'fileSystems\."/"' "${HW_FILE}" 2>/dev/null; then
     cp "${TMP_HW}" "${HW_FILE}"
-    echo "Updated tracked ${HW_FILE} from current machine."
+    if [[ "${UPDATE_HARDWARE}" == "true" ]]; then
+      echo "Updated tracked ${HW_FILE} from current machine."
+    else
+      echo "Initialized ${HW_FILE} because no root filesystem was defined."
+    fi
     if [[ -n "${SUDO_UID-}" ]] && [[ -n "${SUDO_GID-}" ]]; then
       chown "${SUDO_UID}:${SUDO_GID}" "${HW_FILE}"
     fi
