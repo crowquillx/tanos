@@ -18,8 +18,12 @@ in
   programs.git.enable = true;
   programs.bash.enable = true;
 
-  xdg.enable = true;
-  xdg.userDirs.enable = true;
+  xdg = {
+    enable = true;
+    userDirs.enable = true;
+    # Avoid repeated activation failures when a previous backup file already exists.
+    configFile."user-dirs.dirs".force = true;
+  };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
     enable = true;
