@@ -13,7 +13,7 @@ in
   boot.loader.systemd-boot.enable = lib.mkDefault (get [ "boot" "systemdBoot" "enable" ] true);
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
-  networking.networkmanager.enable = false;
+  networking.networkmanager.enable = lib.mkDefault false;
 
   security = {
     rtkit.enable = true;
