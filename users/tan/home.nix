@@ -3,8 +3,12 @@ let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   shell = get [ "desktop" "shell" ] "none";
-  dmsHmModule = inputs.dms.homeModules.dankMaterialShell.default or null;
-  dsearchHmModule = inputs.danksearch.homeModules.default or null;
+  dmsHmModule =
+    let
+      renamed = lib.attrByPath [ "dms" "homeModules" "dank-material-shell" ] null inputs;
+      legacy = lib.attrByPath [ "dms" "homeModules" "dankMaterialShell" "default" ] null inputs;
+    in
+    if renamed != null then renamed else legacy;
   noctaliaHmModule = inputs.noctalia.homeModules.default or null;
 in
 {
@@ -15,7 +19,6 @@ in
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
-    ++ lib.optionals (dsearchHmModule != null) [ dsearchHmModule ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];
 

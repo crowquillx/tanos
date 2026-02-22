@@ -39,7 +39,7 @@ All hosts use username `tan`.
 - `desktop.enable = true | false`
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
-- `features.danksearch.enable = true | false` (defaults to true; installs/enables DankSearch HM module)
+- `features.danksearch.enable = true | false` (defaults to true; installs DankSearch package)
 - `features.laptop.enable = true | false`
 - `features.laptop.tlp.enable = true | false`
 - `features.laptop.thermald.enable = true | false`
@@ -161,7 +161,7 @@ Enabled browsers are installed via Home Manager. `desktop.browser.default` sets 
 
 ## DankSearch
 
-DankSearch is installed/enabled via Home Manager by default.
+DankSearch package is installed by default.
 
 Optional toggle:
 

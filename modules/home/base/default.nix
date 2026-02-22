@@ -1,4 +1,4 @@
-{ lib, pkgs, vars ? { }, inputs, options, ... }:
+{ lib, pkgs, vars ? { }, inputs, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -12,6 +12,7 @@ let
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
 
   zenPkg = lib.attrByPath [ "zen-browser" "packages" pkgs.system "default" ] null inputs;
+  dsearchPkg = lib.attrByPath [ "danksearch" "packages" pkgs.system "default" ] null inputs;
   heliumPkg =
     lib.findFirst (pkg: pkg != null) null [
       (lib.attrByPath [ "helium2nix" "packages" pkgs.system "default" ] null inputs)
@@ -82,6 +83,10 @@ in
       assertion = (gitUserName == null) == (gitUserEmail == null);
       message = "Set both users.git.name and users.git.email (or leave both unset).";
     }
+    {
+      assertion = !(dsearchEnabled && dsearchPkg == null);
+      message = "features.danksearch.enable is true, but danksearch package could not be resolved from flake input.";
+    }
   ];
 
   home.stateVersion = "25.05";
@@ -118,6 +123,7 @@ in
       curl
     ])
     ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
+    ++ lib.optionals (dsearchEnabled && dsearchPkg != null) [ dsearchPkg ]
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
     ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
     ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
@@ -153,7 +159,4 @@ in
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
     enable = true;
   };
-}
-// lib.optionalAttrs (options ? programs.dsearch.enable) {
-  programs.dsearch.enable = dsearchEnabled;
 })
