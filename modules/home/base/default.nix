@@ -99,7 +99,6 @@ in
       alacritty
       foot
       fuzzel
-      waybar
       wl-clipboard
       cliphist
       pavucontrol
