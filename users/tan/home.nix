@@ -11,6 +11,7 @@ in
     [
       ../../modules/home/base/default.nix
       ../../modules/home/base/extra-packages.nix
+      ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]

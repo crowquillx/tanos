@@ -13,10 +13,34 @@
     extraPackages = [ ];
   };
 
+  graphics = {
+    profile = "vm";
+  };
+
   desktop = {
     enable = true;
     compositor = "niri";
-    displayManager = "sddm";
+    displayManager = "auto";
+    browser = {
+      default = "firefox";
+      firefox.enable = true;
+      zen.enable = false;
+      chrome.enable = false;
+      helium.enable = false;
+    };
+    session = {
+      enable = true;
+      polkit.enable = true;
+      keyring.enable = true;
+      lock = {
+        enable = true;
+        # Replace with your shell-specific lock command if desired.
+        command = "loginctl lock-session";
+        idleSeconds = 600;
+        beforeSleep = true;
+        onLidClose = true;
+      };
+    };
     shell = "dms";
     # Example: "dms run --session", "noctalia-shell", or another launcher command.
     shellStartupCommand = null;
@@ -36,7 +60,6 @@
         saturation = 1.08;
       };
     };
-    vm.softwareRendering.enable = true;
   };
 
   features = {

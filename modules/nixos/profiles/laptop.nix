@@ -1,0 +1,44 @@
+{ lib, config, ... }:
+let
+  v = config.tanos.variables;
+  get = path: default: lib.attrByPath path default v;
+  enabled = get [ "features" "laptop" "enable" ] false;
+
+  upowerEnable = get [ "features" "laptop" "upower" "enable" ] true;
+  tlpEnable = get [ "features" "laptop" "tlp" "enable" ] true;
+  thermaldEnable = get [ "features" "laptop" "thermald" "enable" ] true;
+  powertopEnable = get [ "features" "laptop" "powertop" "enable" ] false;
+  fwupdEnable = get [ "features" "laptop" "fwupd" "enable" ] true;
+
+  lidSwitch = get [ "features" "laptop" "logind" "lidSwitch" ] "suspend";
+  lidSwitchExternalPower = get [ "features" "laptop" "logind" "lidSwitchExternalPower" ] "ignore";
+  lidSwitchDocked = get [ "features" "laptop" "logind" "lidSwitchDocked" ] "ignore";
+  lockOnLidClose = get [ "desktop" "session" "lock" "onLidClose" ] true;
+in
+{
+  assertions = [
+    {
+      assertion = !(enabled && lockOnLidClose) || lidSwitch != "ignore";
+      message = "features.laptop.logind.lidSwitch must not be \"ignore\" when desktop.session.lock.onLidClose is true.";
+    }
+  ];
+
+  config = lib.mkIf enabled (lib.mkMerge [
+    {
+      services.upower.enable = upowerEnable;
+      services.thermald.enable = thermaldEnable;
+      services.tlp.enable = tlpEnable;
+      powerManagement.powertop.enable = powertopEnable;
+      services.fwupd.enable = fwupdEnable;
+
+      services.logind = {
+        lidSwitch = lidSwitch;
+        lidSwitchExternalPower = lidSwitchExternalPower;
+        lidSwitchDocked = lidSwitchDocked;
+      };
+    }
+    (lib.mkIf tlpEnable {
+      services.power-profiles-daemon.enable = lib.mkDefault false;
+    })
+  ]);
+}

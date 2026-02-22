@@ -48,7 +48,8 @@ NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 FLAKE_REF="path:${REPO_ROOT}#${HOST}"
 
 if [[ ! -d "${HOST_DIR}" ]]; then
-  echo "Unknown host '${HOST}'. Expected one of: tandesk, tanvm."
+  KNOWN_HOSTS="$(find "${REPO_ROOT}/hosts" -mindepth 1 -maxdepth 1 -type d ! -name 'common' -printf '%f\n' | sort | paste -sd', ' -)"
+  echo "Unknown host '${HOST}'. Expected one of: ${KNOWN_HOSTS}."
   exit 1
 fi
 

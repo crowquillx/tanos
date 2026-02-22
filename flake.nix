@@ -33,6 +33,16 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    zen-browser = {
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    helium2nix = {
+      url = "github:FKouhai/helium2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ self, nixpkgs, ... }:
@@ -66,6 +76,7 @@
       nixosConfigurations = {
         tandesk = mkHost "tandesk" "x86_64-linux";
         tanvm = mkHost "tanvm" "x86_64-linux";
+        tanlappy = mkHost "tanlappy" "x86_64-linux";
       };
     };
 }

@@ -143,9 +143,6 @@ in
             command = [ "bash" "-c" "wl-paste --watch cliphist store &" ];
           }
           {
-            command = [ "/usr/lib/mate-polkit/polkit-mate-authentication-agent-1" ];
-          }
-          {
             command = [ "qs" "-c" "ii" ];
           }
         ] ++ shellStartupEntries;

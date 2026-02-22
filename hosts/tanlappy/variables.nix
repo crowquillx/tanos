@@ -1,6 +1,6 @@
 {
   host = {
-    name = "tandesk";
+    name = "tanlappy";
     isVm = false;
     timeZone = "America/Chicago";
     locale = "en_US.UTF-8";
@@ -14,7 +14,7 @@
   };
 
   graphics = {
-    # "auto" resolves to "none" on non-VM hosts until you set "amd", "intel", or "nvidia".
+    # Keep neutral until hardware is confirmed. Set to "intel"/"amd"/"nvidia" when known.
     profile = "auto";
   };
 
@@ -23,9 +23,9 @@
     compositor = "niri";
     displayManager = "auto";
     browser = {
-      default = "firefox";
+      default = "zen";
       firefox.enable = true;
-      zen.enable = false;
+      zen.enable = true;
       chrome.enable = false;
       helium.enable = false;
     };
@@ -43,36 +43,13 @@
       };
     };
     shell = "dms";
-    # Example: "dms run --session", "noctalia-shell", or another launcher command.
     shellStartupCommand = null;
     niri = {
       source = "naxdy";
 
-      # Host-specific monitor layout for Niri HM settings.
-      outputs = {
-        "DP-3" = {
-          mode = "2560x1440@180.002";
-          scale = 1.0;
-          transform = "normal";
-          position = { x = 2560; y = 1080; };
-          variable-refresh-rate = { on-demand = true; };
-          focus-at-startup = true;
-        };
-        "DP-2" = {
-          mode = "2560x1440@164.999";
-          scale = 1.0;
-          transform = "normal";
-          position = { x = 0; y = 1080; };
-        };
-        "DP-1" = {
-          mode = "1920x1080@144.001";
-          scale = 1.0;
-          transform = "normal";
-          position = { x = 2560; y = 0; };
-        };
-      };
+      # Leave empty to use runtime output discovery on this host.
+      outputs = { };
 
-      # Naxdy blur defaults (overrides source-based fallback explicitly).
       blur = {
         on = true;
         radius = 7.5;
@@ -92,11 +69,29 @@
     printing.enable = false;
     flatpak.enable = false;
     gaming.enable = false;
+
+    laptop = {
+      enable = true;
+
+      # Helpful laptop defaults with explicit toggles per service.
+      upower.enable = true;
+      tlp.enable = true;
+      thermald.enable = true;
+      powertop.enable = false;
+      fwupd.enable = true;
+
+      logind = {
+        lidSwitch = "suspend";
+        lidSwitchExternalPower = "ignore";
+        lidSwitchDocked = "ignore";
+      };
+    };
   };
 
   security.sops = {
-    enable = true;
-    defaultSopsFile = ../../secrets/tandesk.yaml;
+    # Start disabled until tanlappy secrets are created.
+    enable = false;
+    defaultSopsFile = ../../secrets/tanlappy.yaml;
     ageKeyFile = "/var/lib/sops-nix/key.txt";
   };
 }
