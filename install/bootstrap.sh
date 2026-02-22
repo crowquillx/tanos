@@ -103,8 +103,7 @@ fi
 
 echo "Running nixos-rebuild for ${HOST}"
 cd "${REPO_ROOT}"
-nixos-rebuild --extra-experimental-features "${NIX_EXPERIMENTAL_FEATURES}" \
-  switch --flake "${FLAKE_REF}"
+nixos-rebuild switch --flake "${FLAKE_REF}"
 
 echo
 echo "Bootstrap complete."
