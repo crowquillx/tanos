@@ -18,7 +18,7 @@ in
       enable = true;
       compositor.name = compositor;
       configHome = "/home/${primaryUser}";
-      package = inputs.dms.packages.${pkgs.system}.default;
+      package = inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.default;
     };
   };
 }

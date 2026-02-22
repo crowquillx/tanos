@@ -7,8 +7,8 @@ let
   niriSource = get [ "desktop" "niri" "source" ] "naxdy";
   niriPkg =
     if niriSource == "upstream"
-    then (inputs.niri-upstream.packages.${pkgs.system}.default or pkgs.niri)
-    else (inputs.niri-naxdy.packages.${pkgs.system}.default or pkgs.niri);
+    then (inputs.niri-upstream.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri)
+    else (inputs.niri-naxdy.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri);
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") {

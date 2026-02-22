@@ -3,6 +3,7 @@ let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
+  system = pkgs.stdenv.hostPlatform.system;
   gitUserName = get [ "users" "git" "name" ] null;
   gitUserEmail = get [ "users" "git" "email" ] null;
   browserDefault = get [ "desktop" "browser" "default" ] "firefox";
@@ -11,13 +12,13 @@ let
   chromeEnabled = get [ "desktop" "browser" "chrome" "enable" ] false;
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
 
-  zenPkg = lib.attrByPath [ "zen-browser" "packages" pkgs.system "default" ] null inputs;
-  dsearchPkg = lib.attrByPath [ "danksearch" "packages" pkgs.system "default" ] null inputs;
+  zenPkg = lib.attrByPath [ "zen-browser" "packages" system "default" ] null inputs;
+  dsearchPkg = lib.attrByPath [ "danksearch" "packages" system "default" ] null inputs;
   heliumPkg =
     lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "helium2nix" "packages" pkgs.system "default" ] null inputs)
-      (lib.attrByPath [ "helium2nix" "packages" pkgs.system "helium" ] null inputs)
-      (lib.attrByPath [ "helium2nix" "packages" pkgs.system "helium-browser" ] null inputs)
+      (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
+      (lib.attrByPath [ "helium2nix" "packages" system "helium" ] null inputs)
+      (lib.attrByPath [ "helium2nix" "packages" system "helium-browser" ] null inputs)
     ];
 
   allowedBrowsers = [ "firefox" "zen" "chrome" "helium" ];

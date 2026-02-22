@@ -8,7 +8,7 @@ let
     inputs.dms.nixosModules.default
     or (inputs.dms.nixosModules.dank-material-shell or null);
 
-  dmsPkg = inputs.dms.packages.${pkgs.system}.default or (pkgs.dms-shell or null);
+  dmsPkg = inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.default or (pkgs.dms-shell or null);
 in
 {
   # `imports` must not depend on `config` (via `enabled`) or evaluation recurses.

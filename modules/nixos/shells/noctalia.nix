@@ -8,7 +8,7 @@ let
     inputs.noctalia.nixosModules.default
     or (inputs.noctalia.nixosModules.noctalia-shell or null);
 
-  noctaliaPkg = inputs.noctalia.packages.${pkgs.system}.default or null;
+  noctaliaPkg = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default or null;
 in
 {
   # `imports` must not depend on `config` (via `enabled`) or evaluation recurses.

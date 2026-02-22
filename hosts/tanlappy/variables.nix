@@ -79,7 +79,8 @@
 
       # Helpful laptop defaults with explicit toggles per service.
       upower.enable = true;
-      tlp.enable = true;
+      # DMS enables power-profiles-daemon; keep TLP off to avoid the NixOS conflict assertion.
+      tlp.enable = false;
       thermald.enable = true;
       powertop.enable = false;
       fwupd.enable = true;
