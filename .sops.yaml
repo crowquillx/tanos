@@ -1,0 +1,6 @@
+creation_rules:
+  - path_regex: secrets/.*\.ya?ml$
+    key_groups:
+      - age:
+          # Replace with your real age public key(s), then remove this placeholder.
+          - age1replacewithyourpublickeyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
