@@ -110,7 +110,6 @@
     printing.enable = false;
     flatpak = {
       enable = true;
-      uninstallUnmanaged = false;
     };
     gaming = {
       enable = false;
