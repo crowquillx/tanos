@@ -34,6 +34,7 @@ All hosts use username `tan`.
 - `desktop.session.polkit.enable = true | false`
 - `desktop.session.keyring.enable = true | false`
 - `desktop.session.lock = { enable, command, idleSeconds, beforeSleep, onLidClose }`
+- `users.git = { name, email }` (optional; sets Home Manager git identity)
 - `users.extraPackages = [ "pkgName" "python3Packages.pip" ... ]` (extra HM packages by nixpkgs attr path)
 - `desktop.enable = true | false`
 - `features.bluetooth.enable = true | false`
@@ -168,6 +169,19 @@ Optional toggle:
 features.danksearch.enable = true;
 # features.danksearch.enable = false;
 ```
+
+## Git Identity
+
+Set per-host Git identity in `hosts/<host>/variables.nix`:
+
+```nix
+users.git = {
+  name = "Tan User";
+  email = "tan@example.com";
+};
+```
+
+Set both fields together, or leave both `null`.
 
 ## Session Runtime (Polkit, Keyring, Idle Lock)
 

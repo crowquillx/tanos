@@ -3,6 +3,8 @@ let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
+  gitUserName = get [ "users" "git" "name" ] null;
+  gitUserEmail = get [ "users" "git" "email" ] null;
   browserDefault = get [ "desktop" "browser" "default" ] "firefox";
   firefoxEnabled = get [ "desktop" "browser" "firefox" "enable" ] true;
   zenEnabled = get [ "desktop" "browser" "zen" "enable" ] false;
@@ -76,6 +78,10 @@ in
       assertion = !(browserDefault == "helium" && browserPkg == null);
       message = "desktop.browser.default = \"helium\" requires a resolvable helium2nix package.";
     }
+    {
+      assertion = (gitUserName == null) == (gitUserEmail == null);
+      message = "Set both users.git.name and users.git.email (or leave both unset).";
+    }
   ];
 
   home.stateVersion = "25.05";
@@ -120,7 +126,16 @@ in
       libnotify
     ]);
 
-  programs.git.enable = true;
+  programs.git =
+    {
+      enable = true;
+    }
+    // lib.optionalAttrs (gitUserName != null) {
+      userName = gitUserName;
+    }
+    // lib.optionalAttrs (gitUserEmail != null) {
+      userEmail = gitUserEmail;
+    };
   programs.bash.enable = true;
 
   xdg = {

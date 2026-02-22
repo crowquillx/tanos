@@ -11,6 +11,10 @@
   users = {
     primary = "tan";
     extraPackages = [ ];
+    git = {
+      name = null;
+      email = null;
+    };
   };
 
   graphics = {
