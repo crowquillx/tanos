@@ -6,7 +6,6 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST_DIR="${REPO_ROOT}/hosts/${HOST}"
 HW_FILE="${HOST_DIR}/hardware-configuration.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
-NIX_CONF="/etc/nix/nix.conf"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 
 if [[ ! -d "${HOST_DIR}" ]]; then
@@ -22,22 +21,10 @@ fi
 echo "Bootstrapping host: ${HOST}"
 echo "Repo root: ${REPO_ROOT}"
 
-mkdir -p "$(dirname "${NIX_CONF}")"
-if [[ -f "${NIX_CONF}" ]] && grep -Eq '^\s*experimental-features\s*=' "${NIX_CONF}"; then
-  CURRENT_FEATURES="$(sed -nE 's/^\s*experimental-features\s*=\s*//p' "${NIX_CONF}" | head -n1)"
-  MERGED_FEATURES="$(
-    printf '%s\n' "${CURRENT_FEATURES} ${NIX_EXPERIMENTAL_FEATURES}" \
-      | tr ' ' '\n' \
-      | sed '/^$/d' \
-      | awk '!seen[$0]++' \
-      | tr '\n' ' ' \
-      | sed 's/[[:space:]]*$//'
-  )"
-  sed -i -E "s|^\s*experimental-features\s*=.*|experimental-features = ${MERGED_FEATURES}|" "${NIX_CONF}"
-else
-  echo "experimental-features = ${NIX_EXPERIMENTAL_FEATURES}" >> "${NIX_CONF}"
-fi
-echo "Ensured ${NIX_CONF} enables: ${NIX_EXPERIMENTAL_FEATURES}"
+# Keep bootstrap self-contained even when /etc/nix/nix.conf is immutable
+# (common on NixOS where /etc is declaratively managed).
+export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"experimental-features = ${NIX_EXPERIMENTAL_FEATURES}"
+echo "Using experimental features for this run: ${NIX_EXPERIMENTAL_FEATURES}"
 
 if command -v nixos-generate-config >/dev/null 2>&1; then
   TMP_HW="$(mktemp)"
