@@ -7,9 +7,6 @@ let
 in
 {
   config = lib.mkIf (desktopEnabled && enabled) {
-    qt = {
-      enable = true;
-      platformTheme.name = "gtk";
-    };
+    qt.enable = true;
   };
 }
