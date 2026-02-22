@@ -6,7 +6,7 @@ usage() {
 Usage: bootstrap.sh [host] [--update-hardware]
 
 Options:
-  --update-hardware  Regenerate and overwrite hosts/<host>/hardware-configuration.nix
+  --update-hardware  Also regenerate and overwrite hosts/<host>/hardware-configuration.nix
   -h, --help         Show this help
 EOF
 }
@@ -43,6 +43,7 @@ done
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOST_DIR="${REPO_ROOT}/hosts/${HOST}"
 HW_FILE="${HOST_DIR}/hardware-configuration.nix"
+GENERATED_HW_FILE="${REPO_ROOT}/.local/hardware-configuration-${HOST}.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 FLAKE_REF="path:${REPO_ROOT}#${HOST}"
@@ -65,18 +66,29 @@ echo "Repo root: ${REPO_ROOT}"
 export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"experimental-features = ${NIX_EXPERIMENTAL_FEATURES}"
 echo "Using experimental features for this run: ${NIX_EXPERIMENTAL_FEATURES}"
 
-if [[ "${UPDATE_HARDWARE}" == "true" ]]; then
-  if command -v nixos-generate-config >/dev/null 2>&1; then
-    TMP_HW="$(mktemp)"
-    nixos-generate-config --show-hardware-config > "${TMP_HW}"
-    cp "${TMP_HW}" "${HW_FILE}"
-    rm -f "${TMP_HW}"
-    echo "Updated ${HW_FILE} from current machine."
-  else
-    echo "nixos-generate-config not found; keeping existing ${HW_FILE}."
+if command -v nixos-generate-config >/dev/null 2>&1; then
+  TMP_HW="$(mktemp)"
+  nixos-generate-config --show-hardware-config > "${TMP_HW}"
+  mkdir -p "$(dirname "${GENERATED_HW_FILE}")"
+  cp "${TMP_HW}" "${GENERATED_HW_FILE}"
+  echo "Updated runtime hardware config at ${GENERATED_HW_FILE}."
+  if [[ -n "${SUDO_UID-}" ]] && [[ -n "${SUDO_GID-}" ]]; then
+    chown "${SUDO_UID}:${SUDO_GID}" "${GENERATED_HW_FILE}"
   fi
+
+  if [[ "${UPDATE_HARDWARE}" == "true" ]]; then
+    cp "${TMP_HW}" "${HW_FILE}"
+    echo "Updated tracked ${HW_FILE} from current machine."
+    if [[ -n "${SUDO_UID-}" ]] && [[ -n "${SUDO_GID-}" ]]; then
+      chown "${SUDO_UID}:${SUDO_GID}" "${HW_FILE}"
+    fi
+  else
+    echo "Skipping tracked hardware config update. Use --update-hardware to regenerate ${HW_FILE}."
+  fi
+
+  rm -f "${TMP_HW}"
 else
-  echo "Skipping hardware config update. Use --update-hardware to regenerate ${HW_FILE}."
+  echo "nixos-generate-config not found; keeping existing hardware config files."
 fi
 
 if [[ ! -f "${KEY_FILE}" ]]; then

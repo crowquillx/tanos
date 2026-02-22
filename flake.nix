@@ -39,7 +39,7 @@
     let
       lib = nixpkgs.lib;
 
-      mkHost = hostName: system:
+      mkHost = hostName: hostPlatform:
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
@@ -50,11 +50,11 @@
             else (inputs.niri-naxdy.nixosModules.niri or { });
         in
         lib.nixosSystem {
-          inherit system;
           specialArgs = {
             inherit inputs vars hostName;
           };
           modules = [
+            { nixpkgs.hostPlatform = hostPlatform; }
             niriModule
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
