@@ -20,6 +20,8 @@ in
     ../../modules/nixos/services/flatpak.nix
     ../../modules/nixos/services/keyring.nix
     ../../modules/nixos/security/sops.nix
+    ../../modules/nixos/shells/dms.nix
+    ../../modules/nixos/shells/noctalia.nix
     ../../modules/nixos/profiles/vm-guest.nix
     ../../modules/nixos/profiles/laptop.nix
     ../../modules/nixos/profiles/gaming.nix
