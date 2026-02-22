@@ -16,29 +16,32 @@ let
   lockOnLidClose = get [ "desktop" "session" "lock" "onLidClose" ] true;
 in
 {
-  assertions = [
+  config = lib.mkMerge [
     {
-      assertion = !(enabled && lockOnLidClose) || lidSwitch != "ignore";
-      message = "features.laptop.logind.lidSwitch must not be \"ignore\" when desktop.session.lock.onLidClose is true.";
+      assertions = [
+        {
+          assertion = !(enabled && lockOnLidClose) || lidSwitch != "ignore";
+          message = "features.laptop.logind.lidSwitch must not be \"ignore\" when desktop.session.lock.onLidClose is true.";
+        }
+      ];
     }
+    (lib.mkIf enabled (lib.mkMerge [
+      {
+        services.upower.enable = upowerEnable;
+        services.thermald.enable = thermaldEnable;
+        services.tlp.enable = tlpEnable;
+        powerManagement.powertop.enable = powertopEnable;
+        services.fwupd.enable = fwupdEnable;
+
+        services.logind = {
+          lidSwitch = lidSwitch;
+          lidSwitchExternalPower = lidSwitchExternalPower;
+          lidSwitchDocked = lidSwitchDocked;
+        };
+      }
+      (lib.mkIf tlpEnable {
+        services.power-profiles-daemon.enable = lib.mkDefault false;
+      })
+    ]))
   ];
-
-  config = lib.mkIf enabled (lib.mkMerge [
-    {
-      services.upower.enable = upowerEnable;
-      services.thermald.enable = thermaldEnable;
-      services.tlp.enable = tlpEnable;
-      powerManagement.powertop.enable = powertopEnable;
-      services.fwupd.enable = fwupdEnable;
-
-      services.logind = {
-        lidSwitch = lidSwitch;
-        lidSwitchExternalPower = lidSwitchExternalPower;
-        lidSwitchDocked = lidSwitchDocked;
-      };
-    }
-    (lib.mkIf tlpEnable {
-      services.power-profiles-daemon.enable = lib.mkDefault false;
-    })
-  ]);
 }

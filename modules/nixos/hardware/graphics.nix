@@ -21,21 +21,23 @@ let
   nvidiaOpenEnable = get [ "graphics" "nvidia" "open" ] false;
 in
 {
-  assertions = [
-    {
-      assertion = builtins.elem profileRaw allowedProfiles;
-      message = ''
-        Invalid graphics.profile "${toString profileRaw}".
-        Allowed values: ${lib.concatStringsSep ", " allowedProfiles}
-      '';
-    }
-    {
-      assertion = missingPackageNames == [ ];
-      message = "Unknown graphics.extraPackages entries: ${lib.concatStringsSep ", " missingPackageNames}";
-    }
-  ];
-
   config = lib.mkMerge [
+    {
+      assertions = [
+        {
+          assertion = builtins.elem profileRaw allowedProfiles;
+          message = ''
+            Invalid graphics.profile "${toString profileRaw}".
+            Allowed values: ${lib.concatStringsSep ", " allowedProfiles}
+          '';
+        }
+        {
+          assertion = missingPackageNames == [ ];
+          message = "Unknown graphics.extraPackages entries: ${lib.concatStringsSep ", " missingPackageNames}";
+        }
+      ];
+    }
+
     (lib.mkIf (profile != "none") {
       hardware.graphics.enable = lib.mkDefault true;
     })
