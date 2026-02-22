@@ -25,23 +25,18 @@ in
         }
       ];
     }
-    (lib.mkIf enabled (lib.mkMerge [
-      {
-        services.upower.enable = upowerEnable;
-        services.thermald.enable = thermaldEnable;
-        services.tlp.enable = tlpEnable;
-        powerManagement.powertop.enable = powertopEnable;
-        services.fwupd.enable = fwupdEnable;
+    (lib.mkIf enabled {
+      services.upower.enable = upowerEnable;
+      services.thermald.enable = thermaldEnable;
+      services.tlp.enable = tlpEnable;
+      powerManagement.powertop.enable = powertopEnable;
+      services.fwupd.enable = fwupdEnable;
 
-        services.logind = {
-          lidSwitch = lidSwitch;
-          lidSwitchExternalPower = lidSwitchExternalPower;
-          lidSwitchDocked = lidSwitchDocked;
-        };
-      }
-      (lib.mkIf tlpEnable {
-        services.power-profiles-daemon.enable = lib.mkDefault false;
-      })
-    ]))
+      services.logind = {
+        lidSwitch = lidSwitch;
+        lidSwitchExternalPower = lidSwitchExternalPower;
+        lidSwitchDocked = lidSwitchDocked;
+      };
+    })
   ];
 }

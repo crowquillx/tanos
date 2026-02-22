@@ -38,7 +38,7 @@ in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
     (
-      lib.optionalAttrs (options ? programs.niri.settings) {
+      {
       # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
       programs.niri.settings =
         {
