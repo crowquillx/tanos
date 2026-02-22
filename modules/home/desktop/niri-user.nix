@@ -133,8 +133,6 @@ in
           QT_QPA_PLATFORM = "wayland";
           ELECTRON_OZONE_PLATFORM_HINT = "auto";
           QT_LOGGING_RULES = "quickshell.dbus.properties=false";
-          QT_QPA_PLATFORMTHEME = "kde";
-          QT_STYLE_OVERRIDE = "Darkly";
           ILLOGICAL_IMPULSE_VIRTUAL_ENV = "$HOME/.local/state/quickshell/.venv";
         };
 

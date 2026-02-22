@@ -46,6 +46,10 @@ HW_FILE="${HOST_DIR}/hardware-configuration.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 FLAKE_REF="path:${REPO_ROOT}#${HOST}"
+PRIMARY_USER="$(sed -nE 's/^[[:space:]]*primary[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "${HOST_DIR}/variables.nix" | head -n1)"
+if [[ -z "${PRIMARY_USER}" ]]; then
+  PRIMARY_USER="${SUDO_USER:-tan}"
+fi
 
 if [[ ! -d "${HOST_DIR}" ]]; then
   KNOWN_HOSTS="$(find "${REPO_ROOT}/hosts" -mindepth 1 -maxdepth 1 -type d ! -name 'common' -printf '%f\n' | sort | paste -sd', ' -)"
@@ -108,6 +112,19 @@ if ! findmnt -rn /boot >/dev/null 2>&1; then
   echo "Fix boot mounts, then run: sudo nixos-rebuild switch --flake ${FLAKE_REF}"
 fi
 nixos-rebuild "${REBUILD_ACTION}" --flake "${FLAKE_REF}"
+
+echo "Running Home Manager activation for ${HOST} as ${PRIMARY_USER}"
+if ! id "${PRIMARY_USER}" >/dev/null 2>&1; then
+  echo "Primary user '${PRIMARY_USER}' does not exist on this system; skipping Home Manager activation."
+else
+  HM_OUT_LINK="/tmp/tanos-hm-${HOST}"
+  rm -f "${HM_OUT_LINK}"
+  sudo -H -u "${PRIMARY_USER}" \
+    nix --extra-experimental-features "${NIX_EXPERIMENTAL_FEATURES}" \
+    build "${FLAKE_REF}.homeConfigurations.${HOST}.activationPackage" \
+    --out-link "${HM_OUT_LINK}"
+  sudo -H -u "${PRIMARY_USER}" "${HM_OUT_LINK}/activate"
+fi
 
 echo
 echo "Bootstrap complete."

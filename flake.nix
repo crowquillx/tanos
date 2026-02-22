@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     niri-naxdy = {
       url = "github:Naxdy/niri";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,6 +58,11 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     let
       lib = nixpkgs.lib;
+      hostPlatforms = {
+        tandesk = "x86_64-linux";
+        tanvm = "x86_64-linux";
+        tanlappy = "x86_64-linux";
+      };
 
       mkHost = hostName: hostPlatform:
         let
@@ -73,15 +83,35 @@
             niriModule
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
+            inputs.stylix.nixosModules.stylix
             (hostPath + "/default.nix")
+          ];
+        };
+
+      mkHome = hostName: hostPlatform:
+        let
+          hostPath = ./hosts + "/${hostName}";
+          vars = import (hostPath + "/variables.nix");
+          primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
+          userHomePath = ./users + "/${primaryUser}/home.nix";
+        in
+        inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            system = hostPlatform;
+            config.allowUnfree = true;
+          };
+          extraSpecialArgs = { inherit vars inputs; };
+          modules = [
+            userHomePath
+            {
+              home.username = primaryUser;
+              home.homeDirectory = "/home/${primaryUser}";
+            }
           ];
         };
     in
     {
-      nixosConfigurations = {
-        tandesk = mkHost "tandesk" "x86_64-linux";
-        tanvm = mkHost "tanvm" "x86_64-linux";
-        tanlappy = mkHost "tanlappy" "x86_64-linux";
-      };
+      nixosConfigurations = lib.mapAttrs mkHost hostPlatforms;
+      homeConfigurations = lib.mapAttrs mkHome hostPlatforms;
     };
 }

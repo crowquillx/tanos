@@ -24,15 +24,29 @@ let
     in
     if renamed != null then renamed else legacy;
   noctaliaHmModule = inputs.noctalia.homeModules.default or null;
+  stylixHmModule =
+    let
+      candidates = [
+        (lib.attrByPath [ "stylix" "homeManagerModules" "stylix" ] null inputs)
+        (lib.attrByPath [ "stylix" "homeManagerModules" "default" ] null inputs)
+      ];
+    in
+    lib.findFirst (m: m != null) null candidates;
 in
 {
   imports =
     [
       ../../modules/home/base/default.nix
       ../../modules/home/base/extra-packages.nix
+      ../../modules/home/base/tcli.nix
+      ../../modules/home/terminals/kitty.nix
+      ../../modules/home/theme/gtk.nix
+      ../../modules/home/theme/qt.nix
+      ../../modules/home/shell/zoxide.nix
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
+    ++ lib.optionals (stylixHmModule != null) [ stylixHmModule ]
     ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModule != null) [ niriHmModule ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];

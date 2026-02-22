@@ -89,13 +89,71 @@
   };
 
   features = {
+    stylix = {
+      enable = true;
+      variant = "moon";
+    };
+
+    shell = {
+      fish.enable = true;
+      starship.enable = true;
+    };
+
+    nh = {
+      enable = true;
+      clean = {
+        enable = true;
+        extraArgs = "--keep-since 4d --keep 3";
+      };
+    };
+
     audio.enable = true;
+    codingTools.enable = true;
+    fileManager.thunar.enable = true;
+    terminals.kitty.enable = true;
+    theme = {
+      gtk = {
+        enable = true;
+        iconTheme = {
+          name = "MoreWaita";
+          package = "morewaita-icon-theme";
+        };
+      };
+      qt.enable = true;
+    };
+    zoxide.enable = true;
     bluetooth.enable = true;
     networking.networkmanager.enable = true;
     portals.enable = true;
+    services = {
+      fstrim.enable = true;
+      resolved.enable = true;
+      powerProfilesDaemon.enable = true;
+    };
     printing.enable = false;
-    flatpak.enable = false;
-    gaming.enable = false;
+    flatpak = {
+      enable = true;
+      uninstallUnmanaged = false;
+    };
+    gaming = {
+      enable = true;
+      steam = {
+        gamescopeSession.enable = false;
+        remotePlay.openFirewall = true;
+        dedicatedServer.openFirewall = true;
+        localNetworkGameTransfers.openFirewall = true;
+      };
+    };
+    virtualisation = {
+      vmHost = {
+        enable = false;
+        spiceUSBRedirection.enable = true;
+      };
+      containers = {
+        podman.enable = false;
+        docker.enable = false;
+      };
+    };
   };
 
   security.sops = {

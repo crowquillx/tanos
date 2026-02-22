@@ -3,6 +3,7 @@ let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
   primaryUser = get [ "users" "primary" ] "tan";
+  fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 in
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -26,7 +27,7 @@ in
   users.users.${primaryUser} = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ];
-    shell = pkgs.bashInteractive;
+    shell = if fishEnabled then pkgs.fish else pkgs.bashInteractive;
   };
 
   fonts.packages = with pkgs; [

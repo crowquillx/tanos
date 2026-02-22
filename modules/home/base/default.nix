@@ -3,6 +3,8 @@ let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
+  codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
+  thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
   system = pkgs.stdenv.hostPlatform.system;
   gitUserName = get [ "users" "git" "name" ] null;
   gitUserEmail = get [ "users" "git" "email" ] null;
@@ -11,9 +13,42 @@ let
   zenEnabled = get [ "desktop" "browser" "zen" "enable" ] false;
   chromeEnabled = get [ "desktop" "browser" "chrome" "enable" ] false;
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
+  fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 
   zenPkg = lib.attrByPath [ "zen-browser" "packages" system "default" ] null inputs;
   dsearchPkg = lib.attrByPath [ "danksearch" "packages" system "default" ] null inputs;
+  codexPkg = lib.attrByPath [ "codex" ] null pkgs;
+  vscodePkg = lib.attrByPath [ "vscode" ] null pkgs;
+  geminiCliPkg =
+    let
+      sourcePkg = lib.attrByPath [ "gemini-cli" ] null pkgs;
+      binPkg = lib.attrByPath [ "gemini-cli-bin" ] null pkgs;
+    in
+    if sourcePkg != null then sourcePkg else binPkg;
+  antigravityPkg =
+    let
+      fhsPkg = lib.attrByPath [ "antigravity-fhs" ] null pkgs;
+      nativePkg = lib.attrByPath [ "antigravity" ] null pkgs;
+    in
+    if fhsPkg != null then fhsPkg else nativePkg;
+  thunarPkg =
+    let
+      xfcePkg = lib.attrByPath [ "xfce" "thunar" ] null pkgs;
+      topLevelPkg = lib.attrByPath [ "thunar" ] null pkgs;
+    in
+    if xfcePkg != null then xfcePkg else topLevelPkg;
+  thunarArchivePluginPkg =
+    let
+      xfcePkg = lib.attrByPath [ "xfce" "thunar-archive-plugin" ] null pkgs;
+      topLevelPkg = lib.attrByPath [ "thunar-archive-plugin" ] null pkgs;
+    in
+    if xfcePkg != null then xfcePkg else topLevelPkg;
+  archiveManagerPkg =
+    let
+      fileRoller = lib.attrByPath [ "file-roller" ] null pkgs;
+      xarchiver = lib.attrByPath [ "xarchiver" ] null pkgs;
+    in
+    if fileRoller != null then fileRoller else xarchiver;
   heliumPkg =
     lib.findFirst (pkg: pkg != null) null [
       (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
@@ -88,6 +123,34 @@ in
       assertion = !(dsearchEnabled && dsearchPkg == null);
       message = "features.danksearch.enable is true, but danksearch package could not be resolved from flake input.";
     }
+    {
+      assertion = !(codingToolsEnabled && codexPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'codex' could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && vscodePkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'vscode' could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && geminiCliPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'gemini-cli' (or gemini-cli-bin fallback) could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && antigravityPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'antigravity-fhs' (preferred) or 'antigravity' could not be resolved.";
+    }
+    {
+      assertion = !(thunarEnabled && thunarPkg == null);
+      message = "features.fileManager.thunar.enable is true, but thunar package could not be resolved from nixpkgs.";
+    }
+    {
+      assertion = !(thunarEnabled && thunarArchivePluginPkg == null);
+      message = "features.fileManager.thunar.enable is true, but thunar-archive-plugin package could not be resolved from nixpkgs.";
+    }
+    {
+      assertion = !(thunarEnabled && archiveManagerPkg == null);
+      message = "features.fileManager.thunar.enable is true, but no archive manager package (file-roller/xarchiver) could be resolved from nixpkgs.";
+    }
   ];
 
   home.stateVersion = "25.05";
@@ -124,6 +187,13 @@ in
     ])
     ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
     ++ lib.optionals (dsearchEnabled && dsearchPkg != null) [ dsearchPkg ]
+    ++ lib.optionals (codingToolsEnabled && codexPkg != null) [ codexPkg ]
+    ++ lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
+    ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
+    ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
+    ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
+    ++ lib.optionals (thunarEnabled && thunarArchivePluginPkg != null) [ thunarArchivePluginPkg ]
+    ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
     ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
     ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
@@ -143,6 +213,7 @@ in
       userEmail = gitUserEmail;
     };
   programs.bash.enable = true;
+  programs.fish.enable = fishEnabled;
 
   xdg = {
     enable = true;
