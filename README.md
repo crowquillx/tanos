@@ -20,8 +20,11 @@ Both hosts use username `tan`.
 ## Key Switches (`hosts/<host>/variables.nix`)
 
 - `desktop.niri.source = "naxdy" | "upstream"`
+- `desktop.niri.outputs = { ... }` (host-specific monitor layout for HM niri settings)
+- `desktop.niri.blur = { on, radius, noise, brightness, contrast, saturation }` (Naxdy-only blur tuning; ignored on upstream)
 - `desktop.shell = "dms" | "noctalia" | "none"`
 - `desktop.shellStartupCommand = "<command>"` (optional, for shells that need explicit niri startup command)
+- `users.extraPackages = [ "pkgName" "python3Packages.pip" ... ]` (extra HM packages by nixpkgs attr path)
 - `desktop.enable = true | false`
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
@@ -55,8 +58,26 @@ Use `tanvm` first, then move to `tandesk`.
 Edit host variables:
 
 ```nix
-desktop.niri.source = "naxdy";   # current default
-# desktop.niri.source = "upstream";
+desktop.niri = {
+  source = "naxdy"; # current default
+  # source = "upstream";
+  outputs = {
+    "eDP-1" = {
+      mode = "1920x1080@60";
+      scale = 1.0;
+      transform = "normal";
+      position = { x = 0; y = 0; };
+    };
+  };
+  blur = {
+    on = true;
+    radius = 7.5;
+    noise = 0.054;
+    brightness = 0.817;
+    contrast = 1.3;
+    saturation = 1.08;
+  };
+};
 ```
 
 Apply:
@@ -123,3 +144,4 @@ sops secrets/tanvm.yaml
 - `hardware-configuration.nix` placeholders are overwritten by bootstrap.
 - `tanvm` defaults disable bluetooth and enable software rendering for reliability.
 - This setup targets `nixpkgs-unstable`.
+- User-facing desktop packages/shell config are HM-first; system modules keep service/session plumbing.

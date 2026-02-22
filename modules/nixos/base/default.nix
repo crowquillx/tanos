@@ -36,29 +36,9 @@ in
     nerd-fonts.fira-code
   ];
 
+  # Keep system-wide packages minimal; user-facing tooling lives in Home Manager.
   environment.systemPackages = with pkgs; [
     git
-    wget
-    curl
-    jq
-    ripgrep
-    fd
-    unzip
-    zip
-    vim
-    neovim
-    htop
-    fastfetch
-    foot
-    fuzzel
-    waybar
-    wl-clipboard
-    networkmanagerapplet
-    pavucontrol
-    brightnessctl
-    playerctl
-    grim
-    slurp
   ];
 
   nixpkgs.config.allowUnfree = true;

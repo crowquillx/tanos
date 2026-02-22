@@ -1,4 +1,4 @@
-{ lib, config, vars, ... }:
+{ lib, config, vars, inputs, ... }:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
@@ -10,8 +10,6 @@ in
     ../../modules/nixos/base/default.nix
     ../../modules/nixos/desktop/niri.nix
     ../../modules/nixos/desktop/sddm.nix
-    ../../modules/nixos/shells/dms.nix
-    ../../modules/nixos/shells/noctalia.nix
     ../../modules/nixos/services/audio.nix
     ../../modules/nixos/services/bluetooth.nix
     ../../modules/nixos/services/networking.nix
@@ -45,7 +43,7 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
-    extraSpecialArgs = { inherit vars; };
+    extraSpecialArgs = { inherit vars inputs; };
     users.${primaryUser} = import (../../users + "/${primaryUser}/home.nix");
   };
 }
