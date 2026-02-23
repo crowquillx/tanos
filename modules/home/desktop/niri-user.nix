@@ -32,7 +32,6 @@ in
       (
       {
         # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
-        programs.niri.enable = lib.mkDefault true;
         programs.niri.settings =
           {
         prefer-no-csd = true;
@@ -385,6 +384,9 @@ in
         programs.niri.settings.outputs = niriOutputs;
       }
       )
+      (lib.optionalAttrs (lib.hasAttrByPath [ "programs" "niri" "enable" ] options) {
+        programs.niri.enable = lib.mkDefault true;
+      })
       (lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
         # If the shell HM module is available, default it on when selected.
         programs."dank-material-shell".enable = lib.mkDefault true;
