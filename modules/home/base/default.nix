@@ -205,10 +205,10 @@ in
       enable = true;
     }
     // lib.optionalAttrs (gitUserName != null) {
-      settings.user.name = gitUserName;
+      extraConfig.user.name = gitUserName;
     }
     // lib.optionalAttrs (gitUserEmail != null) {
-      settings.user.email = gitUserEmail;
+      extraConfig.user.email = gitUserEmail;
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
