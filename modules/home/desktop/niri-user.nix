@@ -378,6 +378,7 @@ in
           }
         ];
       };
+      }
       // lib.optionalAttrs (niriOutputs != { }) {
         programs.niri.settings.outputs = niriOutputs;
       }
