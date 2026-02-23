@@ -56,8 +56,6 @@
       "equibop"
     ];
     niri = {
-      source = "naxdy";
-
       # Host-specific monitor layout for Niri HM settings.
       outputs = {
         "DP-3" = {
@@ -82,15 +80,6 @@
         };
       };
 
-      # Naxdy blur defaults (overrides source-based fallback explicitly).
-      blur = {
-        on = true;
-        radius = 7.5;
-        noise = 0.054;
-        brightness = 0.817;
-        contrast = 1.3;
-        saturation = 1.08;
-      };
     };
   };
 

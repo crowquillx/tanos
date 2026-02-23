@@ -1,34 +1,12 @@
-{ lib, pkgs, options, vars ? { }, inputs, ... }:
+{ lib, pkgs, options, vars ? { }, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   desktopEnabled = get [ "desktop" "enable" ] true;
   compositor = get [ "desktop" "compositor" ] "niri";
-  niriSource = get [ "desktop" "niri" "source" ] "naxdy";
   niriOutputs = get [ "desktop" "niri" "outputs" ] { };
-  niriBlurOverride = get [ "desktop" "niri" "blur" ] null;
-  niriBlurDefaults =
-    if niriSource == "upstream" then {
-      on = true;
-      radius = 5.0;
-      noise = 0.03;
-      brightness = 1.0;
-      contrast = 1.0;
-      saturation = 1.0;
-    } else {
-      on = true;
-      radius = 7.5;
-      noise = 0.054;
-      brightness = 0.817;
-      contrast = 1.3;
-      saturation = 1.08;
-    };
-  niriBlur = if niriBlurOverride != null then niriBlurOverride else niriBlurDefaults;
   shell = get [ "desktop" "shell" ] "none";
-  niriPkg =
-    if niriSource == "upstream"
-    then (inputs.niri-upstream.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri)
-    else (inputs.niri-naxdy.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri);
+  niriPkg = pkgs.niri-unstable;
   hasNiriSettingsOption = lib.hasAttrByPath [ "programs" "niri" "settings" ] options;
   hasNiriEnableOption = lib.hasAttrByPath [ "programs" "niri" "enable" ] options;
   hasNiriPackageOption = lib.hasAttrByPath [ "programs" "niri" "package" ] options;
@@ -108,12 +86,7 @@ in
 
         overview.zoom = 0.75;
 
-        window-rules =
-          (lib.optionals (niriSource == "naxdy") [
-            # Naxdy-only blur values, host-configurable in desktop.niri.blur.
-            { blur = niriBlur; }
-          ])
-          ++ [
+        window-rules = [
             {
               geometry-corner-radius = 16;
               clip-to-geometry = true;
@@ -207,42 +180,42 @@ in
           ];
 
         animations = {
-          workspace-switch.kind.spring = {
+          workspace-switch.spring = {
             damping-ratio = 0.78;
             stiffness = 600;
             epsilon = 0.0001;
           };
-          window-open.kind.spring = {
+          window-open.spring = {
             damping-ratio = 0.82;
             stiffness = 500;
             epsilon = 0.0001;
           };
-          window-close.kind.spring = {
+          window-close.spring = {
             damping-ratio = 0.88;
             stiffness = 900;
             epsilon = 0.0001;
           };
-          horizontal-view-movement.kind.spring = {
+          horizontal-view-movement.spring = {
             damping-ratio = 0.80;
             stiffness = 550;
             epsilon = 0.0001;
           };
-          window-movement.kind.spring = {
+          window-movement.spring = {
             damping-ratio = 0.85;
             stiffness = 650;
             epsilon = 0.0001;
           };
-          window-resize.kind.spring = {
+          window-resize.spring = {
             damping-ratio = 0.88;
             stiffness = 700;
             epsilon = 0.0001;
           };
-          config-notification-open-close.kind.spring = {
+          config-notification-open-close.spring = {
             damping-ratio = 0.90;
             stiffness = 800;
             epsilon = 0.0001;
           };
-          screenshot-ui-open.kind.spring = {
+          screenshot-ui-open.spring = {
             damping-ratio = 0.85;
             stiffness = 750;
             epsilon = 0.0001;
@@ -409,11 +382,8 @@ in
       (lib.optionalAttrs (shell == "noctalia" && lib.hasAttrByPath [ "services" "noctalia-shell" "enable" ] options) {
         services."noctalia-shell".enable = lib.mkDefault true;
       })
-      (lib.optionalAttrs (niriSource != "naxdy" && niriBlurOverride != null) {
-        warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
-      })
       (lib.optionalAttrs (!hasNiriSettingsOption) {
-        warnings = [ ''Selected niri source "${niriSource}" does not provide Home Manager option programs.niri.settings; skipping niri-user settings.''
+        warnings = [ "Selected niri module does not provide Home Manager option programs.niri.settings; skipping niri-user settings."
         ];
       })
     ]

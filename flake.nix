@@ -19,13 +19,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    niri-naxdy = {
-      url = "github:Naxdy/niri";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    niri-upstream = {
-      url = "github:YaLTeR/niri";
+    niri = {
+      url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -68,19 +63,17 @@
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
-          niriSource = lib.attrByPath [ "desktop" "niri" "source" ] "naxdy" vars;
-          niriModule =
-            if niriSource == "upstream"
-            then (inputs.niri-upstream.nixosModules.niri or { })
-            else (inputs.niri-naxdy.nixosModules.niri or { });
         in
         lib.nixosSystem {
           specialArgs = {
             inherit inputs vars hostName;
           };
           modules = [
-            { nixpkgs.hostPlatform = hostPlatform; }
-            niriModule
+            {
+              nixpkgs.hostPlatform = hostPlatform;
+              nixpkgs.overlays = [ inputs.niri.overlays.niri ];
+            }
+            inputs.niri.nixosModules.niri
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
             inputs.stylix.nixosModules.stylix
@@ -99,6 +92,7 @@
           pkgs = import nixpkgs {
             system = hostPlatform;
             config.allowUnfree = true;
+            overlays = [ inputs.niri.overlays.niri ];
           };
           extraSpecialArgs = { inherit vars inputs; };
           modules = [

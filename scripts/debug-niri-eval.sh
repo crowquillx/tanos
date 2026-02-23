@@ -44,7 +44,7 @@ run_eval_optional_raw() {
 
   run_eval \
     "1) HM niri package option" \
-    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.wayland.windowManager.niri.package"
+    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.package"
 
   run_eval_raw \
     "2) pkgs.niri pname" \
@@ -56,11 +56,11 @@ run_eval_optional_raw() {
 
   run_eval \
     "4) HM niri settings value" \
-    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.wayland.windowManager.niri.settings"
+    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.settings"
 
   run_eval_raw \
     "5) HM niri enable value" \
-    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.wayland.windowManager.niri.enable"
+    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.enable"
 } 2>&1 | tee "${LOG_FILE}"
 
 echo

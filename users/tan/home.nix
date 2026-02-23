@@ -5,21 +5,7 @@ let
   desktopEnabled = get [ "desktop" "enable" ] true;
   compositor = get [ "desktop" "compositor" ] "niri";
   shell = get [ "desktop" "shell" ] "none";
-  niriSource = get [ "desktop" "niri" "source" ] "naxdy";
-  niriInput = if niriSource == "upstream" then inputs.niri-upstream else inputs.niri-naxdy;
-  niriHmModules =
-    let
-      modules = [
-        # Prefer explicit names first, then fall back to default exports.
-        (lib.attrByPath [ "homeModules" "niri" ] null niriInput)
-        (lib.attrByPath [ "homeModules" "config" ] null niriInput)
-        (lib.attrByPath [ "homeManagerModules" "niri" ] null niriInput)
-        (lib.attrByPath [ "homeManagerModules" "config" ] null niriInput)
-        (lib.attrByPath [ "homeModules" "default" ] null niriInput)
-        (lib.attrByPath [ "homeManagerModules" "default" ] null niriInput)
-      ];
-    in
-    builtins.filter (m: m != null) modules;
+  niriHmModule = lib.attrByPath [ "homeModules" "niri" ] null inputs.niri;
   dmsHmModule =
     let
       renamed = lib.attrByPath [ "dms" "homeModules" "dank-material-shell" ] null inputs;
@@ -41,18 +27,15 @@ in
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
-    ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModules != [ ]) niriHmModules
+    ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModule != null) [ niriHmModule ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];
 
   assertions = [
     {
-      assertion = !(desktopEnabled && compositor == "niri") || niriHmModules != [ ];
+      assertion = !(desktopEnabled && compositor == "niri") || niriHmModule != null;
       message = ''
-        Unable to resolve Home Manager niri modules from selected source "${niriSource}".
-        Expected one or more of: homeModules.niri, homeModules.config,
-        homeManagerModules.niri, homeManagerModules.config,
-        homeModules.default, homeManagerModules.default.
+        Unable to resolve Home Manager module inputs.niri.homeModules.niri.
       '';
     }
   ];
