@@ -73,11 +73,16 @@
             if niriSource == "upstream"
             then (inputs.niri-upstream.packages.${hostPlatform}.default or null)
             else (inputs.niri-naxdy.packages.${hostPlatform}.default or null);
-          niriOverlay = final: prev: {
-            niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (niriPkg != null) {
-              niri = niriPkg;
+          niriOverlay = final: prev:
+            let
+              resolvedNiriPkg = if niriPkg != null then niriPkg else (prev.niri or null);
+              niriAttr = lib.optionalAttrs (resolvedNiriPkg != null) { niri = resolvedNiriPkg; };
+            in
+            niriAttr // {
+              niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (resolvedNiriPkg != null) {
+                niri = resolvedNiriPkg;
+              };
             };
-          };
           niriModule =
             if niriSource == "upstream"
             then (inputs.niri-upstream.nixosModules.niri or { })
@@ -109,11 +114,16 @@
             if niriSource == "upstream"
             then (inputs.niri-upstream.packages.${hostPlatform}.default or null)
             else (inputs.niri-naxdy.packages.${hostPlatform}.default or null);
-          niriOverlay = final: prev: {
-            niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (niriPkg != null) {
-              niri = niriPkg;
+          niriOverlay = final: prev:
+            let
+              resolvedNiriPkg = if niriPkg != null then niriPkg else (prev.niri or null);
+              niriAttr = lib.optionalAttrs (resolvedNiriPkg != null) { niri = resolvedNiriPkg; };
+            in
+            niriAttr // {
+              niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (resolvedNiriPkg != null) {
+                niri = resolvedNiriPkg;
+              };
             };
-          };
           primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
           userHomePath = ./users + "/${primaryUser}/home.nix";
         in
