@@ -380,7 +380,7 @@ in
       }
       // lib.optionalAttrs (niriOutputs != { }) {
         programs.niri.settings.outputs = niriOutputs;
-      };
+      }
     )
     // lib.optionalAttrs (shell == "dms" && options ? programs.dank-material-shell.enable) {
       # If the shell HM module is available, default it on when selected.
