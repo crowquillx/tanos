@@ -25,15 +25,16 @@ let
     };
   niriBlur = if niriBlurOverride != null then niriBlurOverride else niriBlurDefaults;
   shell = get [ "desktop" "shell" ] "none";
+  hasNiriSettingsOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "settings" ] options;
+  hasNiriEnableOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "enable" ] options;
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
     lib.mkMerge [
       (
-      {
+      (lib.optionalAttrs hasNiriSettingsOption ({
         # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
-        programs.niri.settings =
-          {
+        wayland.windowManager.niri.settings = {
         prefer-no-csd = true;
 
         hotkey-overlay = {
@@ -381,11 +382,11 @@ in
       };
       }
       // lib.optionalAttrs (niriOutputs != { }) {
-        programs.niri.settings.outputs = niriOutputs;
-      }
+        wayland.windowManager.niri.settings.outputs = niriOutputs;
+      }))
       )
-      (lib.optionalAttrs (lib.hasAttrByPath [ "programs" "niri" "enable" ] options) {
-        programs.niri.enable = lib.mkDefault true;
+      (lib.optionalAttrs hasNiriEnableOption {
+        wayland.windowManager.niri.enable = lib.mkDefault true;
       })
       (lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
         # If the shell HM module is available, default it on when selected.
@@ -402,6 +403,10 @@ in
       })
       (lib.optionalAttrs (niriSource != "naxdy" && niriBlurOverride != null) {
         warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
+      })
+      (lib.optionalAttrs (!hasNiriSettingsOption) {
+        warnings = [ ''Selected niri source "${niriSource}" does not provide Home Manager option wayland.windowManager.niri.settings; skipping niri-user settings.''
+        ];
       })
     ]
   );
