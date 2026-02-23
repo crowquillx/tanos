@@ -54,17 +54,17 @@ in
             proportion = 0.5;
           };
           border = {
-            off = true;
+            enable = false;
             width = 4;
-            active-color = "#707070";
-            inactive-color = "#d0d0d0";
-            urgent-color = "#cc4444";
+            active.color = "#707070";
+            inactive.color = "#d0d0d0";
+            urgent.color = "#cc4444";
           };
           focus-ring = {
-            off = true;
+            enable = false;
             width = 1;
-            active-color = "#808080";
-            inactive-color = "#505050";
+            active.color = "#808080";
+            inactive.color = "#505050";
           };
           shadow = {
             softness = 30;
@@ -79,8 +79,8 @@ in
         };
 
         cursor = {
-          xcursor-theme = "capitaine-cursors-light";
-          xcursor-size = 24;
+          theme = "capitaine-cursors-light";
+          size = 24;
           hide-when-typing = true;
         };
 
@@ -180,42 +180,42 @@ in
           ];
 
         animations = {
-          workspace-switch.spring = {
+          workspace-switch.kind.spring = {
             damping-ratio = 0.78;
             stiffness = 600;
             epsilon = 0.0001;
           };
-          window-open.spring = {
+          window-open.kind.spring = {
             damping-ratio = 0.82;
             stiffness = 500;
             epsilon = 0.0001;
           };
-          window-close.spring = {
+          window-close.kind.spring = {
             damping-ratio = 0.88;
             stiffness = 900;
             epsilon = 0.0001;
           };
-          horizontal-view-movement.spring = {
+          horizontal-view-movement.kind.spring = {
             damping-ratio = 0.80;
             stiffness = 550;
             epsilon = 0.0001;
           };
-          window-movement.spring = {
+          window-movement.kind.spring = {
             damping-ratio = 0.85;
             stiffness = 650;
             epsilon = 0.0001;
           };
-          window-resize.spring = {
+          window-resize.kind.spring = {
             damping-ratio = 0.88;
             stiffness = 700;
             epsilon = 0.0001;
           };
-          config-notification-open-close.spring = {
+          config-notification-open-close.kind.spring = {
             damping-ratio = 0.90;
             stiffness = 800;
             epsilon = 0.0001;
           };
-          screenshot-ui-open.spring = {
+          screenshot-ui-open.kind.spring = {
             damping-ratio = 0.85;
             stiffness = 750;
             epsilon = 0.0001;
