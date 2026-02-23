@@ -96,6 +96,7 @@
           };
           extraSpecialArgs = { inherit vars inputs; };
           modules = [
+            inputs.niri.homeModules.niri
             userHomePath
             {
               home.username = primaryUser;

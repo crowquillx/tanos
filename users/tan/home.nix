@@ -2,10 +2,7 @@
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  desktopEnabled = get [ "desktop" "enable" ] true;
-  compositor = get [ "desktop" "compositor" ] "niri";
   shell = get [ "desktop" "shell" ] "none";
-  niriHmModule = lib.attrByPath [ "homeModules" "niri" ] null inputs.niri;
   dmsHmModule =
     let
       renamed = lib.attrByPath [ "dms" "homeModules" "dank-material-shell" ] null inputs;
@@ -27,18 +24,8 @@ in
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
-    ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModule != null) [ niriHmModule ]
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];
-
-  assertions = [
-    {
-      assertion = !(desktopEnabled && compositor == "niri") || niriHmModule != null;
-      message = ''
-        Unable to resolve Home Manager module inputs.niri.homeModules.niri.
-      '';
-    }
-  ];
 
   home.username = "tan";
   home.homeDirectory = "/home/tan";
