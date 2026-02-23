@@ -69,6 +69,15 @@
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
           niriSource = lib.attrByPath [ "desktop" "niri" "source" ] "naxdy" vars;
+          niriPkg =
+            if niriSource == "upstream"
+            then (inputs.niri-upstream.packages.${hostPlatform}.default or null)
+            else (inputs.niri-naxdy.packages.${hostPlatform}.default or null);
+          niriOverlay = final: prev: {
+            niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (niriPkg != null) {
+              niri = niriPkg;
+            };
+          };
           niriModule =
             if niriSource == "upstream"
             then (inputs.niri-upstream.nixosModules.niri or { })
@@ -79,7 +88,10 @@
             inherit inputs vars hostName;
           };
           modules = [
-            { nixpkgs.hostPlatform = hostPlatform; }
+            {
+              nixpkgs.hostPlatform = hostPlatform;
+              nixpkgs.overlays = [ niriOverlay ];
+            }
             niriModule
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
@@ -92,6 +104,16 @@
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
+          niriSource = lib.attrByPath [ "desktop" "niri" "source" ] "naxdy" vars;
+          niriPkg =
+            if niriSource == "upstream"
+            then (inputs.niri-upstream.packages.${hostPlatform}.default or null)
+            else (inputs.niri-naxdy.packages.${hostPlatform}.default or null);
+          niriOverlay = final: prev: {
+            niriPackages = (prev.niriPackages or { }) // lib.optionalAttrs (niriPkg != null) {
+              niri = niriPkg;
+            };
+          };
           primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
           userHomePath = ./users + "/${primaryUser}/home.nix";
         in
@@ -99,6 +121,7 @@
           pkgs = import nixpkgs {
             system = hostPlatform;
             config.allowUnfree = true;
+            overlays = [ niriOverlay ];
           };
           extraSpecialArgs = { inherit vars inputs; };
           modules = [
