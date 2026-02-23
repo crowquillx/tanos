@@ -28,7 +28,8 @@ let
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
-    (
+    lib.mkMerge [
+      (
       {
         # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
         programs.niri.settings =
@@ -382,22 +383,23 @@ in
       // lib.optionalAttrs (niriOutputs != { }) {
         programs.niri.settings.outputs = niriOutputs;
       }
-    )
-    // lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
-      # If the shell HM module is available, default it on when selected.
-      programs."dank-material-shell".enable = lib.mkDefault true;
-      programs."dank-material-shell".systemd.enable = lib.mkDefault false;
-    }
-    // lib.optionalAttrs (shell == "noctalia" && lib.hasAttrByPath [ "programs" "noctalia-shell" "enable" ] options) {
-      # If the shell HM module is available, default it on when selected.
-      programs."noctalia-shell".enable = lib.mkDefault true;
-      programs."noctalia-shell".systemd.enable = lib.mkDefault false;
-    }
-    // lib.optionalAttrs (shell == "noctalia" && lib.hasAttrByPath [ "services" "noctalia-shell" "enable" ] options) {
-      services."noctalia-shell".enable = lib.mkDefault true;
-    }
-    // lib.optionalAttrs (niriSource != "naxdy" && niriBlurOverride != null) {
-      warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
-    }
+      )
+      (lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
+        # If the shell HM module is available, default it on when selected.
+        programs."dank-material-shell".enable = lib.mkDefault true;
+        programs."dank-material-shell".systemd.enable = lib.mkDefault false;
+      })
+      (lib.optionalAttrs (shell == "noctalia" && lib.hasAttrByPath [ "programs" "noctalia-shell" "enable" ] options) {
+        # If the shell HM module is available, default it on when selected.
+        programs."noctalia-shell".enable = lib.mkDefault true;
+        programs."noctalia-shell".systemd.enable = lib.mkDefault false;
+      })
+      (lib.optionalAttrs (shell == "noctalia" && lib.hasAttrByPath [ "services" "noctalia-shell" "enable" ] options) {
+        services."noctalia-shell".enable = lib.mkDefault true;
+      })
+      (lib.optionalAttrs (niriSource != "naxdy" && niriBlurOverride != null) {
+        warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
+      })
+    ]
   );
 }
