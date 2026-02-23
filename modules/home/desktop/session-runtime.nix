@@ -87,55 +87,60 @@ in
       ];
     }
     (lib.mkIf (desktopEnabled && sessionEnabled) {
-      systemd.user.services.tanos-polkit-agent = lib.mkIf polkitEnable {
-        Unit = {
-          Description = "Tanos Polkit Authentication Agent";
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
-        };
-        Service = {
-          ExecStart = "${pkgs.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
-          Restart = "on-failure";
-          RestartSec = 2;
-        };
-        Install = {
-          WantedBy = [ "graphical-session.target" ];
-        };
-      };
-
-      systemd.user.services.tanos-idle-lock = lib.mkIf lockEnable {
-        Unit = {
-          Description = "Tanos Idle Lock Service";
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
-        };
-        Service = {
-          ExecStart = lib.escapeShellArgs ([ "${pkgs.swayidle}/bin/swayidle" ] ++ swayidleArgs);
-          Restart = "on-failure";
-          RestartSec = 2;
-        };
-        Install = {
-          WantedBy = [ "graphical-session.target" ];
-        };
-      };
-
-      systemd.user.services.tanos-shell-startup = lib.mkIf shellStartupEnable {
-        Unit = {
-          Description = "Tanos Desktop Shell Startup";
-          PartOf = [ "graphical-session.target" ];
-          After = [ "graphical-session.target" ];
-        };
-        Service = {
-          ExecStart = "${pkgs.bash}/bin/bash -lc ${lib.escapeShellArg effectiveShellStartupCommand}";
-          Restart = "on-failure";
-          RestartSec = 2;
-        };
-        Install = {
-          WantedBy = [ "graphical-session.target" ];
-        };
-      };
-
-      systemd.user.services = lib.mkIf appStartupEnable startupAppServices;
+      systemd.user.services = lib.mkMerge [
+        (lib.mkIf polkitEnable {
+          tanos-polkit-agent = {
+            Unit = {
+              Description = "Tanos Polkit Authentication Agent";
+              PartOf = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service = {
+              ExecStart = "${pkgs.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
+              Restart = "on-failure";
+              RestartSec = 2;
+            };
+            Install = {
+              WantedBy = [ "graphical-session.target" ];
+            };
+          };
+        })
+        (lib.mkIf lockEnable {
+          tanos-idle-lock = {
+            Unit = {
+              Description = "Tanos Idle Lock Service";
+              PartOf = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service = {
+              ExecStart = lib.escapeShellArgs ([ "${pkgs.swayidle}/bin/swayidle" ] ++ swayidleArgs);
+              Restart = "on-failure";
+              RestartSec = 2;
+            };
+            Install = {
+              WantedBy = [ "graphical-session.target" ];
+            };
+          };
+        })
+        (lib.mkIf shellStartupEnable {
+          tanos-shell-startup = {
+            Unit = {
+              Description = "Tanos Desktop Shell Startup";
+              PartOf = [ "graphical-session.target" ];
+              After = [ "graphical-session.target" ];
+            };
+            Service = {
+              ExecStart = "${pkgs.bash}/bin/bash -lc ${lib.escapeShellArg effectiveShellStartupCommand}";
+              Restart = "on-failure";
+              RestartSec = 2;
+            };
+            Install = {
+              WantedBy = [ "graphical-session.target" ];
+            };
+          };
+        })
+        (lib.mkIf appStartupEnable startupAppServices)
+      ];
     })
   ];
 }
