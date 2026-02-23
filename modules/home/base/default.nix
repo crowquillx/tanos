@@ -1,4 +1,4 @@
-{ lib, pkgs, vars ? { }, inputs, ... }:
+{ lib, pkgs, vars ? { }, inputs, config, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -223,6 +223,10 @@ in
       defaultApplications = browserAssociations;
       associations.added = browserAssociations;
     };
+  };
+
+  home.sessionVariables = {
+    TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
   };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {

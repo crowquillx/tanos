@@ -1,5 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 let
+  homeManagerPkg =
+    let
+      pkgsBySystem = inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system};
+    in
+    pkgsBySystem.home-manager or pkgsBySystem.default;
   tcli = pkgs.writeShellScriptBin "tcli" ''
     #!/usr/bin/env bash
     set -euo pipefail
@@ -47,8 +52,8 @@ let
         return
       fi
 
-      if [[ -f "$HOME/REPOS/tanos/flake.nix" ]]; then
-        printf '%s\n' "$HOME/REPOS/tanos"
+      if [[ -f "$HOME/tanos/flake.nix" ]]; then
+        printf '%s\n' "$HOME/tanos"
         return
       fi
 
@@ -93,7 +98,33 @@ let
       esac
 
       printf '==> Rebuilding Home Manager (%s) for host %s\n' "$hm_action" "$host"
-      home-manager "$hm_action" --flake "''${flake_ref}#''${host}"
+      run_home_manager "$hm_action" "$host" "$flake_ref"
+    }
+
+    run_home_manager() {
+      local hm_action="$1"
+      local host="$2"
+      local flake_ref="$3"
+      local hm_target="''${flake_ref}#''${host}"
+
+      if command -v home-manager >/dev/null 2>&1; then
+        home-manager "$hm_action" --flake "$hm_target"
+        return
+      fi
+
+      printf '==> home-manager command not found; using activationPackage fallback\n'
+      case "$hm_action" in
+        build)
+          nix build "''${flake_ref}#homeConfigurations.''${host}.activationPackage"
+          ;;
+        switch)
+          nix build "''${flake_ref}#homeConfigurations.''${host}.activationPackage"
+          ./result/activate
+          ;;
+        *)
+          die "unsupported home-manager fallback action: $hm_action"
+          ;;
+      esac
     }
 
     run_update() {
@@ -251,7 +282,10 @@ let
   '';
 in
 {
-  home.packages = [ tcli ];
+  home.packages = [
+    tcli
+    homeManagerPkg
+  ];
 
   programs.bash.shellAliases = {
     fu = "tcli update";

@@ -71,7 +71,7 @@ Runs garbage collection for both system and user-side generations:
 1. `TANOS_FLAKE_DIR` environment variable
 2. current git root (if it has `flake.nix`)
 3. current directory (if it has `flake.nix`)
-4. `$HOME/REPOS/tanos`
+4. `$HOME/tanos`
 
 ## Aliases
 
