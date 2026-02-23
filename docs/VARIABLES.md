@@ -15,6 +15,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.niri.blur = { on, radius, noise, brightness, contrast, saturation }`
 - `desktop.shell = "dms" | "noctalia" | "none"`
 - `desktop.shellStartupCommand = "<command>"`
+- `desktop.startup.apps = [ "<cmd>" ... ]`
 - `desktop.session.polkit.enable = true | false`
 - `desktop.session.keyring.enable = true | false`
 - `desktop.session.lock = { enable, command, idleSeconds, beforeSleep, onLidClose }`
@@ -69,6 +70,19 @@ features = {
   zoxide.enable = true;
 };
 ```
+
+### Desktop startup apps (systemd user services)
+
+```nix
+desktop.startup.apps = [
+  "wl-paste --watch cliphist store"
+  "qs -c ii"
+  "spotify"
+  "equibop"
+];
+```
+
+These are started as Home Manager-managed user services under `graphical-session.target`.
 
 ### NH
 

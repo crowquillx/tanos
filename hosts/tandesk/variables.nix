@@ -49,6 +49,12 @@
     shell = "dms";
     # Example: "dms run --session", "noctalia-shell", or another launcher command.
     shellStartupCommand = null;
+    startup.apps = [
+      "wl-paste --watch cliphist store"
+      "qs -c ii"
+      "spotify"
+      "equibop"
+    ];
     niri = {
       source = "naxdy";
 
