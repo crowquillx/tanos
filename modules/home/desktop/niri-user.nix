@@ -25,15 +25,6 @@ let
     };
   niriBlur = if niriBlurOverride != null then niriBlurOverride else niriBlurDefaults;
   shell = get [ "desktop" "shell" ] "none";
-  startupCommand = get [ "desktop" "shellStartupCommand" ] null;
-  defaultShellStartupCommand =
-    if shell == "dms" then "dms run --session"
-    else if shell == "noctalia" then "noctalia-shell"
-    else null;
-  effectiveStartupCommand = if startupCommand != null then startupCommand else defaultShellStartupCommand;
-  shellStartupEntries = lib.optionals (effectiveStartupCommand != null) [
-    { command = [ "bash" "-lc" effectiveStartupCommand ]; }
-  ];
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
@@ -143,7 +134,7 @@ in
           {
             command = [ "qs" "-c" "ii" ];
           }
-        ] ++ shellStartupEntries;
+        ];
       }
       // lib.optionalAttrs (niriOutputs != { }) {
         outputs = niriOutputs;

@@ -10,6 +10,14 @@ let
   lockCommand = get [ "desktop" "session" "lock" "command" ] "loginctl lock-session";
   idleSeconds = get [ "desktop" "session" "lock" "idleSeconds" ] 600;
   lockBeforeSleep = get [ "desktop" "session" "lock" "beforeSleep" ] true;
+  shell = get [ "desktop" "shell" ] "none";
+  startupCommand = get [ "desktop" "shellStartupCommand" ] null;
+  defaultShellStartupCommand =
+    if shell == "dms" then "dms run --session"
+    else if shell == "noctalia" then "noctalia-shell"
+    else null;
+  effectiveShellStartupCommand = if startupCommand != null then startupCommand else defaultShellStartupCommand;
+  shellStartupEnable = shell != "none" && effectiveShellStartupCommand != null;
 
   lockScript = pkgs.writeShellScript "tanos-lock-session" ''
     exec ${lockCommand}
@@ -39,6 +47,12 @@ in
           assertion = !(sessionEnabled && lockEnable) || (builtins.isInt idleSeconds && idleSeconds > 0);
           message = "desktop.session.lock.idleSeconds must be a positive integer.";
         }
+        {
+          assertion =
+            !(desktopEnabled && sessionEnabled && shellStartupEnable)
+            || (lib.isString effectiveShellStartupCommand && effectiveShellStartupCommand != "");
+          message = "desktop.shellStartupCommand must be a non-empty string when a desktop shell is enabled.";
+        }
       ];
     }
     (lib.mkIf (desktopEnabled && sessionEnabled) {
@@ -66,6 +80,22 @@ in
         };
         Service = {
           ExecStart = lib.escapeShellArgs ([ "${pkgs.swayidle}/bin/swayidle" ] ++ swayidleArgs);
+          Restart = "on-failure";
+          RestartSec = 2;
+        };
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
+        };
+      };
+
+      systemd.user.services.tanos-shell-startup = lib.mkIf shellStartupEnable {
+        Unit = {
+          Description = "Tanos Desktop Shell Startup";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          ExecStart = "${pkgs.bash}/bin/bash -lc ${lib.escapeShellArg effectiveShellStartupCommand}";
           Restart = "on-failure";
           RestartSec = 2;
         };
