@@ -32,6 +32,7 @@ in
       (
       {
         # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
+        programs.niri.enable = lib.mkDefault true;
         programs.niri.settings =
           {
         prefer-no-csd = true;
