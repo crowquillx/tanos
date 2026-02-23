@@ -377,7 +377,7 @@ in
             opacity = 1.0;
           }
         ];
-      }
+      };
       // lib.optionalAttrs (niriOutputs != { }) {
         programs.niri.settings.outputs = niriOutputs;
       }
