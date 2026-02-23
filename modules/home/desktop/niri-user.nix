@@ -382,18 +382,18 @@ in
         programs.niri.settings.outputs = niriOutputs;
       }
     )
-    // lib.optionalAttrs (shell == "dms" && options ? programs.dank-material-shell.enable) {
+    // lib.optionalAttrs (shell == "dms" && options ? programs."dank-material-shell".enable) {
       # If the shell HM module is available, default it on when selected.
-      programs.dank-material-shell.enable = lib.mkDefault true;
-      programs.dank-material-shell.systemd.enable = lib.mkDefault false;
+      programs."dank-material-shell".enable = lib.mkDefault true;
+      programs."dank-material-shell".systemd.enable = lib.mkDefault false;
     }
-    // lib.optionalAttrs (shell == "noctalia" && options ? programs.noctalia-shell.enable) {
+    // lib.optionalAttrs (shell == "noctalia" && options ? programs."noctalia-shell".enable) {
       # If the shell HM module is available, default it on when selected.
-      programs.noctalia-shell.enable = lib.mkDefault true;
-      programs.noctalia-shell.systemd.enable = lib.mkDefault false;
+      programs."noctalia-shell".enable = lib.mkDefault true;
+      programs."noctalia-shell".systemd.enable = lib.mkDefault false;
     }
-    // lib.optionalAttrs (shell == "noctalia" && options ? services.noctalia-shell.enable) {
-      services.noctalia-shell.enable = lib.mkDefault true;
+    // lib.optionalAttrs (shell == "noctalia" && options ? services."noctalia-shell".enable) {
+      services."noctalia-shell".enable = lib.mkDefault true;
     }
     // lib.optionalAttrs (niriSource != "naxdy" && niriBlurOverride != null) {
       warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
