@@ -10,12 +10,11 @@ let
   niriHmModules =
     let
       modules = [
-        # Prefer explicit HM module paths; avoid ambiguous homeModules.default.
-        (lib.attrByPath [ "homeManagerModules" "default" ] null niriInput)
-        (lib.attrByPath [ "homeManagerModules" "niri" ] null niriInput)
-        (lib.attrByPath [ "homeManagerModules" "config" ] null niriInput)
+        # Prefer explicit module names only; default module can target a different schema.
         (lib.attrByPath [ "homeModules" "niri" ] null niriInput)
         (lib.attrByPath [ "homeModules" "config" ] null niriInput)
+        (lib.attrByPath [ "homeManagerModules" "niri" ] null niriInput)
+        (lib.attrByPath [ "homeManagerModules" "config" ] null niriInput)
       ];
     in
     builtins.filter (m: m != null) modules;
@@ -49,8 +48,8 @@ in
       assertion = !(desktopEnabled && compositor == "niri") || niriHmModules != [ ];
       message = ''
         Unable to resolve Home Manager niri modules from selected source "${niriSource}".
-        Expected one or more of: homeManagerModules.default, homeManagerModules.niri,
-        homeManagerModules.config, homeModules.niri, homeModules.config.
+        Expected one or more of: homeModules.niri, homeModules.config,
+        homeManagerModules.niri, homeManagerModules.config.
       '';
     }
   ];

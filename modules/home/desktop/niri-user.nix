@@ -29,9 +29,9 @@ let
     if niriSource == "upstream"
     then (inputs.niri-upstream.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri)
     else (inputs.niri-naxdy.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri);
-  hasNiriSettingsOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "settings" ] options;
-  hasNiriEnableOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "enable" ] options;
-  hasNiriPackageOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "package" ] options;
+  hasNiriSettingsOption = lib.hasAttrByPath [ "programs" "niri" "settings" ] options;
+  hasNiriEnableOption = lib.hasAttrByPath [ "programs" "niri" "enable" ] options;
+  hasNiriPackageOption = lib.hasAttrByPath [ "programs" "niri" "package" ] options;
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
@@ -39,7 +39,7 @@ in
       (
       (lib.optionalAttrs hasNiriSettingsOption ({
         # Home Manager-owned Niri config, with host-driven outputs/blur from variables.nix.
-        wayland.windowManager.niri.settings = {
+        programs.niri.settings = {
         prefer-no-csd = true;
 
         hotkey-overlay = {
@@ -387,14 +387,14 @@ in
       };
       }
       // lib.optionalAttrs (niriOutputs != { }) {
-        wayland.windowManager.niri.settings.outputs = niriOutputs;
+        programs.niri.settings.outputs = niriOutputs;
       }))
       )
       (lib.optionalAttrs hasNiriEnableOption {
-        wayland.windowManager.niri.enable = lib.mkDefault true;
+        programs.niri.enable = lib.mkDefault true;
       })
       (lib.optionalAttrs hasNiriPackageOption {
-        wayland.windowManager.niri.package = lib.mkDefault niriPkg;
+        programs.niri.package = lib.mkDefault niriPkg;
       })
       (lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
         # If the shell HM module is available, default it on when selected.
@@ -413,7 +413,7 @@ in
         warnings = [ "desktop.niri.blur is ignored unless desktop.niri.source = \"naxdy\"." ];
       })
       (lib.optionalAttrs (!hasNiriSettingsOption) {
-        warnings = [ ''Selected niri source "${niriSource}" does not provide Home Manager option wayland.windowManager.niri.settings; skipping niri-user settings.''
+        warnings = [ ''Selected niri source "${niriSource}" does not provide Home Manager option programs.niri.settings; skipping niri-user settings.''
         ];
       })
     ]
