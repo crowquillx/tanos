@@ -1,4 +1,4 @@
-{ lib, options, vars ? { }, ... }:
+{ lib, pkgs, options, vars ? { }, inputs, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -25,8 +25,13 @@ let
     };
   niriBlur = if niriBlurOverride != null then niriBlurOverride else niriBlurDefaults;
   shell = get [ "desktop" "shell" ] "none";
+  niriPkg =
+    if niriSource == "upstream"
+    then (inputs.niri-upstream.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri)
+    else (inputs.niri-naxdy.packages.${pkgs.stdenv.hostPlatform.system}.default or pkgs.niri);
   hasNiriSettingsOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "settings" ] options;
   hasNiriEnableOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "enable" ] options;
+  hasNiriPackageOption = lib.hasAttrByPath [ "wayland" "windowManager" "niri" "package" ] options;
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
@@ -387,6 +392,9 @@ in
       )
       (lib.optionalAttrs hasNiriEnableOption {
         wayland.windowManager.niri.enable = lib.mkDefault true;
+      })
+      (lib.optionalAttrs hasNiriPackageOption {
+        wayland.windowManager.niri.package = lib.mkDefault niriPkg;
       })
       (lib.optionalAttrs (shell == "dms" && lib.hasAttrByPath [ "programs" "dank-material-shell" "enable" ] options) {
         # If the shell HM module is available, default it on when selected.
