@@ -32,10 +32,12 @@ in
       powerManagement.powertop.enable = powertopEnable;
       services.fwupd.enable = fwupdEnable;
 
-      services.logind = {
-        lidSwitch = lidSwitch;
-        lidSwitchExternalPower = lidSwitchExternalPower;
-        lidSwitchDocked = lidSwitchDocked;
+      services.logind.settings = {
+        Login = {
+          HandleLidSwitch = lidSwitch;
+          HandleLidSwitchExternalPower = lidSwitchExternalPower;
+          HandleLidSwitchDocked = lidSwitchDocked;
+        };
       };
     })
   ];

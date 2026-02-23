@@ -33,16 +33,14 @@ let
     if fhsPkg != null then fhsPkg else nativePkg;
   thunarPkg =
     let
-      xfcePkg = lib.attrByPath [ "xfce" "thunar" ] null pkgs;
       topLevelPkg = lib.attrByPath [ "thunar" ] null pkgs;
     in
-    if xfcePkg != null then xfcePkg else topLevelPkg;
+    topLevelPkg;
   thunarArchivePluginPkg =
     let
-      xfcePkg = lib.attrByPath [ "xfce" "thunar-archive-plugin" ] null pkgs;
       topLevelPkg = lib.attrByPath [ "thunar-archive-plugin" ] null pkgs;
     in
-    if xfcePkg != null then xfcePkg else topLevelPkg;
+    topLevelPkg;
   archiveManagerPkg =
     let
       fileRoller = lib.attrByPath [ "file-roller" ] null pkgs;
@@ -207,10 +205,10 @@ in
       enable = true;
     }
     // lib.optionalAttrs (gitUserName != null) {
-      userName = gitUserName;
+      settings.user.name = gitUserName;
     }
     // lib.optionalAttrs (gitUserEmail != null) {
-      userEmail = gitUserEmail;
+      settings.user.email = gitUserEmail;
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
