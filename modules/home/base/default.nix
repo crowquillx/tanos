@@ -205,7 +205,7 @@ in
       enable = true;
     }
     // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
-      extraConfig.user = {
+      settings.user = {
         name = gitUserName;
         email = gitUserEmail;
       };
