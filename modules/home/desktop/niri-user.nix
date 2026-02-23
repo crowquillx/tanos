@@ -88,7 +88,12 @@ in
 
         window-rules = [
             {
-              geometry-corner-radius = 16;
+              geometry-corner-radius = {
+                top-left = 16;
+                top-right = 16;
+                bottom-left = 16;
+                bottom-right = 16;
+              };
               clip-to-geometry = true;
             }
             {
