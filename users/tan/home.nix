@@ -10,11 +10,13 @@ let
   niriHmModules =
     let
       modules = [
-        # Prefer explicit module names only; default module can target a different schema.
+        # Prefer explicit names first, then fall back to default exports.
         (lib.attrByPath [ "homeModules" "niri" ] null niriInput)
         (lib.attrByPath [ "homeModules" "config" ] null niriInput)
         (lib.attrByPath [ "homeManagerModules" "niri" ] null niriInput)
         (lib.attrByPath [ "homeManagerModules" "config" ] null niriInput)
+        (lib.attrByPath [ "homeModules" "default" ] null niriInput)
+        (lib.attrByPath [ "homeManagerModules" "default" ] null niriInput)
       ];
     in
     builtins.filter (m: m != null) modules;
@@ -49,7 +51,8 @@ in
       message = ''
         Unable to resolve Home Manager niri modules from selected source "${niriSource}".
         Expected one or more of: homeModules.niri, homeModules.config,
-        homeManagerModules.niri, homeManagerModules.config.
+        homeManagerModules.niri, homeManagerModules.config,
+        homeModules.default, homeManagerModules.default.
       '';
     }
   ];
