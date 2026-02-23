@@ -7,16 +7,19 @@ let
   shell = get [ "desktop" "shell" ] "none";
   niriSource = get [ "desktop" "niri" "source" ] "naxdy";
   niriInput = if niriSource == "upstream" then inputs.niri-upstream else inputs.niri-naxdy;
-  niriHmModule =
+  niriHmModules =
     let
-      candidates = [
+      modules = [
+        # Some niri flakes split "niri" and "config"; import both when present.
         (lib.attrByPath [ "homeModules" "niri" ] null niriInput)
+        (lib.attrByPath [ "homeModules" "config" ] null niriInput)
         (lib.attrByPath [ "homeModules" "default" ] null niriInput)
         (lib.attrByPath [ "homeManagerModules" "niri" ] null niriInput)
+        (lib.attrByPath [ "homeManagerModules" "config" ] null niriInput)
         (lib.attrByPath [ "homeManagerModules" "default" ] null niriInput)
       ];
     in
-    lib.findFirst (m: m != null) null candidates;
+    builtins.filter (m: m != null) modules;
   dmsHmModule =
     let
       renamed = lib.attrByPath [ "dms" "homeModules" "dank-material-shell" ] null inputs;
@@ -38,16 +41,17 @@ in
       ../../modules/home/desktop/session-runtime.nix
       ../../modules/home/desktop/niri-user.nix
     ]
-    ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModule != null) [ niriHmModule ]
+    ++ lib.optionals (desktopEnabled && compositor == "niri" && niriHmModules != [ ]) niriHmModules
     ++ lib.optionals (shell == "dms" && dmsHmModule != null) [ dmsHmModule ]
     ++ lib.optionals (shell == "noctalia" && noctaliaHmModule != null) [ noctaliaHmModule ];
 
   assertions = [
     {
-      assertion = !(desktopEnabled && compositor == "niri") || niriHmModule != null;
+      assertion = !(desktopEnabled && compositor == "niri") || niriHmModules != [ ];
       message = ''
-        Unable to resolve a Home Manager niri module from selected source "${niriSource}".
-        Expected one of: homeModules.niri, homeModules.default, homeManagerModules.niri, homeManagerModules.default.
+        Unable to resolve Home Manager niri modules from selected source "${niriSource}".
+        Expected one or more of: homeModules.niri, homeModules.config, homeModules.default,
+        homeManagerModules.niri, homeManagerModules.config, homeManagerModules.default.
       '';
     }
   ];
