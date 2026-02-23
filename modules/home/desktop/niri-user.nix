@@ -133,7 +133,7 @@ in
             }
             {
               matches = [
-                { app-id = "^org\\.quickshell"; }
+                { app-id = "^org[.]quickshell"; }
               ];
               opacity = 1.0;
             }
@@ -144,10 +144,10 @@ in
                 { is-active = true; app-id = "^foot$"; }
                 { is-active = true; app-id = "^footclient$"; }
                 { is-active = true; app-id = "^Alacritty$"; }
-                { is-active = true; app-id = "^org\\.wezfurlong\\.wezterm$"; }
+                { is-active = true; app-id = "^org[.]wezfurlong[.]wezterm$"; }
                 { is-active = true; app-id = "^konsole$"; }
-                { is-active = true; app-id = "^org\\.kde\\.konsole$"; }
-                { is-active = true; app-id = "^com\\.mitchellh\\.ghostty$"; }
+                { is-active = true; app-id = "^org[.]kde[.]konsole$"; }
+                { is-active = true; app-id = "^com[.]mitchellh[.]ghostty$"; }
               ];
               opacity = 0.95;
             }
@@ -182,7 +182,7 @@ in
               max-height = 1;
             }
             {
-              matches = [ { app-id = "^org\\.mozilla\\.firefox$"; } ];
+              matches = [ { app-id = "^org[.]mozilla[.]firefox$"; } ];
               default-column-width = { proportion = 0.66667; };
             }
             {
@@ -197,11 +197,11 @@ in
               default-column-width = { fixed = 1200; };
             }
             {
-              matches = [ { app-id = "^com\\.obsproject\\.Studio$"; } ];
+              matches = [ { app-id = "^com[.]obsproject[.]Studio$"; } ];
               min-width = 876;
             }
             {
-              matches = [ { app-id = "^org\\.wezfurlong\\.wezterm$"; } ];
+              matches = [ { app-id = "^org[.]wezfurlong[.]wezterm$"; } ];
               default-column-width = { };
             }
           ];
