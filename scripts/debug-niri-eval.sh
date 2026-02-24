@@ -11,7 +11,7 @@ run_eval() {
   local title="$1"
   shift
   echo "=== ${title} ==="
-  nix --extra-experimental-features 'nix-command flakes' eval --show-trace "$@"
+  nix --extra-experimental-features 'nix-command flakes' eval --accept-flake-config --show-trace "$@"
   echo
 }
 
@@ -19,7 +19,7 @@ run_eval_raw() {
   local title="$1"
   shift
   echo "=== ${title} ==="
-  nix --extra-experimental-features 'nix-command flakes' eval --show-trace --raw "$@"
+  nix --extra-experimental-features 'nix-command flakes' eval --accept-flake-config --show-trace --raw "$@"
   echo
 }
 
@@ -27,7 +27,7 @@ run_eval_optional_raw() {
   local title="$1"
   shift
   echo "=== ${title} (optional) ==="
-  if nix --extra-experimental-features 'nix-command flakes' eval --show-trace --raw "$@"; then
+  if nix --extra-experimental-features 'nix-command flakes' eval --accept-flake-config --show-trace --raw "$@"; then
     :
   else
     echo "optional check failed; continuing"
@@ -55,12 +55,16 @@ run_eval_optional_raw() {
     "${FLAKE_REF}#nixosConfigurations.${HOST}.pkgs.niriPackages.niri.pname"
 
   run_eval \
-    "4) HM niri settings value" \
-    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.settings"
+    "4) HM niri final rendered config" \
+    "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.finalConfig"
 
-  run_eval_raw \
-    "5) HM niri enable value" \
+  run_eval_optional_raw \
+    "5) HM niri enable value (nixosConfigurations path)" \
     "${FLAKE_REF}#nixosConfigurations.${HOST}.config.home-manager.users.${USER_NAME}.programs.niri.enable"
+
+  run_eval \
+    "6) HM niri enable value (homeConfigurations path)" \
+    "${FLAKE_REF}#homeConfigurations.${HOST}.config.programs.niri.enable"
 } 2>&1 | tee "${LOG_FILE}"
 
 echo

@@ -59,23 +59,44 @@
       # Host-specific monitor layout for Niri HM settings.
       outputs = {
         "DP-3" = {
-          mode = "2560x1440@180.002";
+          mode = {
+            width = 2560;
+            height = 1440;
+            refresh = 180.002;
+          };
           scale = 1.0;
-          transform = "normal";
+          transform = {
+            rotation = 0;
+            flipped = false;
+          };
           position = { x = 2560; y = 1080; };
-          variable-refresh-rate = { on-demand = true; };
+          variable-refresh-rate = "on-demand";
           focus-at-startup = true;
         };
         "DP-2" = {
-          mode = "2560x1440@164.999";
+          mode = {
+            width = 2560;
+            height = 1440;
+            refresh = 164.999;
+          };
           scale = 1.0;
-          transform = "normal";
+          transform = {
+            rotation = 0;
+            flipped = false;
+          };
           position = { x = 0; y = 1080; };
         };
         "DP-1" = {
-          mode = "1920x1080@144.001";
+          mode = {
+            width = 1920;
+            height = 1080;
+            refresh = 144.001;
+          };
           scale = 1.0;
-          transform = "normal";
+          transform = {
+            rotation = 0;
+            flipped = false;
+          };
           position = { x = 2560; y = 0; };
         };
       };

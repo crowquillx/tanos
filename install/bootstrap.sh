@@ -98,7 +98,7 @@ if [[ ! -f "${KEY_FILE}" ]]; then
   echo "Creating sops age key at ${KEY_FILE}"
   mkdir -p "$(dirname "${KEY_FILE}")"
   nix --extra-experimental-features "${NIX_EXPERIMENTAL_FEATURES}" \
-    shell nixpkgs#age --command age-keygen -o "${KEY_FILE}"
+    shell --accept-flake-config nixpkgs#age --command age-keygen -o "${KEY_FILE}"
   chmod 600 "${KEY_FILE}"
 else
   echo "sops age key already exists at ${KEY_FILE}"
@@ -110,9 +110,9 @@ REBUILD_ACTION="switch"
 if ! findmnt -rn /boot >/dev/null 2>&1; then
   REBUILD_ACTION="test"
   echo "/boot is not mounted; using nixos-rebuild test to avoid bootloader install failure."
-  echo "Fix boot mounts, then run: sudo nixos-rebuild switch --flake ${NIXOS_FLAKE_REF}"
+  echo "Fix boot mounts, then run: sudo nixos-rebuild switch --accept-flake-config --flake ${NIXOS_FLAKE_REF}"
 fi
-nixos-rebuild "${REBUILD_ACTION}" --flake "${NIXOS_FLAKE_REF}"
+nixos-rebuild "${REBUILD_ACTION}" --accept-flake-config --flake "${NIXOS_FLAKE_REF}"
 
 echo "Running Home Manager activation for ${HOST} as ${PRIMARY_USER}"
 if ! id "${PRIMARY_USER}" >/dev/null 2>&1; then
@@ -122,7 +122,7 @@ else
   rm -f "${HM_OUT_LINK}"
   sudo -H -u "${PRIMARY_USER}" \
     nix --extra-experimental-features "${NIX_EXPERIMENTAL_FEATURES}" \
-    build "${FLAKE_PATH}#homeConfigurations.${HOST}.activationPackage" \
+    build --accept-flake-config "${FLAKE_PATH}#homeConfigurations.${HOST}.activationPackage" \
     --out-link "${HM_OUT_LINK}"
   sudo -H -u "${PRIMARY_USER}" "${HM_OUT_LINK}/activate"
 fi
@@ -131,4 +131,4 @@ echo
 echo "Bootstrap complete."
 echo "Next:"
 echo "1) Add encrypted secrets under ./secrets and update .sops.yaml recipients."
-echo "2) Re-run: sudo nixos-rebuild switch --flake ${NIXOS_FLAKE_REF}"
+echo "2) Re-run: sudo nixos-rebuild switch --accept-flake-config --flake ${NIXOS_FLAKE_REF}"
