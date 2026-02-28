@@ -24,7 +24,7 @@
 
   desktop = {
     enable = true;
-    compositor = "niri";
+    compositor = "hyprland";
     displayManager = "auto";
     browser = {
       default = "firefox";
@@ -46,8 +46,6 @@
         onLidClose = true;
       };
     };
-    shell = "dms";
-    # Example: "dms run --session", "noctalia-shell", or another launcher command.
     shellStartupCommand = null;
     startup.apps = [
       "wl-paste --watch cliphist store"
@@ -55,53 +53,6 @@
       "spotify"
       "equibop"
     ];
-    niri = {
-      # Host-specific monitor layout for Niri HM settings.
-      outputs = {
-        "DP-3" = {
-          mode = {
-            width = 2560;
-            height = 1440;
-            refresh = 180.002;
-          };
-          scale = 1.0;
-          transform = {
-            rotation = 0;
-            flipped = false;
-          };
-          position = { x = 2560; y = 1080; };
-          variable-refresh-rate = "on-demand";
-          focus-at-startup = true;
-        };
-        "DP-2" = {
-          mode = {
-            width = 2560;
-            height = 1440;
-            refresh = 164.999;
-          };
-          scale = 1.0;
-          transform = {
-            rotation = 0;
-            flipped = false;
-          };
-          position = { x = 0; y = 1080; };
-        };
-        "DP-1" = {
-          mode = {
-            width = 1920;
-            height = 1080;
-            refresh = 144.001;
-          };
-          scale = 1.0;
-          transform = {
-            rotation = 0;
-            flipped = false;
-          };
-          position = { x = 2560; y = 0; };
-        };
-      };
-
-    };
   };
 
   features = {

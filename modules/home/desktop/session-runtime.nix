@@ -10,19 +10,14 @@ let
   lockCommand = get [ "desktop" "session" "lock" "command" ] "loginctl lock-session";
   idleSeconds = get [ "desktop" "session" "lock" "idleSeconds" ] 600;
   lockBeforeSleep = get [ "desktop" "session" "lock" "beforeSleep" ] true;
-  shell = get [ "desktop" "shell" ] "none";
   startupCommand = get [ "desktop" "shellStartupCommand" ] null;
   defaultStartupApps = [
     "wl-paste --watch cliphist store"
     "qs -c ii"
   ];
   startupApps = get [ "desktop" "startup" "apps" ] defaultStartupApps;
-  defaultShellStartupCommand =
-    if shell == "dms" then "dms run --session"
-    else if shell == "noctalia" then "noctalia-shell"
-    else null;
-  effectiveShellStartupCommand = if startupCommand != null then startupCommand else defaultShellStartupCommand;
-  shellStartupEnable = shell != "none" && effectiveShellStartupCommand != null;
+  effectiveShellStartupCommand = startupCommand;
+  shellStartupEnable = effectiveShellStartupCommand != null;
   appStartupEnable = startupApps != [ ];
 
   mkStartupService = index: command: {
@@ -78,7 +73,7 @@ in
           assertion =
             !(desktopEnabled && sessionEnabled && shellStartupEnable)
             || (lib.isString effectiveShellStartupCommand && effectiveShellStartupCommand != "");
-          message = "desktop.shellStartupCommand must be a non-empty string when a desktop shell is enabled.";
+          message = "desktop.shellStartupCommand must be a non-empty string when provided.";
         }
         {
           assertion = builtins.all (cmd: lib.isString cmd && cmd != "") startupApps;

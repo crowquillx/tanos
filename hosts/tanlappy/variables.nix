@@ -24,7 +24,7 @@
 
   desktop = {
     enable = true;
-    compositor = "niri";
+    compositor = "hyprland";
     displayManager = "auto";
     browser = {
       default = "zen";
@@ -46,12 +46,7 @@
         onLidClose = true;
       };
     };
-    shell = "dms";
     shellStartupCommand = null;
-    niri = {
-      # Leave empty to use runtime output discovery on this host.
-      outputs = { };
-    };
   };
 
   features = {
@@ -125,7 +120,7 @@
 
       # Helpful laptop defaults with explicit toggles per service.
       upower.enable = true;
-      # DMS enables power-profiles-daemon; keep TLP off to avoid the NixOS conflict assertion.
+      # Keep TLP off while power-profiles-daemon is enabled to avoid the NixOS conflict assertion.
       tlp.enable = false;
       thermald.enable = true;
       powertop.enable = false;

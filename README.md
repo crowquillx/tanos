@@ -1,6 +1,6 @@
 # tanos
 
-Minimal multi-host NixOS flake with Home Manager, `nixpkgs-unstable`, niri (`Naxdy` fork by default), switchable shell layers (`dms` or `noctalia`), SDDM, Stylix (Rose Pine), fish + starship, NH, and `sops-nix`.
+Minimal multi-host NixOS flake with Home Manager, `nixpkgs-unstable`, Hyprland (upstream flake), `soymou/illogical-flake`, SDDM, Stylix (Rose Pine), fish + starship, NH, and `sops-nix`.
 
 ## Hosts
 
@@ -28,7 +28,7 @@ This repo assumes base NixOS is already installed.
    - `sudo ./install/bootstrap.sh tanvm`
    - `sudo ./install/bootstrap.sh tandesk`
    - `sudo ./install/bootstrap.sh tanlappy`
-4. Reboot and log in through SDDM (niri session).
+4. Reboot and log in through SDDM (Hyprland session).
 
 ## tcli
 

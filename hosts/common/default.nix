@@ -10,8 +10,7 @@ in
     ../../modules/nixos/base/default.nix
     ../../modules/nixos/theme/stylix.nix
     ../../modules/nixos/hardware/graphics.nix
-    ../../modules/nixos/desktop/niri.nix
-    ../../modules/nixos/desktop/dms-greeter.nix
+    ../../modules/nixos/desktop/hyprland.nix
     ../../modules/nixos/desktop/sddm.nix
     ../../modules/nixos/shells/fish-starship.nix
     ../../modules/nixos/services/audio.nix
@@ -27,8 +26,6 @@ in
     ../../modules/nixos/services/virtualisation.nix
     ../../modules/nixos/services/keyring.nix
     ../../modules/nixos/security/sops.nix
-    ../../modules/nixos/shells/dms.nix
-    ../../modules/nixos/shells/noctalia.nix
     ../../modules/nixos/profiles/vm-guest.nix
     ../../modules/nixos/profiles/laptop.nix
   ];
@@ -39,27 +36,19 @@ in
     {
       assertion =
         let
-          shell = get [ "desktop" "shell" ] "none";
-          compositor = get [ "desktop" "compositor" ] "niri";
+          compositor = get [ "desktop" "compositor" ] "hyprland";
         in
-        shell == "none" || compositor == "niri";
-      message = "A desktop shell requires desktop.compositor = \"niri\".";
+        compositor == "hyprland";
+      message = "desktop.compositor must be set to \"hyprland\".";
     }
     {
       assertion =
         let
-          shell = get [ "desktop" "shell" ] "none";
           dm = get [ "desktop" "displayManager" ] "auto";
-          effectiveDm =
-            if dm == "auto"
-            then if shell == "dms" then "dms-greeter" else "sddm"
-            else dm;
         in
-        builtins.elem dm [ "auto" "sddm" "dms-greeter" ]
-        && (effectiveDm != "dms-greeter" || shell == "dms");
+        builtins.elem dm [ "auto" "sddm" ];
       message = ''
-        desktop.displayManager must be one of: auto, sddm, dms-greeter.
-        dms-greeter is only supported when desktop.shell = "dms".
+        desktop.displayManager must be one of: auto, sddm.
       '';
     }
   ];

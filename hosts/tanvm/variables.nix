@@ -23,7 +23,7 @@
 
   desktop = {
     enable = true;
-    compositor = "niri";
+    compositor = "hyprland";
     displayManager = "auto";
     browser = {
       default = "firefox";
@@ -45,13 +45,7 @@
         onLidClose = true;
       };
     };
-    shell = "dms";
-    # Example: "dms run --session", "noctalia-shell", or another launcher command.
     shellStartupCommand = null;
-    niri = {
-      # Leave empty to use runtime output discovery on this host.
-      outputs = { };
-    };
   };
 
   features = {

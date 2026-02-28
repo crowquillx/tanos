@@ -4,16 +4,13 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 
 ## Key switches
 
-- `desktop.niri.source = "naxdy" | "upstream"`
-- `desktop.displayManager = "auto" | "dms-greeter" | "sddm"`
+- `desktop.compositor = "hyprland"`
+- `desktop.displayManager = "auto" | "sddm"`
 - `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
-- `desktop.niri.outputs = { ... }`
-- `desktop.niri.blur = { on, radius, noise, brightness, contrast, saturation }`
-- `desktop.shell = "dms" | "noctalia" | "none"`
 - `desktop.shellStartupCommand = "<command>"`
 - `desktop.startup.apps = [ "<cmd>" ... ]`
 - `desktop.session.polkit.enable = true | false`
@@ -148,15 +145,6 @@ features.virtualisation = {
     podman.enable = false;
     docker.enable = false;
   };
-};
-```
-
-### Niri source
-
-```nix
-desktop.niri = {
-  source = "naxdy";
-  # source = "upstream";
 };
 ```
 
