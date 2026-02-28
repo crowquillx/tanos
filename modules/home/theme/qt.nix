@@ -8,5 +8,6 @@ in
 {
   config = lib.mkIf (desktopEnabled && enabled) {
     qt.enable = true;
+    home.sessionVariables.QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
   };
 }
