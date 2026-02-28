@@ -213,23 +213,22 @@ in
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
+  programs.starship = lib.optionalAttrs hasIllogicalEnableOption {
+    # Defer starship.toml ownership to Illogical; system Starship remains enabled via NixOS module.
+    enable = lib.mkForce false;
+  };
 
-  xdg =
-    {
+  xdg = {
+    enable = true;
+    userDirs.enable = true;
+    # Avoid repeated activation failures when a previous backup file already exists.
+    configFile."user-dirs.dirs".force = true;
+    mimeApps = {
       enable = true;
-      userDirs.enable = true;
-      # Avoid repeated activation failures when a previous backup file already exists.
-      configFile."user-dirs.dirs".force = true;
-      mimeApps = {
-        enable = true;
-        defaultApplications = browserAssociations;
-        associations.added = browserAssociations;
-      };
-    }
-    // lib.optionalAttrs hasIllogicalEnableOption {
-      # Keep Starship enabled, but make Illogical the single source of starship.toml.
-      configFile."starship.toml".source = lib.mkForce (inputs.illogical + "/dots/.config/starship.toml");
+      defaultApplications = browserAssociations;
+      associations.added = browserAssociations;
     };
+  };
 
   home.sessionVariables = {
     TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
