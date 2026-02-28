@@ -66,8 +66,8 @@ in
     users.${primaryUser} = lib.mkMerge [
       (import (../../users + "/${primaryUser}/home.nix"))
       {
-        home.username = lib.mkDefault primaryUser;
-        home.homeDirectory = lib.mkDefault "/home/${primaryUser}";
+        home.username = lib.mkForce primaryUser;
+        home.homeDirectory = lib.mkForce "/home/${primaryUser}";
       }
     ];
   };
