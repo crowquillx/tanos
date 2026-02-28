@@ -63,13 +63,9 @@ in
     sharedModules =
       lib.optionals (hyprlandHmModule != null) [ hyprlandHmModule ]
       ++ lib.optionals (illogicalHmModule != null) [ illogicalHmModule ];
-    users.${primaryUser} = lib.mkMerge [
-      (import (../../users + "/${primaryUser}/home.nix"))
-      {
-        home.username = lib.mkForce primaryUser;
-        home.homeDirectory = lib.mkForce "/home/${primaryUser}";
-        xdg.configHome = lib.mkForce "/home/${primaryUser}/.config";
-      }
-    ];
+    users.${primaryUser} = import (../../users + "/${primaryUser}/home.nix");
+    users.${primaryUser}.home.username = lib.mkForce primaryUser;
+    users.${primaryUser}.home.homeDirectory = lib.mkForce "/home/${primaryUser}";
+    users.${primaryUser}.xdg.configHome = lib.mkForce "/home/${primaryUser}/.config";
   };
 }
