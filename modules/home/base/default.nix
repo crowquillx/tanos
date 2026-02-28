@@ -238,6 +238,13 @@ in
   systemd.user.sessionVariables = {
     QT_STYLE_OVERRIDE = lib.mkForce "";
   };
+  xdg.configFile = lib.optionalAttrs hasIllogicalEnableOption {
+    # Temporary compatibility override: this path currently fails HM file install checks.
+    "Kvantum/Basel6Kvantum".enable = lib.mkForce false;
+  };
+  home.file = lib.optionalAttrs hasIllogicalEnableOption {
+    ".config/Kvantum/Basel6Kvantum".enable = lib.mkForce false;
+  };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
     enable = true;
