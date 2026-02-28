@@ -1,8 +1,7 @@
-{ lib, pkgs, vars ? { }, inputs, config, options, ... }:
+{ lib, pkgs, vars ? { }, inputs, config, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  hasIllogicalEnableOption = lib.hasAttrByPath [ "programs" "illogical-impulse" "enable" ] options;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
@@ -213,10 +212,6 @@ in
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
-  programs.starship = lib.optionalAttrs hasIllogicalEnableOption {
-    # Illogical owns ~/.config/starship.toml when present.
-    enable = lib.mkForce false;
-  };
 
   xdg = {
     enable = true;
@@ -232,18 +227,6 @@ in
 
   home.sessionVariables = {
     TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
-    # Resolve upstream Illogical HM conflict by preferring the common default.
-    QT_STYLE_OVERRIDE = lib.mkForce "";
-  };
-  systemd.user.sessionVariables = {
-    QT_STYLE_OVERRIDE = lib.mkForce "";
-  };
-  xdg.configFile = lib.optionalAttrs hasIllogicalEnableOption {
-    # Temporary compatibility override: this path currently fails HM file install checks.
-    "Kvantum/Basel6Kvantum".enable = lib.mkForce false;
-  };
-  home.file = lib.optionalAttrs hasIllogicalEnableOption {
-    ".config/Kvantum/Basel6Kvantum".enable = lib.mkForce false;
   };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {

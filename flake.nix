@@ -54,7 +54,6 @@
       lib = nixpkgs.lib;
       hyprlandNixosModule = lib.attrByPath [ "hyprland" "nixosModules" "default" ] null inputs;
       hyprlandHmModule = lib.attrByPath [ "hyprland" "homeManagerModules" "default" ] null inputs;
-      illogicalNixosModule = lib.attrByPath [ "illogical" "nixosModules" "default" ] null inputs;
       illogicalHmModule = lib.attrByPath [ "illogical" "homeManagerModules" "default" ] null inputs;
       hostPlatforms = {
         tandesk = "x86_64-linux";
@@ -80,8 +79,7 @@
             inputs.stylix.nixosModules.stylix
             (hostPath + "/default.nix")
           ]
-          ++ lib.optionals (hyprlandNixosModule != null) [ hyprlandNixosModule ]
-          ++ lib.optionals (illogicalNixosModule != null) [ illogicalNixosModule ];
+          ++ lib.optionals (hyprlandNixosModule != null) [ hyprlandNixosModule ];
         };
 
       mkHome = hostName: hostPlatform:
