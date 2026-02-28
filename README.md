@@ -85,3 +85,6 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - `tanvm` defaults disable bluetooth and use `graphics.profile = "vm"` for software-rendering reliability.
 - `tanlappy` enables laptop defaults and leaves monitor layout on runtime discovery.
 - This setup targets `nixpkgs-unstable`.
+- Hyprland cache setup:
+  - Keep `inputs.hyprland` on its own `nixpkgs` (do not set `inputs.hyprland.inputs.nixpkgs.follows = "nixpkgs"`), otherwise Hyprland cache hits are typically lost.
+  - If you pulled this change into an existing clone, refresh lock metadata once: `nix flake lock --update-input hyprland`.

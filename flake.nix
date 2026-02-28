@@ -26,7 +26,6 @@
 
     hyprland = {
       url = "github:hyprwm/Hyprland?submodules=1";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     illogical = {

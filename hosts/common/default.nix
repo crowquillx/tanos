@@ -3,6 +3,8 @@ let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
   primaryUser = get [ "users" "primary" ] "tan";
+  hyprlandHmModule = lib.attrByPath [ "hyprland" "homeManagerModules" "default" ] null inputs;
+  illogicalHmModule = lib.attrByPath [ "illogical" "homeManagerModules" "default" ] null inputs;
 in
 {
   imports = [
@@ -58,6 +60,9 @@ in
     useUserPackages = true;
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit vars inputs; };
+    sharedModules =
+      lib.optionals (hyprlandHmModule != null) [ hyprlandHmModule ]
+      ++ lib.optionals (illogicalHmModule != null) [ illogicalHmModule ];
     users.${primaryUser} = import (../../users + "/${primaryUser}/home.nix");
   };
 }

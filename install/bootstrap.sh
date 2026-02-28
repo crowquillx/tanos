@@ -45,6 +45,8 @@ HOST_DIR="${REPO_ROOT}/hosts/${HOST}"
 HW_FILE="${HOST_DIR}/hardware-configuration.nix"
 KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
+HYPRLAND_SUBSTITUTER="https://hyprland.cachix.org"
+HYPRLAND_PUBLIC_KEY="hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
 FLAKE_PATH="path:${REPO_ROOT}"
 NIXOS_FLAKE_REF="${FLAKE_PATH}#${HOST}"
 PRIMARY_USER="$(sed -nE 's/^[[:space:]]*primary[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "${HOST_DIR}/variables.nix" | head -n1)"
@@ -69,7 +71,10 @@ echo "Repo root: ${REPO_ROOT}"
 # Keep bootstrap self-contained even when /etc/nix/nix.conf is immutable
 # (common on NixOS where /etc is declaratively managed).
 export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"experimental-features = ${NIX_EXPERIMENTAL_FEATURES}"
+export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-substituters = ${HYPRLAND_SUBSTITUTER}"
+export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-trusted-public-keys = ${HYPRLAND_PUBLIC_KEY}"
 echo "Using experimental features for this run: ${NIX_EXPERIMENTAL_FEATURES}"
+echo "Using Hyprland cache for this run: ${HYPRLAND_SUBSTITUTER}"
 
 if command -v nixos-generate-config >/dev/null 2>&1; then
   TMP_HW="$(mktemp)"
