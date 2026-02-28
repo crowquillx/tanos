@@ -68,6 +68,7 @@ in
       {
         home.username = lib.mkForce primaryUser;
         home.homeDirectory = lib.mkForce "/home/${primaryUser}";
+        xdg.configHome = lib.mkForce "/home/${primaryUser}/.config";
       }
     ];
   };
