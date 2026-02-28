@@ -214,21 +214,22 @@ in
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
 
-  xdg = {
-    enable = true;
-    userDirs.enable = true;
-    # Avoid repeated activation failures when a previous backup file already exists.
-    configFile."user-dirs.dirs".force = true;
-    configFile = lib.optionalAttrs hasIllogicalEnableOption {
-      # Keep Starship enabled, but make Illogical the single source of starship.toml.
-      "starship.toml".source = lib.mkForce (inputs.illogical + "/dots/.config/starship.toml");
-    };
-    mimeApps = {
+  xdg =
+    {
       enable = true;
-      defaultApplications = browserAssociations;
-      associations.added = browserAssociations;
+      userDirs.enable = true;
+      # Avoid repeated activation failures when a previous backup file already exists.
+      configFile."user-dirs.dirs".force = true;
+      mimeApps = {
+        enable = true;
+        defaultApplications = browserAssociations;
+        associations.added = browserAssociations;
+      };
+    }
+    // lib.optionalAttrs hasIllogicalEnableOption {
+      # Keep Starship enabled, but make Illogical the single source of starship.toml.
+      configFile."starship.toml".source = lib.mkForce (inputs.illogical + "/dots/.config/starship.toml");
     };
-  };
 
   home.sessionVariables = {
     TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
