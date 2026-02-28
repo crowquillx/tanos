@@ -227,6 +227,10 @@ in
 
   home.sessionVariables = {
     TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
+    QT_STYLE_OVERRIDE = lib.mkForce "";
+  };
+  systemd.user.sessionVariables = {
+    QT_STYLE_OVERRIDE = lib.mkForce "";
   };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
