@@ -235,6 +235,9 @@ in
     # Resolve upstream Illogical HM conflict by preferring the common default.
     QT_STYLE_OVERRIDE = lib.mkForce "";
   };
+  systemd.user.sessionVariables = {
+    QT_STYLE_OVERRIDE = lib.mkForce "";
+  };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
     enable = true;
