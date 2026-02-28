@@ -213,15 +213,16 @@ in
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
-  programs.starship = lib.optionalAttrs hasIllogicalEnableOption {
-    enable = lib.mkForce false;
-  };
 
   xdg = {
     enable = true;
     userDirs.enable = true;
     # Avoid repeated activation failures when a previous backup file already exists.
     configFile."user-dirs.dirs".force = true;
+    configFile = lib.optionalAttrs hasIllogicalEnableOption {
+      # Keep Starship enabled, but make Illogical the single source of starship.toml.
+      "starship.toml".source = lib.mkForce (inputs.illogical + "/dots/.config/starship.toml");
+    };
     mimeApps = {
       enable = true;
       defaultApplications = browserAssociations;
