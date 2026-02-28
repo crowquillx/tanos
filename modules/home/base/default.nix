@@ -1,7 +1,8 @@
-{ lib, pkgs, vars ? { }, inputs, config, ... }:
+{ lib, pkgs, vars ? { }, inputs, config, options, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
+  hasIllogicalEnableOption = lib.hasAttrByPath [ "programs" "illogical-impulse" "enable" ] options;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
@@ -212,6 +213,10 @@ in
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
+  programs.starship = lib.optionalAttrs hasIllogicalEnableOption {
+    # Illogical owns ~/.config/starship.toml when present.
+    enable = lib.mkForce false;
+  };
 
   xdg = {
     enable = true;

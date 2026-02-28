@@ -13,10 +13,10 @@ in
     lib.mkMerge [
       {
         home.sessionVariables = {
-          XDG_CURRENT_DESKTOP = "Hyprland";
-          XDG_SESSION_DESKTOP = "Hyprland";
-          NIXOS_OZONE_WL = "1";
-          ELECTRON_OZONE_PLATFORM_HINT = "auto";
+          XDG_CURRENT_DESKTOP = lib.mkDefault "Hyprland";
+          XDG_SESSION_DESKTOP = lib.mkDefault "Hyprland";
+          NIXOS_OZONE_WL = lib.mkDefault "1";
+          ELECTRON_OZONE_PLATFORM_HINT = lib.mkDefault "auto";
         };
       }
       (lib.optionalAttrs hasHyprlandEnableOption {
