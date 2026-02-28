@@ -232,6 +232,8 @@ in
 
   home.sessionVariables = {
     TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
+    # Resolve upstream Illogical HM conflict by preferring the common default.
+    QT_STYLE_OVERRIDE = lib.mkForce "";
   };
 
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
