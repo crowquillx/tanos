@@ -24,7 +24,7 @@
 
   desktop = {
     enable = true;
-    compositor = "hyprland";
+    compositor = "niri";
     displayManager = "auto";
     browser = {
       default = "firefox";
@@ -32,6 +32,20 @@
       zen.enable = false;
       chrome.enable = false;
       helium.enable = false;
+    };
+    niri = {
+      # Populate output names with `niri msg outputs`.
+      outputs = { };
+      settings = { };
+    };
+    noctalia = {
+      enable = true;
+      systemd.enable = true;
+      settings = { };
+      colors = { };
+      plugins = { };
+      pluginSettings = { };
+      userTemplates = { };
     };
     session = {
       enable = true;
@@ -49,7 +63,6 @@
     shellStartupCommand = null;
     startup.apps = [
       "wl-paste --watch cliphist store"
-      "qs -c ii"
       "spotify"
       "equibop"
     ];

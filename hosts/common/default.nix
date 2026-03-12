@@ -3,8 +3,7 @@ let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
   primaryUser = get [ "users" "primary" ] "tan";
-  hyprlandHmModule = lib.attrByPath [ "hyprland" "homeManagerModules" "default" ] null inputs;
-  illogicalHmModule = lib.attrByPath [ "illogical" "homeManagerModules" "default" ] null inputs;
+  noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
 in
 {
   imports = [
@@ -12,7 +11,7 @@ in
     ../../modules/nixos/base/default.nix
     ../../modules/nixos/theme/stylix.nix
     ../../modules/nixos/hardware/graphics.nix
-    ../../modules/nixos/desktop/hyprland.nix
+    ../../modules/nixos/desktop/niri.nix
     ../../modules/nixos/desktop/sddm.nix
     ../../modules/nixos/shells/fish-starship.nix
     ../../modules/nixos/services/audio.nix
@@ -38,10 +37,10 @@ in
     {
       assertion =
         let
-          compositor = get [ "desktop" "compositor" ] "hyprland";
+          compositor = get [ "desktop" "compositor" ] "niri";
         in
-        compositor == "hyprland";
-      message = "desktop.compositor must be set to \"hyprland\".";
+        compositor == "niri";
+      message = "desktop.compositor must be set to \"niri\".";
     }
     {
       assertion =
@@ -60,9 +59,7 @@ in
     useUserPackages = true;
     backupFileExtension = "hm-backup";
     extraSpecialArgs = { inherit vars inputs; };
-    sharedModules =
-      lib.optionals (hyprlandHmModule != null) [ hyprlandHmModule ]
-      ++ lib.optionals (illogicalHmModule != null) [ illogicalHmModule ];
+    sharedModules = lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
     users.${primaryUser} = {
       imports = [ (import (../../users + "/${primaryUser}/home.nix")) ];
       home.username = lib.mkForce primaryUser;

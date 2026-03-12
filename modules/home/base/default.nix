@@ -1,8 +1,7 @@
-{ lib, pkgs, vars ? { }, inputs, config, options, ... }:
+{ lib, pkgs, vars ? { }, inputs, config, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  hasIllogicalEnableOption = lib.hasAttrByPath [ "programs" "illogical-impulse" "enable" ] options;
   dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
@@ -213,10 +212,6 @@ in
     };
   programs.bash.enable = true;
   programs.fish.enable = fishEnabled;
-  programs.starship = lib.optionalAttrs hasIllogicalEnableOption {
-    # Defer starship.toml ownership to Illogical; system Starship remains enabled via NixOS module.
-    enable = lib.mkForce false;
-  };
 
   xdg = {
     enable = true;

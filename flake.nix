@@ -1,10 +1,5 @@
 {
-  description = "Minimal multi-host NixOS + Home Manager setup with Hyprland + illogical-flake and sops-nix";
-
-  nixConfig = {
-    extra-substituters = [ "https://hyprland.cachix.org" ];
-    extra-trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
-  };
+  description = "Minimal multi-host NixOS + Home Manager setup with Niri, Noctalia, and sops-nix";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -24,12 +19,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprland = {
-      url = "github:hyprwm/Hyprland?submodules=1";
+    niri = {
+      url = "github:sodiboo/niri-flake";
     };
 
-    illogical = {
-      url = "github:soymou/illogical-flake";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -52,9 +47,10 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     let
       lib = nixpkgs.lib;
-      hyprlandNixosModule = lib.attrByPath [ "hyprland" "nixosModules" "default" ] null inputs;
-      hyprlandHmModule = lib.attrByPath [ "hyprland" "homeManagerModules" "default" ] null inputs;
-      illogicalHmModule = lib.attrByPath [ "illogical" "homeManagerModules" "default" ] null inputs;
+      niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
+      niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
+      niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
+      noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
       hostPlatforms = {
         tandesk = "x86_64-linux";
         tanvm = "x86_64-linux";
@@ -73,13 +69,14 @@
           modules = [
             {
               nixpkgs.hostPlatform = hostPlatform;
+              nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
             }
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
             inputs.stylix.nixosModules.stylix
             (hostPath + "/default.nix")
           ]
-          ++ lib.optionals (hyprlandNixosModule != null) [ hyprlandNixosModule ];
+          ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
         };
 
       mkHome = hostName: hostPlatform:
@@ -93,6 +90,7 @@
           pkgs = import nixpkgs {
             system = hostPlatform;
             config.allowUnfree = true;
+            overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
           };
           extraSpecialArgs = { inherit vars inputs; };
           modules = [
@@ -102,8 +100,8 @@
               home.homeDirectory = "/home/${primaryUser}";
             }
           ]
-          ++ lib.optionals (hyprlandHmModule != null) [ hyprlandHmModule ]
-          ++ lib.optionals (illogicalHmModule != null) [ illogicalHmModule ];
+          ++ lib.optionals (niriHmConfigModule != null) [ niriHmConfigModule ]
+          ++ lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
         };
     in
     {

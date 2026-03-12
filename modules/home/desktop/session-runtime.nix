@@ -1,9 +1,10 @@
-{ lib, pkgs, vars ? { }, ... }:
+{ lib, pkgs, vars ? { }, config, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   desktopEnabled = get [ "desktop" "enable" ] true;
   sessionEnabled = get [ "desktop" "session" "enable" ] desktopEnabled;
+  waylandTarget = config.wayland.systemd.target;
 
   polkitEnable = get [ "desktop" "session" "polkit" "enable" ] true;
   lockEnable = get [ "desktop" "session" "lock" "enable" ] true;
@@ -13,7 +14,6 @@ let
   startupCommand = get [ "desktop" "shellStartupCommand" ] null;
   defaultStartupApps = [
     "wl-paste --watch cliphist store"
-    "qs -c ii"
   ];
   startupApps = get [ "desktop" "startup" "apps" ] defaultStartupApps;
   effectiveShellStartupCommand = startupCommand;
@@ -25,8 +25,8 @@ let
     value = {
       Unit = {
         Description = "Tanos Startup App ${toString index}";
-        PartOf = [ "graphical-session.target" ];
-        After = [ "graphical-session.target" ];
+        PartOf = [ waylandTarget ];
+        After = [ waylandTarget ];
       };
       Service = {
         ExecStart = "${pkgs.bash}/bin/bash -lc ${lib.escapeShellArg command}";
@@ -34,7 +34,7 @@ let
         RestartSec = 2;
       };
       Install = {
-        WantedBy = [ "graphical-session.target" ];
+        WantedBy = [ waylandTarget ];
       };
     };
   };
@@ -87,8 +87,8 @@ in
           tanos-polkit-agent = {
             Unit = {
               Description = "Tanos Polkit Authentication Agent";
-              PartOf = [ "graphical-session.target" ];
-              After = [ "graphical-session.target" ];
+              PartOf = [ waylandTarget ];
+              After = [ waylandTarget ];
             };
             Service = {
               ExecStart = "${pkgs.mate-polkit}/libexec/polkit-mate-authentication-agent-1";
@@ -96,7 +96,7 @@ in
               RestartSec = 2;
             };
             Install = {
-              WantedBy = [ "graphical-session.target" ];
+              WantedBy = [ waylandTarget ];
             };
           };
         })
@@ -104,8 +104,8 @@ in
           tanos-idle-lock = {
             Unit = {
               Description = "Tanos Idle Lock Service";
-              PartOf = [ "graphical-session.target" ];
-              After = [ "graphical-session.target" ];
+              PartOf = [ waylandTarget ];
+              After = [ waylandTarget ];
             };
             Service = {
               ExecStart = lib.escapeShellArgs ([ "${pkgs.swayidle}/bin/swayidle" ] ++ swayidleArgs);
@@ -113,7 +113,7 @@ in
               RestartSec = 2;
             };
             Install = {
-              WantedBy = [ "graphical-session.target" ];
+              WantedBy = [ waylandTarget ];
             };
           };
         })
@@ -121,8 +121,8 @@ in
           tanos-shell-startup = {
             Unit = {
               Description = "Tanos Desktop Shell Startup";
-              PartOf = [ "graphical-session.target" ];
-              After = [ "graphical-session.target" ];
+              PartOf = [ waylandTarget ];
+              After = [ waylandTarget ];
             };
             Service = {
               ExecStart = "${pkgs.bash}/bin/bash -lc ${lib.escapeShellArg effectiveShellStartupCommand}";
@@ -130,7 +130,7 @@ in
               RestartSec = 2;
             };
             Install = {
-              WantedBy = [ "graphical-session.target" ];
+              WantedBy = [ waylandTarget ];
             };
           };
         })

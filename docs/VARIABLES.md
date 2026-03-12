@@ -4,10 +4,13 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 
 ## Key switches
 
-- `desktop.compositor = "hyprland"`
+- `desktop.compositor = "niri"`
 - `desktop.displayManager = "auto" | "sddm"`
 - `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
+- `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`
+- `desktop.niri.settings = { ... }`
+- `desktop.noctalia = { enable, systemd.enable, settings, colors, plugins, pluginSettings, userTemplates }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
@@ -73,13 +76,51 @@ features = {
 ```nix
 desktop.startup.apps = [
   "wl-paste --watch cliphist store"
-  "qs -c ii"
   "spotify"
   "equibop"
 ];
 ```
 
-These are started as Home Manager-managed user services under `graphical-session.target`.
+These are started as Home Manager-managed user services under `wayland.systemd.target`.
+
+### Niri monitor configuration
+
+```nix
+desktop.niri = {
+  outputs = {
+    "eDP-1" = {
+      scale = 2.0;
+      "focus-at-startup" = true;
+      position = {
+        x = 0;
+        y = 0;
+      };
+    };
+  };
+
+  settings = {
+    "prefer-no-csd" = true;
+  };
+};
+```
+
+Use `niri msg outputs` from inside a running Niri session to discover the output names and supported modes.
+
+### Noctalia shell
+
+```nix
+desktop.noctalia = {
+  enable = true;
+  systemd.enable = true;
+  settings = { };
+  colors = { };
+  plugins = { };
+  pluginSettings = { };
+  userTemplates = { };
+};
+```
+
+This is passed directly to Home Manager's `programs.noctalia-shell.*` options, so the shell stays fully HM-managed.
 
 ### NH
 

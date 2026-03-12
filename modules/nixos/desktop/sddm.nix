@@ -4,6 +4,7 @@ let
   get = path: default: lib.attrByPath path default v;
   desktopEnabled = get [ "desktop" "enable" ] true;
   dm = get [ "desktop" "displayManager" ] "auto";
+  compositor = get [ "desktop" "compositor" ] "niri";
   effectiveDm = if dm == "auto" then "sddm" else dm;
 in
 {
@@ -11,7 +12,7 @@ in
     services.xserver.enable = true;
 
     services.displayManager = {
-      defaultSession = "hyprland";
+      defaultSession = compositor;
       sddm = {
         enable = true;
         wayland.enable = true;

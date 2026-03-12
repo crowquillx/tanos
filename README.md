@@ -1,6 +1,6 @@
 # tanos
 
-Minimal multi-host NixOS flake with Home Manager, `nixpkgs-unstable`, Hyprland (upstream flake), `soymou/illogical-flake`, SDDM, Stylix (Rose Pine), fish + starship, NH, and `sops-nix`.
+Minimal multi-host NixOS flake with Home Manager, `nixpkgs-unstable`, Niri via `sodiboo/niri-flake`, Noctalia shell, SDDM, Stylix (Rose Pine), fish + starship, NH, and `sops-nix`.
 
 ## Hosts
 
@@ -28,7 +28,7 @@ This repo assumes base NixOS is already installed.
    - `sudo ./install/bootstrap.sh tanvm`
    - `sudo ./install/bootstrap.sh tandesk`
    - `sudo ./install/bootstrap.sh tanlappy`
-4. Reboot and log in through SDDM (Hyprland session).
+4. Reboot and log in through SDDM (Niri session).
 
 ## tcli
 
@@ -83,8 +83,12 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 
 - `hardware-configuration.nix` placeholders are overwritten by bootstrap.
 - `tanvm` defaults disable bluetooth and use `graphics.profile = "vm"` for software-rendering reliability.
-- `tanlappy` enables laptop defaults and leaves monitor layout on runtime discovery.
+- `tanlappy` enables laptop defaults and leaves Niri output layout ready to define in `hosts/tanlappy/variables.nix`.
 - This setup targets `nixpkgs-unstable`.
-- Hyprland cache setup:
-  - Keep `inputs.hyprland` on its own `nixpkgs` (do not set `inputs.hyprland.inputs.nixpkgs.follows = "nixpkgs"`), otherwise Hyprland cache hits are typically lost.
-  - If you pulled this change into an existing clone, refresh lock metadata once: `nix flake lock --update-input hyprland`.
+- Niri package setup:
+  - The system uses `pkgs.niri-unstable` from `inputs.niri.overlays.niri`, matching Sodiboo's docs for using the overlay with your system `nixpkgs`.
+  - The NixOS module keeps `niri-flake.cache.enable = true`, so `niri.cachix.org` is used by default.
+  - Per-host monitor layout lives under `desktop.niri.outputs` in `hosts/<host>/variables.nix`.
+- Noctalia setup:
+  - Noctalia is managed through Home Manager with `programs.noctalia-shell.systemd.enable = true`.
+  - Per-host Noctalia settings live under `desktop.noctalia` in `hosts/<host>/variables.nix`.

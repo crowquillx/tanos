@@ -10,7 +10,8 @@
       ../../modules/home/theme/qt.nix
       ../../modules/home/shell/zoxide.nix
       ../../modules/home/desktop/session-runtime.nix
-      ../../modules/home/desktop/hyprland-user.nix
+      ../../modules/home/desktop/niri-user.nix
+      ../../modules/home/desktop/noctalia-shell.nix
     ];
 
   home.username = "tan";
