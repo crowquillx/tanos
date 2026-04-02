@@ -40,4 +40,4 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Build NixOS configuration
-        run: nix build --accept-flake-config .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+        run: nix build --accept-flake-config .#ciNixosConfigurations.${{ matrix.host }}.config.system.build.toplevel

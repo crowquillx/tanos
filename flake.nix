@@ -94,6 +94,19 @@
           ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
         };
 
+      mkCiHost = hostName: hostPlatform:
+        (mkHost hostName hostPlatform).extendModules {
+          modules = [
+            ({ lib, ... }: {
+              # CI-only fallback so placeholder hardware files still evaluate.
+              fileSystems."/" = lib.mkDefault {
+                device = "none";
+                fsType = "tmpfs";
+              };
+            })
+          ];
+        };
+
       mkHome = hostName: hostPlatform:
         let
           hostPath = ./hosts + "/${hostName}";
@@ -123,6 +136,7 @@
     in
     {
       nixosConfigurations = lib.mapAttrs mkHost hostPlatforms;
+      ciNixosConfigurations = lib.mapAttrs mkCiHost hostPlatforms;
       homeConfigurations = lib.mapAttrs mkHome hostPlatforms;
     };
 }
