@@ -12,6 +12,7 @@ in
     ../../modules/nixos/theme/stylix.nix
     ../../modules/nixos/hardware/graphics.nix
     ../../modules/nixos/desktop/niri.nix
+    ../../modules/nixos/desktop/kde.nix
     ../../modules/nixos/desktop/sddm.nix
     ../../modules/nixos/shells/fish-starship.nix
     ../../modules/nixos/services/audio.nix
@@ -39,8 +40,16 @@ in
         let
           compositor = get [ "desktop" "compositor" ] "niri";
         in
-        compositor == "niri";
-      message = "desktop.compositor must be set to \"niri\".";
+        builtins.elem compositor [ "niri" "plasma" ];
+      message = "desktop.compositor must be one of: niri, plasma.";
+    }
+    {
+      assertion =
+        let
+          extraCompositors = get [ "desktop" "extraCompositors" ] [ ];
+        in
+        builtins.all (c: builtins.elem c [ "niri" "plasma" ]) extraCompositors;
+      message = "desktop.extraCompositors may only include: niri, plasma.";
     }
     {
       assertion =

@@ -1,5 +1,5 @@
 {
-  description = "Minimal multi-host NixOS + Home Manager setup with Niri, Noctalia, and sops-nix";
+  description = "Minimal multi-host NixOS + Home Manager setup with Niri/KDE, Noctalia, and sops-nix";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,6 +21,14 @@
 
     niri = {
       url = "github:sodiboo/niri-flake";
+    };
+
+    niri-wip = {
+      url = "github:sodiboo/niri-flake";
+      # Track niri-wm/niri PR head while keeping niri-flake wiring/overlay shape.
+      # Branch/ref can be changed later if a different WIP target is desired.
+      inputs."niri-unstable".url = "github:niri-wm/niri?ref=pull/3483/head";
+      inputs."niri-stable".url = "github:niri-wm/niri?ref=pull/3483/head";
     };
 
     noctalia = {
@@ -47,20 +55,27 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     let
       lib = nixpkgs.lib;
-      niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
-      niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
-      niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
       noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
       hostPlatforms = {
         tandesk = "x86_64-linux";
         tanvm = "x86_64-linux";
         tanlappy = "x86_64-linux";
       };
+      getNiriInput = vars:
+        let
+          useWip = lib.attrByPath [ "desktop" "niri" "useWip" ] false vars;
+        in
+        if useWip then inputs."niri-wip" else inputs.niri;
+      getNiriOverlay = vars: lib.attrByPath [ "overlays" "niri" ] null (getNiriInput vars);
+      getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
+      getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
 
       mkHost = hostName: hostPlatform:
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
+          niriOverlay = getNiriOverlay vars;
+          niriNixosModule = getNiriNixosModule vars;
         in
         lib.nixosSystem {
           specialArgs = {
@@ -70,6 +85,12 @@
             {
               nixpkgs.hostPlatform = hostPlatform;
               nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
+              # Keeps placeholder hardware configs evaluable (CI/flake check);
+              # real host hardware-configuration.nix values override this mkDefault.
+              fileSystems."/" = lib.mkDefault {
+                device = "none";
+                fsType = "tmpfs";
+              };
             }
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
@@ -79,10 +100,25 @@
           ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
         };
 
+      mkCiHost = hostName: hostPlatform:
+        (mkHost hostName hostPlatform).extendModules {
+          modules = [
+            ({ lib, ... }: {
+              # CI-only fallback so placeholder hardware files still evaluate.
+              fileSystems."/" = lib.mkDefault {
+                device = "none";
+                fsType = "tmpfs";
+              };
+            })
+          ];
+        };
+
       mkHome = hostName: hostPlatform:
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
+          niriOverlay = getNiriOverlay vars;
+          niriHmConfigModule = getNiriHmConfigModule vars;
           primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
           userHomePath = ./users + "/${primaryUser}/home.nix";
         in
@@ -106,6 +142,7 @@
     in
     {
       nixosConfigurations = lib.mapAttrs mkHost hostPlatforms;
+      ciNixosConfigurations = lib.mapAttrs mkCiHost hostPlatforms;
       homeConfigurations = lib.mapAttrs mkHome hostPlatforms;
     };
 }
