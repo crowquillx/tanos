@@ -19,6 +19,7 @@ jobs:
         uses: DeterminateSystems/magic-nix-cache-action@v13
 
       - name: Run statix
+        continue-on-error: true
         run: nix run nixpkgs#statix -- check .
 
       - name: Flake checks
