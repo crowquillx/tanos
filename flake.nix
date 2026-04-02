@@ -85,6 +85,12 @@
             {
               nixpkgs.hostPlatform = hostPlatform;
               nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
+              # Keeps placeholder hardware configs evaluable (CI/flake check);
+              # real host hardware-configuration.nix values override this mkDefault.
+              fileSystems."/" = lib.mkDefault {
+                device = "none";
+                fsType = "tmpfs";
+              };
             }
             inputs.home-manager.nixosModules.home-manager
             inputs.sops-nix.nixosModules.sops
