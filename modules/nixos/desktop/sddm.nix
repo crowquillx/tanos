@@ -6,13 +6,18 @@ let
   dm = get [ "desktop" "displayManager" ] "auto";
   compositor = get [ "desktop" "compositor" ] "niri";
   effectiveDm = if dm == "auto" then "sddm" else dm;
+  defaultSession =
+    if compositor == "plasma" then
+      "plasma"
+    else
+      "niri";
 in
 {
   config = lib.mkIf (desktopEnabled && effectiveDm == "sddm") {
     services.xserver.enable = true;
 
     services.displayManager = {
-      defaultSession = compositor;
+      inherit defaultSession;
       sddm = {
         enable = true;
         wayland.enable = true;

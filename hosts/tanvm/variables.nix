@@ -24,6 +24,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
+    extraCompositors = [ ];
     displayManager = "auto";
     browser = {
       default = "firefox";
@@ -33,6 +34,7 @@
       helium.enable = false;
     };
     niri = {
+      useWip = false;
       # Populate output names with `niri msg outputs`.
       outputs = { };
       settings = { };

@@ -12,6 +12,17 @@ in
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-gnome
+        pkgs.xdg-desktop-portal-kde
+      ];
+      config = {
+        common.default = [ "gtk" ];
+        niri.default = [ "gnome" "gtk" ];
+        kde.default = [ "kde" "gtk" ];
+        KDE.default = [ "kde" "gtk" ];
+        plasma.default = [ "kde" "gtk" ];
+      };
+      configPackages = [
+        pkgs.kdePackages.xdg-desktop-portal-kde
       ];
     };
   };

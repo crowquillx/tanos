@@ -4,12 +4,14 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 
 ## Key switches
 
-- `desktop.compositor = "niri"`
+- `desktop.compositor = "niri" | "plasma"`
+- `desktop.extraCompositors = [ "niri" "plasma" ... ]` (optional additional installed sessions; first login default still comes from `desktop.compositor`)
 - `desktop.displayManager = "auto" | "sddm"`
 - `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
 - `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`
 - `desktop.niri.settings = { ... }`
+- `desktop.niri.useWip = true | false` (switches niri input from stable branch to `wip`)
 - `desktop.noctalia = { enable, systemd.enable, settings, colors, plugins, pluginSettings, userTemplates }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
@@ -105,6 +107,18 @@ desktop.niri = {
 ```
 
 Use `niri msg outputs` from inside a running Niri session to discover the output names and supported modes.
+
+### Install both Niri and Plasma sessions
+
+```nix
+desktop = {
+  # Default selected in SDDM.
+  compositor = "niri";
+
+  # Also install Plasma so both sessions are available at login.
+  extraCompositors = [ "plasma" ];
+};
+```
 
 ### Noctalia shell
 

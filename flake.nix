@@ -1,5 +1,5 @@
 {
-  description = "Minimal multi-host NixOS + Home Manager setup with Niri, Noctalia, and sops-nix";
+  description = "Minimal multi-host NixOS + Home Manager setup with Niri/KDE, Noctalia, and sops-nix";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -21,6 +21,10 @@
 
     niri = {
       url = "github:sodiboo/niri-flake";
+    };
+
+    niri-wip = {
+      url = "github:sodiboo/niri-flake/wip";
     };
 
     noctalia = {
@@ -47,20 +51,27 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     let
       lib = nixpkgs.lib;
-      niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
-      niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
-      niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
       noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
       hostPlatforms = {
         tandesk = "x86_64-linux";
         tanvm = "x86_64-linux";
         tanlappy = "x86_64-linux";
       };
+      getNiriInput = vars:
+        let
+          useWip = lib.attrByPath [ "desktop" "niri" "useWip" ] false vars;
+        in
+        if useWip then inputs."niri-wip" else inputs.niri;
+      getNiriOverlay = vars: lib.attrByPath [ "overlays" "niri" ] null (getNiriInput vars);
+      getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
+      getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
 
       mkHost = hostName: hostPlatform:
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
+          niriOverlay = getNiriOverlay vars;
+          niriNixosModule = getNiriNixosModule vars;
         in
         lib.nixosSystem {
           specialArgs = {
@@ -83,6 +94,8 @@
         let
           hostPath = ./hosts + "/${hostName}";
           vars = import (hostPath + "/variables.nix");
+          niriOverlay = getNiriOverlay vars;
+          niriHmConfigModule = getNiriHmConfigModule vars;
           primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
           userHomePath = ./users + "/${primaryUser}/home.nix";
         in

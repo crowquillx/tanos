@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Enable binary cache
+        uses: DeterminateSystems/magic-nix-cache-action@v13
+
+      - name: Run statix
+        run: nix run nixpkgs#statix -- check .
+
+      - name: Flake checks
+        run: nix flake check --accept-flake-config
+
+  build-hosts:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [tandesk, tanlappy, tanvm]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Enable binary cache
+        uses: DeterminateSystems/magic-nix-cache-action@v13
+
+      - name: Build NixOS configuration
+        run: nix build --accept-flake-config .#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
