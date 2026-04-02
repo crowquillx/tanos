@@ -24,7 +24,10 @@
     };
 
     niri-wip = {
-      url = "github:sodiboo/niri-flake/wip";
+      url = "github:sodiboo/niri-flake";
+      # Track niri-wm/niri PR head while keeping niri-flake wiring/overlay shape.
+      # Branch/ref can be changed later if a different WIP target is desired.
+      inputs.niri.url = "github:niri-wm/niri?ref=pull/3483/head";
     };
 
     noctalia = {

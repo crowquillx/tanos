@@ -11,7 +11,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
 - `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`
 - `desktop.niri.settings = { ... }`
-- `desktop.niri.useWip = true | false` (switches niri input from stable branch to `wip`)
+- `desktop.niri.useWip = true | false` (switches niri input from stable to the WIP override target in `flake.nix`, currently `niri-wm/niri` PR `#3483`)
 - `desktop.noctalia = { enable, systemd.enable, settings, colors, plugins, pluginSettings, userTemplates }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`

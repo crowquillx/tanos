@@ -13,7 +13,7 @@ in
     assertions = [
       {
         assertion = niriPackage != null;
-        message = "pkgs.niri-unstable is unavailable. Ensure inputs.niri.overlays.niri is applied (desktop.niri.useWip selects stable/wip flake branch).";
+        message = "pkgs.niri-unstable is unavailable. Ensure inputs.niri.overlays.niri is applied (desktop.niri.useWip selects stable or the WIP override target).";
       }
     ];
 
