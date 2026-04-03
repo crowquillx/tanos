@@ -82,6 +82,7 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - sops key/secret setup: `docs/SOPS.md`
 - adding and wiring a new host: `docs/NEW_HOST.md`
 - parts-wrapped architecture and migration notes: `docs/DENDRITIC.md`
+- secure boot setup (lanzaboote + microsoft keys): `docs/SECURE_BOOT.md`
 
 ## Notes
 
@@ -89,6 +90,10 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - `tanvm` defaults disable bluetooth and use `graphics.profile = "vm"` for software-rendering reliability.
 - `tanlappy` enables laptop defaults and leaves Niri output layout ready to define in `hosts/tanlappy/variables.nix`.
 - This setup targets `nixpkgs-unstable`.
+- Secure Boot support:
+  - Controlled per host via `boot.secureBoot.*` in `hosts/<host>/variables.nix`.
+  - Defaults to disabled (`enable = false`) with Microsoft keys supported when enabled.
+  - Follow `docs/SECURE_BOOT.md` **before** enabling in firmware.
 - Niri package setup:
   - The system uses `pkgs.niri-unstable` from `inputs.niri.overlays.niri`, matching Sodiboo's docs for using the overlay with your system `nixpkgs`.
   - The NixOS module keeps `niri-flake.cache.enable = true`, so `niri.cachix.org` is used by default.

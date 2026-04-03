@@ -20,6 +20,7 @@
     ../nixos/services/virtualisation.nix
     ../nixos/services/keyring.nix
     ../nixos/security/sops.nix
+    ../nixos/security/secure-boot.nix
     ../nixos/profiles/vm-guest.nix
     ../nixos/profiles/laptop.nix
   ];

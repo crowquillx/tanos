@@ -41,6 +41,7 @@ let
         inputs.home-manager.nixosModules.home-manager
         inputs.sops-nix.nixosModules.sops
         inputs.stylix.nixosModules.stylix
+        inputs.lanzaboote.nixosModules.lanzaboote
         self.nixosModules.${hostName}
       ]
       ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
