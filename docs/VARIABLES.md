@@ -33,7 +33,6 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.zoxide.enable = true | false`
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
-- `features.danksearch.enable = true | false`
 - `features.codingTools.enable = true | false`
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`

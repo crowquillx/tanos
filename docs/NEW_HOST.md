@@ -19,6 +19,8 @@ Edit `hosts/<newhost>/variables.nix` and at minimum set:
 
 Detailed variable reference: `docs/VARIABLES.md`.
 
+If adding/removing globally shared modules, update `modules/combined/stacks.nix` so both NixOS and Home Manager stacks stay aligned.
+
 ## 3) Provide hardware configuration
 
 Option A (recommended): let bootstrap generate it.
@@ -31,7 +33,7 @@ Option B: manually generate and place `hosts/<newhost>/hardware-configuration.ni
 
 ## 4) Register host in flake outputs
 
-Add `<newhost>` in `flake.nix` under `hostPlatforms` so both outputs are generated:
+Add `<newhost>` in `modules/flake/hosts.nix` under `hostPlatforms` so both outputs are generated:
 
 - `nixosConfigurations.<newhost>`
 - `homeConfigurations.<newhost>`

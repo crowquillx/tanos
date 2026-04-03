@@ -12,6 +12,9 @@ All hosts currently use username `tan`.
 
 ## Layout
 
+- `flake.nix`: parts-wrapped flake entrypoint (via `flake-parts`)
+- `modules/flake/*`: parts-wrapped flake modules (hosts + packages + output assembly)
+- `modules/combined/stacks.nix`: shared stack wiring for both NixOS + Home Manager modules
 - `hosts/<host>/variables.nix`: host toggles and values
 - `hosts/<host>/default.nix`: host-specific wiring
 - `modules/nixos/*`: system modules
@@ -78,6 +81,7 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - `tcli` behavior, action mapping, and GC details: `docs/TCLI.md`
 - sops key/secret setup: `docs/SOPS.md`
 - adding and wiring a new host: `docs/NEW_HOST.md`
+- parts-wrapped architecture and migration notes: `docs/DENDRITIC.md`
 
 ## Notes
 
