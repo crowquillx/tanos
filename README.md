@@ -37,15 +37,15 @@ This repo assumes base NixOS is already installed.
 
 `tcli` is installed via Home Manager and is the recommended day-to-day command for this repo.
 
-It handles both layers every time:
+It handles both system + Home Manager through one rebuild path:
 
-1. NixOS system rebuild (`nixos-rebuild`)
-2. Home Manager rebuild (`home-manager` via flake `homeConfigurations`)
+1. NixOS rebuild (`nixos-rebuild`)
+2. Home Manager activation via NixOS `home-manager` module integration
 
 Commands:
 
 - `tcli rebuild [switch|build|test|boot] [host]`
-- `tcli update [host]`
+- `tcli update [host]` (alias: `tcli upgrade [host]`)
 - `tcli gc`
 - `tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]`
 - `tcli nh home [switch|build] [host] [-- <nh-args...>]`

@@ -2,10 +2,7 @@
 
 `tcli` is a Home Manager-installed helper command for this repository.
 
-It provides one place to run common flake lifecycle tasks while always handling both layers:
-
-1. NixOS system modules
-2. Home Manager modules
+It provides one place to run common flake lifecycle tasks while handling both layers through one NixOS rebuild path (Home Manager via NixOS integration).
 
 ## Commands
 
@@ -13,21 +10,16 @@ It provides one place to run common flake lifecycle tasks while always handling 
 
 - Default action: `switch`
 - Default host: current machine hostname
-- Runs:
+- Runs a **single** command:
   - `sudo nixos-rebuild <action> --flake path:<repo>#<host>`
-  - `home-manager <mapped-action> --flake path:<repo>#<host>`
 
-Action mapping for Home Manager:
+Home Manager is applied through the NixOS `home-manager` module (`home-manager.users`), so this remains a full system+home workflow without a second standalone `home-manager` invocation.
 
-- `switch` -> `switch`
-- `build` -> `build`
-- `test` -> `switch` (HM has no `test` action)
-- `boot` -> `build` (HM has no `boot` action)
-
-### `tcli update [host]`
+### `tcli update [host]` / `tcli upgrade [host]`
 
 - Runs `nix flake update --flake path:<repo>`
 - Then runs `tcli rebuild switch [host]`
+- This uses one rebuild invocation (no extra standalone Home Manager build).
 
 ### `tcli gc`
 
