@@ -19,6 +19,7 @@ let
     in
     if fhsPkg != null then fhsPkg else nativePkg;
   statixPkg = lib.attrByPath [ "statix" ] null pkgs;
+  opencodePkg = lib.attrByPath [ "opencode" ] null pkgs;
   deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
   alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
   nixfmtPkg =
@@ -82,6 +83,7 @@ in
   home.packages =
     lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
+    ++ lib.optionals (codingToolsEnabled && opencodePkg != null) [ opencodePkg ]
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
     ++ lib.optionals (codingToolsEnabled && statixPkg != null) [ statixPkg ]
     ++ lib.optionals (codingToolsEnabled && deadnixPkg != null) [ deadnixPkg ]
