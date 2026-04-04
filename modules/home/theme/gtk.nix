@@ -1,4 +1,9 @@
-{ lib, pkgs, vars ? { }, ... }:
+{
+  lib,
+  pkgs,
+  vars ? { },
+  ...
+}:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -34,6 +39,10 @@ in
         name = iconThemeName;
         package = iconThemePkg;
       };
+    };
+
+    xfconf.settings.xsettings = {
+      "Net/IconThemeName" = iconThemeName;
     };
   };
 }

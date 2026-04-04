@@ -25,7 +25,7 @@
       "mpv"
       "pywalfox-native"
       "sops"
-  ];
+    ];
     git = {
       name = "tan";
       email = "tancodes@proton.me";
@@ -47,6 +47,7 @@
     extraCompositors = [ ];
     displayManager = "auto";
     sddm.wayland.enable = false;
+    sddm.background = "./wallpapers/1.jpg";
     browser = {
       default = "zen";
       firefox.enable = false;
@@ -170,8 +171,8 @@
       gtk = {
         enable = true;
         iconTheme = {
-          name = "MoreWaita";
-          package = "morewaita-icon-theme";
+          name = "rose-pine";
+          package = "rose-pine-icon-theme";
         };
       };
       qt.enable = true;
@@ -188,6 +189,9 @@
     printing.enable = false;
     flatpak = {
       enable = true;
+      packages = [
+        "org.upscayl.Upscayl"
+      ];
     };
     gaming = {
       enable = true;

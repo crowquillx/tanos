@@ -104,8 +104,8 @@
       gtk = {
         enable = true;
         iconTheme = {
-          name = "MoreWaita";
-          package = "morewaita-icon-theme";
+          name = "rose-pine";
+          package = "rose-pine-icon-theme";
         };
       };
       qt.enable = true;

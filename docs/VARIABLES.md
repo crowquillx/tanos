@@ -8,6 +8,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.extraCompositors = [ "niri" "plasma" ... ]` (optional additional installed sessions; first login default still comes from `desktop.compositor`)
 - `desktop.displayManager = "auto" | "sddm"`
 - `desktop.sddm.wayland.enable = true | false`
+- `desktop.sddm.background = <path> | null` (SDDM astronaut theme background image; uses the embedded theme default when `null`)
 - `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
 - `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`
