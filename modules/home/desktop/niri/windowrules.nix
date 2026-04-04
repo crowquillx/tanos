@@ -2,7 +2,7 @@
 let
   equibopElectronMatch = {
     app-id = "^electron$";
-    title = "^Discord$";
+    title = "^.*Discord.*$";
   };
 in
 [
@@ -78,7 +78,6 @@ in
   ])
 
   (plain "window-rule" [
-    (leaf "match" { app-id = "^equibop$"; })
     (leaf "match" equibopElectronMatch)
     (leaf "open-on-output" "DP-1")
     (leaf "open-maximized" true)
@@ -89,4 +88,5 @@ in
     (leaf "open-on-output" "DP-2")
     (leaf "open-maximized" true)
   ])
+
 ]
