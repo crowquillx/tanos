@@ -39,6 +39,10 @@ Read [docs/DENDRITIC.md](/home/tan/tanos/docs/DENDRITIC.md) before changing flak
 - Keep NixOS and Home Manager responsibilities separated. System services belong in `modules/nixos`; user session behavior belongs in `modules/home`.
 
 ### Prefer declarative modules over shell-heavy activation
+- Do not reinvent the wheel when a working upstream implementation already exists.
+- Prefer established NixOS modules, Home Manager modules, and maintained external flakes over custom reimplementations.
+- Before writing custom glue, check whether the behavior already exists in `nixpkgs`, Home Manager, or a well-maintained flake used by the community.
+- Good example: use a maintained declarative Flatpak module such as `nix-flatpak` rather than custom activation scripts for package lifecycle management.
 - Avoid custom boot-time shell in `system.activationScripts` when an existing NixOS or Home Manager module can model the state directly.
 - Prefer upstream module options and well-maintained flake inputs over hand-rolled lifecycle scripts.
 - Be especially conservative with anything that runs during activation or boot. A broken activation snippet can prevent the machine from booting cleanly.
