@@ -33,10 +33,6 @@ let
         {
           nixpkgs.hostPlatform = hostPlatform;
           nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
-          fileSystems."/" = lib.mkDefault {
-            device = "none";
-            fsType = "tmpfs";
-          };
         }
         inputs.home-manager.nixosModules.home-manager
         inputs.sops-nix.nixosModules.sops
