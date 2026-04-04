@@ -16,6 +16,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
+- `boot.secureBoot = { enable, includeMicrosoftKeys, autoEnroll, pkiBundle }` (Lanzaboote-based secure boot)
 - `desktop.shellStartupCommand = "<command>"`
 - `desktop.startup.apps = [ "<cmd>" ... ]`
 - `desktop.session.polkit.enable = true | false`
@@ -33,7 +34,6 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.zoxide.enable = true | false`
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
-- `features.danksearch.enable = true | false`
 - `features.codingTools.enable = true | false`
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`

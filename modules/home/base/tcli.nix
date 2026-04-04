@@ -16,6 +16,7 @@ let
     Usage:
       tcli rebuild [switch|build|test|boot] [host]
       tcli update [host]
+      tcli upgrade [host]
       tcli gc
       tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]
       tcli nh home [switch|build] [host] [-- <nh-args...>]
@@ -24,9 +25,8 @@ let
     Notes:
       - Host defaults to current hostname.
       - Flake path defaults to current repo root; override with TANOS_FLAKE_DIR.
-      - Rebuild always runs BOTH:
-        1) nixos-rebuild for system modules
-        2) home-manager for home modules
+      - Rebuild runs a single nixos-rebuild invocation.
+      - Home Manager is applied through NixOS module integration (home-manager.users).
     EOF
     }
 
@@ -85,46 +85,8 @@ let
       esac
 
       printf '==> Rebuilding NixOS (%s) for host %s\n' "$action" "$host"
+      printf '==> Home Manager is applied via NixOS module integration (single build path)\n'
       sudo nixos-rebuild "$action" --flake "''${flake_ref}#''${host}"
-
-      local hm_action="switch"
-      case "$action" in
-        build) hm_action="build" ;;
-        test) hm_action="switch" ;;
-        boot)
-          hm_action="build"
-          printf '==> Home Manager has no boot mode; using build\n'
-          ;;
-      esac
-
-      printf '==> Rebuilding Home Manager (%s) for host %s\n' "$hm_action" "$host"
-      run_home_manager "$hm_action" "$host" "$flake_ref"
-    }
-
-    run_home_manager() {
-      local hm_action="$1"
-      local host="$2"
-      local flake_ref="$3"
-      local hm_target="''${flake_ref}#''${host}"
-
-      if command -v home-manager >/dev/null 2>&1; then
-        home-manager "$hm_action" --flake "$hm_target"
-        return
-      fi
-
-      printf '==> home-manager command not found; using activationPackage fallback\n'
-      case "$hm_action" in
-        build)
-          nix build "''${flake_ref}#homeConfigurations.''${host}.activationPackage"
-          ;;
-        switch)
-          nix build "''${flake_ref}#homeConfigurations.''${host}.activationPackage"
-          ./result/activate
-          ;;
-        *)
-          die "unsupported home-manager fallback action: $hm_action"
-          ;;
-      esac
     }
 
     run_update() {
@@ -209,7 +171,7 @@ let
           [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
           run_rebuild "$action" "$host" "$flake_ref"
           ;;
-        update)
+        update|upgrade)
           host="$(resolve_host "''${1-}")"
           [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
           run_update "$host" "$flake_ref"

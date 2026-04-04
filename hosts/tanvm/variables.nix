@@ -7,6 +7,15 @@
   };
 
   boot.systemdBoot.enable = true;
+  boot.secureBoot = {
+    enable = false;
+    # Keep Microsoft UEFI CA/3rd-party keys available for dual-boot and vendor tooling.
+    includeMicrosoftKeys = true;
+    # Set true after reading docs/SECURE_BOOT.md and confirming firmware setup steps.
+    autoEnroll = false;
+    # Default sbctl/Lanzaboote PKI location.
+    pkiBundle = "/etc/secureboot";
+  };
 
   users = {
     primary = "tan";

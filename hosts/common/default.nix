@@ -1,4 +1,4 @@
-{ lib, config, vars, inputs, ... }:
+{ lib, config, vars, inputs, combined, ... }:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
@@ -8,29 +8,8 @@ in
 {
   imports = [
     ./variables-schema.nix
-    ../../modules/nixos/base/default.nix
-    ../../modules/nixos/theme/stylix.nix
-    ../../modules/nixos/hardware/graphics.nix
-    ../../modules/nixos/desktop/niri.nix
-    ../../modules/nixos/desktop/kde.nix
-    ../../modules/nixos/desktop/sddm.nix
-    ../../modules/nixos/shells/fish-starship.nix
-    ../../modules/nixos/services/audio.nix
-    ../../modules/nixos/services/core.nix
-    ../../modules/nixos/services/bluetooth.nix
-    ../../modules/nixos/services/networking.nix
-    ../../modules/nixos/services/portals.nix
-    ../../modules/nixos/services/filemanager.nix
-    ../../modules/nixos/services/printing.nix
-    ../../modules/nixos/services/flatpak.nix
-    ../../modules/nixos/services/nh.nix
-    ../../modules/nixos/services/steam.nix
-    ../../modules/nixos/services/virtualisation.nix
-    ../../modules/nixos/services/keyring.nix
-    ../../modules/nixos/security/sops.nix
-    ../../modules/nixos/profiles/vm-guest.nix
-    ../../modules/nixos/profiles/laptop.nix
-  ];
+  ] ++ combined.nixosModules;
+
 
   tanos.variables = vars;
 
@@ -67,7 +46,7 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-backup";
-    extraSpecialArgs = { inherit vars inputs; };
+    extraSpecialArgs = { inherit vars inputs combined; };
     sharedModules = lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
     users.${primaryUser} = {
       imports = [ (import (../../users + "/${primaryUser}/home.nix")) ];

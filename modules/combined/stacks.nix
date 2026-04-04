@@ -1,0 +1,40 @@
+{
+  nixosModules = [
+    ../nixos/base/default.nix
+    ../nixos/theme/stylix.nix
+    ../nixos/hardware/graphics.nix
+    ../nixos/desktop/niri.nix
+    ../nixos/desktop/kde.nix
+    ../nixos/desktop/sddm.nix
+    ../nixos/shells/fish-starship.nix
+    ../nixos/services/audio.nix
+    ../nixos/services/core.nix
+    ../nixos/services/bluetooth.nix
+    ../nixos/services/networking.nix
+    ../nixos/services/portals.nix
+    ../nixos/services/filemanager.nix
+    ../nixos/services/printing.nix
+    ../nixos/services/flatpak.nix
+    ../nixos/services/nh.nix
+    ../nixos/services/steam.nix
+    ../nixos/services/virtualisation.nix
+    ../nixos/services/keyring.nix
+    ../nixos/security/sops.nix
+    ../nixos/security/secure-boot.nix
+    ../nixos/profiles/vm-guest.nix
+    ../nixos/profiles/laptop.nix
+  ];
+
+  homeModules = [
+    ../home/base/default.nix
+    ../home/base/extra-packages.nix
+    ../home/base/tcli.nix
+    ../home/terminals/kitty.nix
+    ../home/theme/gtk.nix
+    ../home/theme/qt.nix
+    ../home/shell/zoxide.nix
+    ../home/desktop/session-runtime.nix
+    ../home/desktop/niri-user.nix
+    ../home/desktop/noctalia-shell.nix
+  ];
+}

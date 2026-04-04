@@ -2,7 +2,6 @@
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  dsearchEnabled = get [ "features" "danksearch" "enable" ] true;
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
   system = pkgs.stdenv.hostPlatform.system;
@@ -16,7 +15,6 @@ let
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 
   zenPkg = lib.attrByPath [ "zen-browser" "packages" system "default" ] null inputs;
-  dsearchPkg = lib.attrByPath [ "danksearch" "packages" system "default" ] null inputs;
   codexPkg = lib.attrByPath [ "codex" ] null pkgs;
   vscodePkg = lib.attrByPath [ "vscode" ] null pkgs;
   geminiCliPkg =
@@ -118,10 +116,6 @@ in
       message = "Set both users.git.name and users.git.email (or leave both unset).";
     }
     {
-      assertion = !(dsearchEnabled && dsearchPkg == null);
-      message = "features.danksearch.enable is true, but danksearch package could not be resolved from flake input.";
-    }
-    {
       assertion = !(codingToolsEnabled && codexPkg == null);
       message = "features.codingTools.enable is true, but nixpkgs package 'codex' could not be resolved.";
     }
@@ -184,7 +178,6 @@ in
       curl
     ])
     ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
-    ++ lib.optionals (dsearchEnabled && dsearchPkg != null) [ dsearchPkg ]
     ++ lib.optionals (codingToolsEnabled && codexPkg != null) [ codexPkg ]
     ++ lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]

@@ -12,6 +12,9 @@ All hosts currently use username `tan`.
 
 ## Layout
 
+- `flake.nix`: parts-wrapped flake entrypoint (via `flake-parts`)
+- `modules/flake/*`: parts-wrapped flake modules (hosts + packages + output assembly)
+- `modules/combined/stacks.nix`: shared stack wiring for both NixOS + Home Manager modules
 - `hosts/<host>/variables.nix`: host toggles and values
 - `hosts/<host>/default.nix`: host-specific wiring
 - `modules/nixos/*`: system modules
@@ -34,15 +37,15 @@ This repo assumes base NixOS is already installed.
 
 `tcli` is installed via Home Manager and is the recommended day-to-day command for this repo.
 
-It handles both layers every time:
+It handles both system + Home Manager through one rebuild path:
 
-1. NixOS system rebuild (`nixos-rebuild`)
-2. Home Manager rebuild (`home-manager` via flake `homeConfigurations`)
+1. NixOS rebuild (`nixos-rebuild`)
+2. Home Manager activation via NixOS `home-manager` module integration
 
 Commands:
 
 - `tcli rebuild [switch|build|test|boot] [host]`
-- `tcli update [host]`
+- `tcli update [host]` (alias: `tcli upgrade [host]`)
 - `tcli gc`
 - `tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]`
 - `tcli nh home [switch|build] [host] [-- <nh-args...>]`
@@ -78,6 +81,8 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - `tcli` behavior, action mapping, and GC details: `docs/TCLI.md`
 - sops key/secret setup: `docs/SOPS.md`
 - adding and wiring a new host: `docs/NEW_HOST.md`
+- parts-wrapped architecture and migration notes: `docs/DENDRITIC.md`
+- secure boot setup (lanzaboote + microsoft keys): `docs/SECURE_BOOT.md`
 
 ## Notes
 
@@ -85,6 +90,10 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - `tanvm` defaults disable bluetooth and use `graphics.profile = "vm"` for software-rendering reliability.
 - `tanlappy` enables laptop defaults and leaves Niri output layout ready to define in `hosts/tanlappy/variables.nix`.
 - This setup targets `nixpkgs-unstable`.
+- Secure Boot support:
+  - Controlled per host via `boot.secureBoot.*` in `hosts/<host>/variables.nix`.
+  - Defaults to disabled (`enable = false`) with Microsoft keys supported when enabled.
+  - Follow `docs/SECURE_BOOT.md` **before** enabling in firmware.
 - Niri package setup:
   - The system uses `pkgs.niri-unstable` from `inputs.niri.overlays.niri`, matching Sodiboo's docs for using the overlay with your system `nixpkgs`.
   - The NixOS module keeps `niri-flake.cache.enable = true`, so `niri.cachix.org` is used by default.
