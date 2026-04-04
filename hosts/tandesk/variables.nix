@@ -1,8 +1,8 @@
 {
   host = {
-    name = "tandesk";
+    name = "tandesk-nix";
     isVm = false;
-    timeZone = "America/Chicago";
+    timeZone = "America/Boise";
     locale = "en_US.UTF-8";
   };
 
@@ -21,8 +21,8 @@
     primary = "tan";
     extraPackages = [ ];
     git = {
-      name = null;
-      email = null;
+      name = "tan";
+      email = "tancodes@proton.me";
     };
   };
 
@@ -41,14 +41,14 @@
     extraCompositors = [ ];
     displayManager = "auto";
     browser = {
-      default = "firefox";
-      firefox.enable = true;
-      zen.enable = false;
+      default = "zen";
+      firefox.enable = false;
+      zen.enable = true;
       chrome.enable = false;
       helium.enable = false;
     };
     niri = {
-      useWip = false;
+      useWip = true;
       # Populate output names with `niri msg outputs`.
       outputs = { };
       settings = { };
