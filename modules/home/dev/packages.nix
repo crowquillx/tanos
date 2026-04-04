@@ -32,10 +32,11 @@ let
       (lib.attrByPath [ "nixd" ] null pkgs)
       (lib.attrByPath [ "nil" ] null pkgs)
     ];
-  t3Pkg =
+  t3DesktopPkg =
     lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "t3code-nix" "packages" system "t3" ] null inputs)
-      (lib.attrByPath [ "t3code-nix" "packages" system "t3code-cli" ] null inputs)
+      (lib.attrByPath [ "t3code-nix" "packages" system "t3code" ] null inputs)
+      (lib.attrByPath [ "t3code-nix" "packages" system "t3code-desktop" ] null inputs)
+      (lib.attrByPath [ "t3code-nix" "packages" system "default" ] null inputs)
     ];
 in
 {
@@ -73,8 +74,8 @@ in
       message = "features.codingTools.enable is true, but no Nix language server (nixd or nil) could be resolved.";
     }
     {
-      assertion = !(codingToolsEnabled && t3Pkg == null);
-      message = "features.codingTools.enable is true, but no t3 CLI package could be resolved from t3code-nix.";
+      assertion = !(codingToolsEnabled && t3DesktopPkg == null);
+      message = "features.codingTools.enable is true, but no T3 Code desktop package could be resolved from t3code-nix.";
     }
   ];
 
@@ -87,5 +88,20 @@ in
     ++ lib.optionals (codingToolsEnabled && alejandraPkg != null) [ alejandraPkg ]
     ++ lib.optionals (codingToolsEnabled && nixfmtPkg != null) [ nixfmtPkg ]
     ++ lib.optionals (codingToolsEnabled && nixLspPkg != null) [ nixLspPkg ]
-    ++ lib.optionals (codingToolsEnabled && t3Pkg != null) [ t3Pkg ];
+    ++ lib.optionals (codingToolsEnabled && t3DesktopPkg != null) [ t3DesktopPkg ];
+
+  xdg.desktopEntries = lib.optionalAttrs (codingToolsEnabled && t3DesktopPkg != null) {
+    t3code = {
+      name = "T3 Code";
+      comment = "T3 Code desktop build";
+      exec = "t3code --no-sandbox %U";
+      terminal = false;
+      type = "Application";
+      categories = [ "Development" ];
+      icon = "${t3DesktopPkg}/share/pixmaps/t3code.png";
+      settings = {
+        StartupWMClass = "t3-code-desktop";
+      };
+    };
+  };
 }

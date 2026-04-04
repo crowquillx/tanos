@@ -2,7 +2,6 @@
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
   system = pkgs.stdenv.hostPlatform.system;
   gitUserName = get [ "users" "git" "name" ] null;
@@ -15,20 +14,6 @@ let
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 
   zenPkg = lib.attrByPath [ "zen-browser" "packages" system "default" ] null inputs;
-  codexPkg = lib.attrByPath [ "codex" ] null pkgs;
-  vscodePkg = lib.attrByPath [ "vscode" ] null pkgs;
-  geminiCliPkg =
-    let
-      sourcePkg = lib.attrByPath [ "gemini-cli" ] null pkgs;
-      binPkg = lib.attrByPath [ "gemini-cli-bin" ] null pkgs;
-    in
-    if sourcePkg != null then sourcePkg else binPkg;
-  antigravityPkg =
-    let
-      fhsPkg = lib.attrByPath [ "antigravity-fhs" ] null pkgs;
-      nativePkg = lib.attrByPath [ "antigravity" ] null pkgs;
-    in
-    if fhsPkg != null then fhsPkg else nativePkg;
   thunarPkg =
     let
       topLevelPkg = lib.attrByPath [ "thunar" ] null pkgs;
@@ -51,20 +36,6 @@ let
       xarchiver = lib.attrByPath [ "xarchiver" ] null pkgs;
     in
     if fileRoller != null then fileRoller else xarchiver;
-  statixPkg = lib.attrByPath [ "statix" ] null pkgs;
-  deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
-  alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
-  nixfmtPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "nixfmt" ] null pkgs)
-      (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
-      (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
-    ];
-  nixLspPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "nixd" ] null pkgs)
-      (lib.attrByPath [ "nil" ] null pkgs)
-    ];
   heliumPkg =
     lib.findFirst (pkg: pkg != null) null [
       (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
@@ -136,42 +107,6 @@ in
       message = "Set both users.git.name and users.git.email (or leave both unset).";
     }
     {
-      assertion = !(codingToolsEnabled && codexPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'codex' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && vscodePkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'vscode' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && geminiCliPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'gemini-cli' (or gemini-cli-bin fallback) could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && antigravityPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'antigravity-fhs' (preferred) or 'antigravity' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && statixPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'statix' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && deadnixPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'deadnix' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && alejandraPkg == null);
-      message = "features.codingTools.enable is true, but nixpkgs package 'alejandra' could not be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && nixfmtPkg == null);
-      message = "features.codingTools.enable is true, but no nixfmt package could be resolved.";
-    }
-    {
-      assertion = !(codingToolsEnabled && nixLspPkg == null);
-      message = "features.codingTools.enable is true, but no Nix language server (nixd or nil) could be resolved.";
-    }
-    {
       assertion = !(thunarEnabled && thunarPkg == null);
       message = "features.fileManager.thunar.enable is true, but thunar package could not be resolved from nixpkgs.";
     }
@@ -222,15 +157,6 @@ in
       curl
     ])
     ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
-    ++ lib.optionals (codingToolsEnabled && codexPkg != null) [ codexPkg ]
-    ++ lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
-    ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
-    ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
-    ++ lib.optionals (codingToolsEnabled && statixPkg != null) [ statixPkg ]
-    ++ lib.optionals (codingToolsEnabled && deadnixPkg != null) [ deadnixPkg ]
-    ++ lib.optionals (codingToolsEnabled && alejandraPkg != null) [ alejandraPkg ]
-    ++ lib.optionals (codingToolsEnabled && nixfmtPkg != null) [ nixfmtPkg ]
-    ++ lib.optionals (codingToolsEnabled && nixLspPkg != null) [ nixLspPkg ]
     ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
     ++ lib.optionals (thunarEnabled && thunarArchivePluginPkg != null) [ thunarArchivePluginPkg ]
     ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]

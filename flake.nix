@@ -57,6 +57,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    codex-cli-nix = {
+      url = "github:sadjow/codex-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    mcp-servers-nix = {
+      url = "github:natsukium/mcp-servers-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    t3code-nix = {
+      url = "github:Sawrz/t3code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   outputs = inputs:

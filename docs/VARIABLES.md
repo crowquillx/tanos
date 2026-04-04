@@ -37,6 +37,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
 - `features.codingTools.enable = true | false`
+- `features.mcp.nixos.enable = true | false`
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`
 - `features.flatpak = { enable, packages = [ "<app-id>" ... ] }`

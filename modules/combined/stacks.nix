@@ -29,6 +29,8 @@
     ../home/base/default.nix
     ../home/base/extra-packages.nix
     ../home/base/tcli.nix
+    ../home/dev/packages.nix
+    ../home/dev/mcp.nix
     ../home/terminals/kitty.nix
     ../home/theme/gtk.nix
     ../home/theme/qt.nix

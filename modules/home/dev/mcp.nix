@@ -12,15 +12,16 @@ in
     inputs.mcp-servers-nix.homeManagerModules.default
   ];
 
-  assertions = [
-    {
-      assertion = !(codingToolsEnabled && codexPkg == null);
-      message = "features.codingTools.enable is true, but no Codex package could be resolved from codex-cli-nix.";
-    }
-  ];
-
   config =
     lib.mkMerge [
+      {
+        assertions = [
+          {
+            assertion = !(codingToolsEnabled && codexPkg == null);
+            message = "features.codingTools.enable is true, but no Codex package could be resolved from codex-cli-nix.";
+          }
+        ];
+      }
       (lib.mkIf codingToolsEnabled {
         programs.codex = {
           enable = true;

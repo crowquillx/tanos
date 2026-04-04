@@ -159,6 +159,7 @@
 
     audio.enable = true;
     codingTools.enable = true;
+    mcp.nixos.enable = true;
     fileManager.thunar.enable = true;
     terminals.kitty.enable = true;
     theme = {
