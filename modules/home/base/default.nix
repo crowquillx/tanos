@@ -39,6 +39,12 @@ let
       topLevelPkg = lib.attrByPath [ "thunar-archive-plugin" ] null pkgs;
     in
     topLevelPkg;
+  xfconfPkg =
+    let
+      topLevelPkg = lib.attrByPath [ "xfconf" ] null pkgs;
+      xfcePkg = lib.attrByPath [ "xfce" "xfconf" ] null pkgs;
+    in
+    if topLevelPkg != null then topLevelPkg else xfcePkg;
   archiveManagerPkg =
     let
       fileRoller = lib.attrByPath [ "file-roller" ] null pkgs;
@@ -140,6 +146,10 @@ in
       message = "features.fileManager.thunar.enable is true, but thunar-archive-plugin package could not be resolved from nixpkgs.";
     }
     {
+      assertion = !(thunarEnabled && xfconfPkg == null);
+      message = "features.fileManager.thunar.enable is true, but xfconf package could not be resolved from nixpkgs.";
+    }
+    {
       assertion = !(thunarEnabled && archiveManagerPkg == null);
       message = "features.fileManager.thunar.enable is true, but no archive manager package (file-roller/xarchiver) could be resolved from nixpkgs.";
     }
@@ -184,6 +194,7 @@ in
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
     ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
     ++ lib.optionals (thunarEnabled && thunarArchivePluginPkg != null) [ thunarArchivePluginPkg ]
+    ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
     ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
     ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]

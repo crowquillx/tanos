@@ -111,15 +111,7 @@
       };
       settings = { };
     };
-    noctalia = {
-      enable = true;
-      systemd.enable = true;
-      settings = { };
-      colors = { };
-      plugins = { };
-      pluginSettings = { };
-      userTemplates = { };
-    };
+    noctalia = import ./noctalia;
     session = {
       enable = true;
       polkit.enable = true;

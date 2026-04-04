@@ -2,7 +2,7 @@
 [
   (node "binds" [ ] [
     (node "Mod+D" [ ] [
-      (leaf "spawn-sh" "qs -c noctalia-shell ipc call launcher toggle")
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "launcher" "toggle" ])
     ])
     (node "Mod+Space" { repeat = false; } [
       (flag "toggle-overview")
@@ -15,10 +15,10 @@
     ])
 
     (node "Mod+T" { "hotkey-overlay-title" = "Open Terminal"; } [
-      (leaf "spawn" [ "kitty" ])
+      (leaf "spawn" [ "ghostty" ])
     ])
     (node "Mod+Return" { "hotkey-overlay-title" = "Open Terminal"; } [
-      (leaf "spawn" [ "ghostty" ])
+      (leaf "spawn" [ "kitty" ])
     ])
     (node "Mod+V" { "hotkey-overlay-title" = "Clipboard Manager"; } [
       (leaf "spawn" [ "dms" "ipc" "call" "clipboard" "toggle" ])
@@ -33,29 +33,29 @@
       (leaf "spawn" [ "thunar" ])
     ])
     (node "Mod+Z" { "hotkey-overlay-title" = "Zen Browser"; } [
-      (leaf "spawn" [ "zen-browser" ])
+      (leaf "spawn" [ "zen" ])
     ])
     (node "MouseForward" { "hotkey-overlay-title" = "Equibop: Toggle"; } [
       (leaf "spawn" [ "equibop" "--toggle-mic" ])
     ])
     (node "Super+B" { "hotkey-overlay-title" = "Assistant Panel: Toggle"; } [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:assistant-panel" "toggle" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "plugin:assistant-panel" "toggle" ])
     ])
 
     (node "XF86AudioRaiseVolume" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "increase" ])
     ])
     (node "XF86AudioLowerVolume" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "decrease" ])
     ])
     (node "XF86AudioMute" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "muteOutput" ])
     ])
     (node "XF86MonBrightnessUp" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "brightness" "increase" ])
     ])
     (node "XF86MonBrightnessDown" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "brightness" "decrease" ])
     ])
 
     (node "Mod+Q" { repeat = false; } [
@@ -99,7 +99,7 @@
       (flag "focus-window-up")
     ])
     (node "Mod+L" [ ] [
-      (leaf "spawn" [ "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock" ])
+      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "lockScreen" "lock" ])
     ])
 
     (node "Mod+Shift+Left" [ ] [

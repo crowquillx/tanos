@@ -1,6 +1,6 @@
 { plain, leaf, flag, ... }:
 [
-  (leaf "spawn-at-startup" [ "qs" "-c" "noctalia-shell" ])
+  (leaf "spawn-at-startup" [ "noctalia-shell" ])
 
   (plain "layer-rule" [
     (leaf "match" { namespace = "^noctalia-(background|launcher-overlay|dock)-.*$"; })
