@@ -19,6 +19,10 @@ in
 
     niri-flake.cache.enable = true;
 
+    environment.systemPackages = [
+      pkgs.xwayland-satellite
+    ];
+
     programs.niri = {
       enable = true;
       package = niriPackage;

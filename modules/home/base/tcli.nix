@@ -253,11 +253,15 @@ in
     fu = "tcli update";
     fr = "tcli rebuild";
     ncg = "tcli gc";
+    winblows = "systemctl reboot --boot-loader-entry=auto-windows";
+    enterbios = "systemctl reboot --boot-loader-entry=auto-reboot-to-firmware-setup";
   };
 
   programs.fish.shellAliases = {
     fu = "tcli update";
     fr = "tcli rebuild";
     ncg = "tcli gc";
+    winblows = "systemctl reboot --boot-loader-entry=auto-windows";
+    enterbios = "systemctl reboot --boot-loader-entry=auto-reboot-to-firmware-setup";
   };
 }
