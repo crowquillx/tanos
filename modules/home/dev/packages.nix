@@ -18,6 +18,7 @@ let
       nativePkg = lib.attrByPath [ "antigravity" ] null pkgs;
     in
     if fhsPkg != null then fhsPkg else nativePkg;
+  bubblewrapPkg = lib.attrByPath [ "bubblewrap" ] null pkgs;
   statixPkg = lib.attrByPath [ "statix" ] null pkgs;
   opencodePkg = lib.attrByPath [ "opencode" ] null pkgs;
   deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
@@ -55,6 +56,10 @@ in
       message = "features.codingTools.enable is true, but nixpkgs package 'antigravity-fhs' (preferred) or 'antigravity' could not be resolved.";
     }
     {
+      assertion = !(codingToolsEnabled && bubblewrapPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'bubblewrap' could not be resolved.";
+    }
+    {
       assertion = !(codingToolsEnabled && statixPkg == null);
       message = "features.codingTools.enable is true, but nixpkgs package 'statix' could not be resolved.";
     }
@@ -85,6 +90,7 @@ in
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
     ++ lib.optionals (codingToolsEnabled && opencodePkg != null) [ opencodePkg ]
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
+    ++ lib.optionals (codingToolsEnabled && bubblewrapPkg != null) [ bubblewrapPkg ]
     ++ lib.optionals (codingToolsEnabled && statixPkg != null) [ statixPkg ]
     ++ lib.optionals (codingToolsEnabled && deadnixPkg != null) [ deadnixPkg ]
     ++ lib.optionals (codingToolsEnabled && alejandraPkg != null) [ alejandraPkg ]

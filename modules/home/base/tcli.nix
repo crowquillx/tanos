@@ -14,10 +14,12 @@ let
     tcli - tanos helper for flake updates, rebuilds, and garbage collection
 
     Usage:
+      tcli
+      tcli [switch|build|test|boot] [host] [-- <nh-args...>]
       tcli rebuild [switch|build|test|boot] [host]
-      tcli update [host]
-      tcli upgrade [host]
-      tcli gc
+      tcli update [host] [-- <nh-args...>]
+      tcli upgrade [host] [-- <nh-args...>]
+      tcli gc [-- <nh-args...>]
       tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]
       tcli nh home [switch|build] [host] [-- <nh-args...>]
       tcli nh clean [-- <nh-args...>]
@@ -25,8 +27,8 @@ let
     Notes:
       - Host defaults to current hostname.
       - Flake path defaults to current repo root; override with TANOS_FLAKE_DIR.
-      - Rebuild runs a single nixos-rebuild invocation.
-      - Home Manager is applied through NixOS module integration (home-manager.users).
+      - Bare `tcli` defaults to `switch` on the current host.
+      - Rebuilds run through `nh os`, so Home Manager is still applied via NixOS module integration.
     EOF
     }
 
@@ -74,45 +76,6 @@ let
       hostname
     }
 
-    run_rebuild() {
-      local action="$1"
-      local host="$2"
-      local flake_ref="$3"
-
-      case "$action" in
-        switch|build|test|boot) ;;
-        *) die "invalid rebuild action: $action (expected switch|build|test|boot)" ;;
-      esac
-
-      printf '==> Rebuilding NixOS (%s) for host %s\n' "$action" "$host"
-      printf '==> Home Manager is applied via NixOS module integration (single build path)\n'
-      sudo nixos-rebuild "$action" --flake "''${flake_ref}#''${host}"
-    }
-
-    run_update() {
-      local host="$1"
-      local flake_ref="$2"
-
-      printf '==> Updating flake inputs\n'
-      nix flake update --flake "$flake_ref"
-      run_rebuild "switch" "$host" "$flake_ref"
-    }
-
-    run_gc() {
-      local hm_profile="/nix/var/nix/profiles/per-user/$USER/home-manager"
-
-      printf '==> Deleting old system generations\n'
-      sudo nix-collect-garbage -d
-
-      if [[ -L "$hm_profile" || -e "$hm_profile" ]]; then
-        printf '==> Deleting old Home Manager generations\n'
-        nix-env --delete-generations old --profile "$hm_profile"
-      fi
-
-      printf '==> Deleting old user generations\n'
-      nix-collect-garbage -d
-    }
-
     run_nh_os() {
       local action="$1"
       local host="$2"
@@ -125,7 +88,37 @@ let
       esac
 
       printf '==> nh os %s for host %s\n' "$action" "$host"
-      nh os "$action" "''${flake_ref}#''${host}" "$@"
+      printf '==> Home Manager is applied via NixOS module integration (single build path)\n'
+      nh os "$action" "$flake_ref" -H "$host" "$@"
+    }
+
+    run_rebuild() {
+      local action="$1"
+      local host="$2"
+      local flake_ref="$3"
+      shift 3
+
+      case "$action" in
+        switch|build|test|boot) ;;
+        *) die "invalid rebuild action: $action (expected switch|build|test|boot)" ;;
+      esac
+
+      run_nh_os "$action" "$host" "$flake_ref" "$@"
+    }
+
+    run_update() {
+      local host="$1"
+      local flake_ref="$2"
+      shift 2
+
+      printf '==> nh os switch --update for host %s\n' "$host"
+      printf '==> Updating flake inputs through nh before activation\n'
+      nh os switch "$flake_ref" -H "$host" --update "$@"
+    }
+
+    run_gc() {
+      printf '==> nh clean all\n'
+      nh clean all "$@"
     }
 
     run_nh_home() {
@@ -140,44 +133,70 @@ let
       esac
 
       printf '==> nh home %s for host %s\n' "$action" "$host"
-      nh home "$action" "''${flake_ref}#''${host}" "$@"
-    }
-
-    run_nh_clean() {
-      printf '==> nh clean all\n'
-      nh clean all "$@"
+      nh home "$action" "$flake_ref" -c "$host" "$@"
     }
 
     main() {
-      local cmd="''${1-}"
-      [[ -n "$cmd" ]] || {
-        usage
-        exit 1
-      }
-      shift || true
+      local cmd="''${1-switch}"
+      if [[ $# -gt 0 ]]; then
+        shift || true
+      fi
 
       local flake_dir flake_ref host action nh_scope
       flake_dir="$(resolve_flake_dir)"
-      flake_ref="path:''${flake_dir}"
+      flake_ref="''${flake_dir}"
 
       case "$cmd" in
+        switch|build|test|boot)
+          action="$cmd"
+          if [[ -n "''${1-}" && "$1" != "--" ]]; then
+            host="$(resolve_host "$1")"
+            shift || true
+          else
+            host="$(resolve_host "")"
+          fi
+          [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
+          if [[ "''${1-}" == "--" ]]; then
+            shift || true
+          fi
+          run_rebuild "$action" "$host" "$flake_ref" "$@"
+          ;;
         rebuild)
           action="switch"
           if [[ "''${1-}" =~ ^(switch|build|test|boot)$ ]]; then
             action="$1"
             shift
           fi
-          host="$(resolve_host "''${1-}")"
+          if [[ -n "''${1-}" && "$1" != "--" ]]; then
+            host="$(resolve_host "$1")"
+            shift || true
+          else
+            host="$(resolve_host "")"
+          fi
           [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
-          run_rebuild "$action" "$host" "$flake_ref"
+          if [[ "''${1-}" == "--" ]]; then
+            shift || true
+          fi
+          run_rebuild "$action" "$host" "$flake_ref" "$@"
           ;;
         update|upgrade)
-          host="$(resolve_host "''${1-}")"
+          if [[ -n "''${1-}" && "$1" != "--" ]]; then
+            host="$(resolve_host "$1")"
+            shift || true
+          else
+            host="$(resolve_host "")"
+          fi
           [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
-          run_update "$host" "$flake_ref"
+          if [[ "''${1-}" == "--" ]]; then
+            shift || true
+          fi
+          run_update "$host" "$flake_ref" "$@"
           ;;
         gc)
-          run_gc
+          if [[ "''${1-}" == "--" ]]; then
+            shift || true
+          fi
+          run_gc "$@"
           ;;
         nh)
           nh_scope="''${1-}"
@@ -224,7 +243,7 @@ let
               if [[ "''${1-}" == "--" ]]; then
                 shift || true
               fi
-              run_nh_clean "$@"
+              run_gc "$@"
               ;;
             *)
               die "invalid nh scope: $nh_scope (expected os|home|clean)"

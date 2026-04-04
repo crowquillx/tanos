@@ -37,16 +37,18 @@ This repo assumes base NixOS is already installed.
 
 `tcli` is installed via Home Manager and is the recommended day-to-day command for this repo.
 
-It handles both system + Home Manager through one rebuild path:
+It handles both system + Home Manager through one rebuild path, now backed by `nh` for the rebuild UX:
 
-1. NixOS rebuild (`nixos-rebuild`)
+1. NixOS rebuild (`nh os`)
 2. Home Manager activation via NixOS `home-manager` module integration
 
 Commands:
 
+- `tcli` (defaults to `switch` on the current host)
+- `tcli [switch|build|test|boot] [host] [-- <nh-args...>]`
 - `tcli rebuild [switch|build|test|boot] [host]`
-- `tcli update [host]` (alias: `tcli upgrade [host]`)
-- `tcli gc`
+- `tcli update [host] [-- <nh-args...>]` (alias: `tcli upgrade [host]`)
+- `tcli gc [-- <nh-args...>]`
 - `tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]`
 - `tcli nh home [switch|build] [host] [-- <nh-args...>]`
 - `tcli nh clean [-- <nh-args...>]`
@@ -59,7 +61,7 @@ Defaults:
 Short aliases (bash + fish):
 
 - `fu` -> `tcli update`
-- `fr` -> `tcli rebuild`
+- `fr` -> `tcli`
 - `ncg` -> `tcli gc`
 
 Detailed command behavior and resolution logic: `docs/TCLI.md`.

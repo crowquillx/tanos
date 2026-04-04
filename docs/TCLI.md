@@ -4,44 +4,56 @@
 
 It provides one place to run common flake lifecycle tasks while handling both layers through one NixOS rebuild path (Home Manager via NixOS integration).
 
+The default rebuild path now runs through `nh`, so you get the tree view, diffs, and related `nh` UX without changing the repo's host/home composition model.
+
 ## Commands
 
-### `tcli rebuild [switch|build|test|boot] [host]`
+### `tcli`
 
-- Default action: `switch`
+- Equivalent to: `tcli switch`
+- Defaults to current machine hostname
+- Runs:
+  - `nh os switch <repo> -H <host>`
+
+### `tcli [switch|build|test|boot] [host] [-- <nh-args...>]`
+
 - Default host: current machine hostname
-- Runs a **single** command:
-  - `sudo nixos-rebuild <action> --flake path:<repo>#<host>`
+- Runs a single `nh` command:
+  - `nh os <action> <repo> -H <host> [nh args...]`
 
 Home Manager is applied through the NixOS `home-manager` module (`home-manager.users`), so this remains a full system+home workflow without a second standalone `home-manager` invocation.
 
-### `tcli update [host]` / `tcli upgrade [host]`
+### `tcli rebuild [switch|build|test|boot] [host]`
 
-- Runs `nix flake update --flake path:<repo>`
-- Then runs `tcli rebuild switch [host]`
-- This uses one rebuild invocation (no extra standalone Home Manager build).
+- Backward-compatible alias for `tcli [switch|build|test|boot] [host]`
 
-### `tcli gc`
+### `tcli update [host]` / `tcli upgrade [host] [-- <nh-args...>]`
 
-Runs garbage collection for both system and user-side generations:
+- Defaults to current machine hostname
+- Runs:
+  - `nh os switch <repo> -H <host> --update [nh args...]`
 
-- `sudo nix-collect-garbage -d`
-- remove old Home Manager generations from `/nix/var/nix/profiles/per-user/$USER/home-manager`
-- `nix-collect-garbage -d`
+This still uses one rebuild invocation and keeps Home Manager on the NixOS-integrated path.
+
+### `tcli gc [-- <nh-args...>]`
+
+Runs:
+
+- `nh clean all [nh args...]`
 
 ### `tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]`
 
 - Default action: `switch`
 - Default host: current machine hostname
 - Runs:
-  - `nh os <action> path:<repo>#<host> [nh args...]`
+  - `nh os <action> <repo> -H <host> [nh args...]`
 
 ### `tcli nh home [switch|build] [host] [-- <nh-args...>]`
 
 - Default action: `switch`
 - Default host: current machine hostname
 - Runs:
-  - `nh home <action> path:<repo>#<host> [nh args...]`
+  - `nh home <action> <repo> -c <host> [nh args...]`
 
 ### `tcli nh clean [-- <nh-args...>]`
 
@@ -70,14 +82,14 @@ Runs garbage collection for both system and user-side generations:
 Shell aliases are set by Home Manager (bash + fish):
 
 - `fu` -> `tcli update`
-- `fr` -> `tcli rebuild`
+- `fr` -> `tcli`
 - `ncg` -> `tcli gc`
 
 ## Bootstrap integration
 
-`install/bootstrap.sh` now explicitly runs both:
+`install/bootstrap.sh` still explicitly runs both:
 
 1. `nixos-rebuild`
 2. Home Manager activation package (`homeConfigurations.<host>.activationPackage`)
 
-So bootstrap and `tcli` both enforce full system + HM activation.
+So bootstrap and `tcli` both enforce full system + HM activation, but via different command paths.
