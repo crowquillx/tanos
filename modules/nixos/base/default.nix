@@ -12,6 +12,8 @@ in
   i18n.defaultLocale = get [ "host" "locale" ] "en_US.UTF-8";
 
   boot.loader.systemd-boot.enable = lib.mkDefault (get [ "boot" "systemdBoot" "enable" ] true);
+  boot.loader.systemd-boot.configurationLimit = lib.mkDefault 7;
+  boot.loader.systemd-boot.consoleMode = lib.mkDefault "max";
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
   networking.networkmanager.enable = lib.mkDefault false;

@@ -16,7 +16,8 @@ in
       ];
       config = {
         common.default = [ "gtk" ];
-        niri.default = [ "gnome" "gtk" ];
+        niri.default = [ "gtk" ];
+        niri."org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
         kde.default = [ "kde" "gtk" ];
         KDE.default = [ "kde" "gtk" ];
         plasma.default = [ "kde" "gtk" ];

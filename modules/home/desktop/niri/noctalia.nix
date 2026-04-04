@@ -1,5 +1,9 @@
-{ plain, leaf, flag, ... }:
-[
+{ lib, vars, plain, leaf, ... }:
+let
+  get = path: default: lib.attrByPath path default vars;
+  noctaliaSystemdEnabled = get [ "desktop" "noctalia" "systemd" "enable" ] true;
+in
+lib.optionals (!noctaliaSystemdEnabled) [
   (leaf "spawn-at-startup" [ "noctalia-shell" ])
 
   (plain "layer-rule" [

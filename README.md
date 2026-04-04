@@ -112,8 +112,8 @@ features.flatpak = {
 
 Behavior:
 
-- Declared entries in `features.flatpak.packages` are installed system-wide from Flathub during activation.
-- If you remove an entry from that list later, the next rebuild removes that repo-managed Flatpak.
+- Declared entries in `features.flatpak.packages` are installed declaratively via `nix-flatpak`.
+- If you remove an entry from that list later, the next rebuild removes unmanaged system Flatpaks so the declared set stays authoritative.
 - Unrelated manually-installed Flatpaks are left alone.
 
 If you prefer a one-off manual install instead, enable Flatpak and then run `flatpak install flathub <app-id>`.

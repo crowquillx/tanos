@@ -161,7 +161,7 @@ features.flatpak = {
 };
 ```
 
-Declared `features.flatpak.packages` entries are installed system-wide from Flathub during activation. If you later remove one from the list, the next rebuild removes that repo-managed Flatpak without touching unrelated manual installs.
+Declared `features.flatpak.packages` entries are installed declaratively via `nix-flatpak`. Removing an entry converges the system-wide Flatpak set back to the declared list on the next rebuild.
 
 ### GTK / QT / Kitty
 

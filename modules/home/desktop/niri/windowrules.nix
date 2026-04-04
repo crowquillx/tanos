@@ -1,4 +1,10 @@
 { plain, leaf, flag, rgbaApps, ... }:
+let
+  equibopElectronMatch = {
+    app-id = "^electron$";
+    title = "^Discord$";
+  };
+in
 [
   (plain "window-rule" [
     (leaf "match" { app-id = "^org\\.wezfurlong\\.wezterm$"; })
@@ -30,6 +36,7 @@
     (leaf "match" { app-id = rgbaApps.fileManagers; })
     (leaf "match" { app-id = rgbaApps.chats; })
     (leaf "match" { app-id = rgbaApps.editors; })
+    (leaf "match" equibopElectronMatch)
     (leaf "opacity" 0.90)
     (leaf "draw-border-with-background" false)
     (plain "background-effect" [
@@ -43,6 +50,7 @@
     (leaf "match" { app-id = rgbaApps.fileManagers; is-focused = true; })
     (leaf "match" { app-id = rgbaApps.chats; is-focused = true; })
     (leaf "match" { app-id = rgbaApps.editors; is-focused = true; })
+    (leaf "match" (equibopElectronMatch // { is-focused = true; }))
     (leaf "opacity" 0.96)
   ])
 
@@ -71,6 +79,7 @@
 
   (plain "window-rule" [
     (leaf "match" { app-id = "^equibop$"; })
+    (leaf "match" equibopElectronMatch)
     (leaf "open-on-output" "DP-1")
     (leaf "open-maximized" true)
   ])

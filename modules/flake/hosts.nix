@@ -35,6 +35,7 @@ let
           nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
         }
         inputs.home-manager.nixosModules.home-manager
+        inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.sops-nix.nixosModules.sops
         inputs.stylix.nixosModules.stylix
         inputs.lanzaboote.nixosModules.lanzaboote

@@ -19,7 +19,12 @@
 
   users = {
     primary = "tan";
-    extraPackages = [ ];
+    extraPackages = [
+      "equibop"
+      "spotify"
+      "mpv"
+      "pywalfox-native"
+  ];
     git = {
       name = "tan";
       email = "tancodes@proton.me";
@@ -127,7 +132,6 @@
     };
     shellStartupCommand = null;
     startup.apps = [
-      "wl-paste --watch cliphist store"
       "spotify"
       "equibop"
     ];

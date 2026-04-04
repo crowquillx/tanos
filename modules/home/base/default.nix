@@ -56,9 +56,9 @@ let
   alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
   nixfmtPkg =
     lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
-      (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
       (lib.attrByPath [ "nixfmt" ] null pkgs)
+      (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
+      (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
     ];
   nixLspPkg =
     lib.findFirst (pkg: pkg != null) null [

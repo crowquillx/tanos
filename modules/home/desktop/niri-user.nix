@@ -25,11 +25,21 @@ let
   hasNiriSettings = effectiveNiriSettings != { };
   hasNiriConfig = niriConfig != null;
   niriPackage = lib.attrByPath [ "niri-unstable" ] null pkgs;
+  rosePineCursorPkg = lib.attrByPath [ "rose-pine-cursor" ] null pkgs;
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri") (
     lib.mkMerge [
       {
+        assertions = [
+          {
+            assertion = rosePineCursorPkg != null;
+            message = "desktop.compositor = \"niri\" requires the nixpkgs package 'rose-pine-cursor'.";
+          }
+        ];
+
+        home.packages = lib.optionals (rosePineCursorPkg != null) [ rosePineCursorPkg ];
+
         home.sessionVariables = {
           XDG_CURRENT_DESKTOP = lib.mkDefault "niri";
           XDG_SESSION_DESKTOP = lib.mkDefault "niri";

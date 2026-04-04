@@ -1,6 +1,6 @@
 {
   enable = true;
-  systemd.enable = false;
+  systemd.enable = true;
   settings = import ./settings.nix;
   colors = import ./colors.nix;
   plugins = import ./plugins.nix;
