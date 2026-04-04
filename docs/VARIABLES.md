@@ -161,6 +161,8 @@ desktop.noctalia = {
 This is passed directly to Home Manager's `programs.noctalia-shell.*` options, so the shell stays fully HM-managed.
 When `desktop.noctalia.command` is set to a wrapper such as `tanos-noctalia-shell`, Niri startup and Noctalia IPC keybinds will use that command instead of plain `noctalia-shell`.
 
+For per-monitor wallpaper rotation, set `desktop.noctalia.settings.wallpaper.setWallpaperOnAllMonitors = false;` and keep `wallpaperChangeMode = "random"`.
+
 `desktop.noctalia.assistantPanel.secrets` names optional `sops-nix` secrets that are exposed to the plugin through its documented environment variables. Set only the ones you actually use:
 
 - `NOCTALIA_AP_GOOGLE_API_KEY`

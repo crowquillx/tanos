@@ -3,7 +3,7 @@
 ## Purpose
 This repository is a multi-host NixOS flake with Home Manager integration. It is organized around a small `flake.nix`, `flake-parts`, `import-tree`, and a dendritic or parts-wrapped layout where flake logic, shared stacks, host wiring, and user wiring stay separated.
 
-Agents should preserve that structure. Do not collapse this repo back into a monolithic `flake.nix` or ad hoc host imports unless explicitly asked.
+Agents should preserve that structure. Do not collapse this repo back into a monolithic `flake.nix` or ad hoc host imports unless explicitly asked. As much as possible should be done with nix, do not look for lazy workarounds! 
 
 ## Architecture
 
