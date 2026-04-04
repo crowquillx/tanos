@@ -208,7 +208,10 @@ in
 
   xdg = {
     enable = true;
-    userDirs.enable = true;
+    userDirs = {
+      enable = true;
+      setSessionVariables = false;
+    };
     # Avoid repeated activation failures when a previous backup file already exists.
     configFile."user-dirs.dirs".force = true;
     mimeApps = {

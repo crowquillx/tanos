@@ -1,4 +1,4 @@
-{ lib, pkgs, vars ? { }, ... }:
+{ lib, pkgs, vars ? { }, inputs ? { }, ... }:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -6,8 +6,24 @@ let
   compositor = get [ "desktop" "compositor" ] "niri";
   niriSettings = get [ "desktop" "niri" "settings" ] { };
   niriOutputs = get [ "desktop" "niri" "outputs" ] { };
-  effectiveNiriSettings = lib.recursiveUpdate niriSettings (lib.optionalAttrs (niriOutputs != { }) { outputs = niriOutputs; });
+  niriSettingsBuilder = get [ "desktop" "niri" "settingsBuilder" ] null;
+  defaultNiriConfigBuilder = import ./niri/default.nix;
+  niriConfigBuilder = get [ "desktop" "niri" "configBuilder" ] defaultNiriConfigBuilder;
+  callBuilder = builder:
+    if builder == null then
+      null
+    else if builtins.isFunction builder then
+      builder { inherit lib pkgs vars inputs; }
+    else
+      builder;
+  builtNiriSettings = callBuilder niriSettingsBuilder;
+  niriConfig = callBuilder niriConfigBuilder;
+  effectiveNiriSettings =
+    lib.recursiveUpdate
+      (lib.recursiveUpdate niriSettings (lib.optionalAttrs (niriOutputs != { }) { outputs = niriOutputs; }))
+      (if builtNiriSettings == null then { } else builtNiriSettings);
   hasNiriSettings = effectiveNiriSettings != { };
+  hasNiriConfig = niriConfig != null;
   niriPackage = lib.attrByPath [ "niri-unstable" ] null pkgs;
 in
 {
@@ -24,7 +40,10 @@ in
       (lib.mkIf (niriPackage != null) {
         programs.niri.package = lib.mkDefault niriPackage;
       })
-      (lib.mkIf hasNiriSettings {
+      (lib.mkIf hasNiriConfig {
+        programs.niri.config = niriConfig;
+      })
+      (lib.mkIf (!hasNiriConfig && hasNiriSettings) {
         programs.niri.settings = effectiveNiriSettings;
       })
     ]
