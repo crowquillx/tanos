@@ -7,6 +7,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.compositor = "niri" | "plasma"`
 - `desktop.extraCompositors = [ "niri" "plasma" ... ]` (optional additional installed sessions; first login default still comes from `desktop.compositor`)
 - `desktop.displayManager = "auto" | "sddm"`
+- `desktop.sddm.wayland.enable = true | false`
 - `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
 - `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
 - `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`

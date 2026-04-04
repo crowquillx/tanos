@@ -40,6 +40,7 @@
     compositor = "niri";
     extraCompositors = [ ];
     displayManager = "auto";
+    sddm.wayland.enable = false;
     browser = {
       default = "zen";
       firefox.enable = false;
