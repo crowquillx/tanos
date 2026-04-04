@@ -1,9 +1,23 @@
-{ lib, config, vars, inputs, combined, ... }:
+{ lib, pkgs, config, vars, inputs, combined, ... }:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
   primaryUser = get [ "users" "primary" ] "tan";
   noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
+  hmBackupCommand = pkgs.writeShellScript "home-manager-backup" ''
+    set -eu
+
+    target_path="$1"
+    timestamp="$(${pkgs.coreutils}/bin/date +%Y%m%d-%H%M%S)"
+    backup_path="${"$"}{target_path}.hm-backup-${"$"}timestamp"
+
+    while [ -e "$backup_path" ]; do
+      timestamp="$(${pkgs.coreutils}/bin/date +%Y%m%d-%H%M%S)-$RANDOM"
+      backup_path="${"$"}{target_path}.hm-backup-${"$"}timestamp"
+    done
+
+    exec ${pkgs.coreutils}/bin/mv "$target_path" "$backup_path"
+  '';
 in
 {
   imports = [
@@ -45,7 +59,7 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    backupFileExtension = "hm-backup";
+    backupCommand = hmBackupCommand;
     extraSpecialArgs = { inherit vars inputs combined; };
     sharedModules = lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
     users.${primaryUser} = {

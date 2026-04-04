@@ -19,6 +19,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
 - `boot.secureBoot = { enable, includeMicrosoftKeys, autoEnroll, pkiBundle }` (Lanzaboote-based secure boot)
 - `desktop.shellStartupCommand = "<command>"`
+- `desktop.startup.backend = "systemd" | "niri"`
 - `desktop.startup.apps = [ "<cmd>" ... ]`
 - `desktop.session.polkit.enable = true | false`
 - `desktop.session.keyring.enable = true | false`
@@ -74,17 +75,34 @@ features = {
 };
 ```
 
-### Desktop startup apps (systemd user services)
+### Desktop startup apps
 
 ```nix
-desktop.startup.apps = [
-  "wl-paste --watch cliphist store"
-  "spotify"
-  "equibop"
-];
+desktop.startup = {
+  backend = "systemd";
+  apps = [
+    "wl-paste --watch cliphist store"
+    "spotify"
+    "equibop"
+  ];
+};
 ```
 
-These are started as Home Manager-managed user services under `wayland.systemd.target`.
+`backend = "systemd"` manages the apps as Home Manager user services under `wayland.systemd.target`, which means they can be restarted during `rebuild switch`.
+
+For Niri hosts, use:
+
+```nix
+desktop.startup = {
+  backend = "niri";
+  apps = [
+    "spotify"
+    "equibop"
+  ];
+};
+```
+
+This uses Niri `spawn-at-startup`, so the apps start when the session starts but are not bounced by Home Manager user-service reloads during rebuilds.
 
 ### Niri monitor configuration
 

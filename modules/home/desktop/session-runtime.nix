@@ -3,6 +3,7 @@ let
   v = vars;
   get = path: default: lib.attrByPath path default v;
   desktopEnabled = get [ "desktop" "enable" ] true;
+  compositor = get [ "desktop" "compositor" ] "niri";
   sessionEnabled = get [ "desktop" "session" "enable" ] desktopEnabled;
   waylandTarget = config.wayland.systemd.target;
 
@@ -15,10 +16,12 @@ let
   defaultStartupApps = [
     "wl-paste --watch cliphist store"
   ];
+  startupBackend = get [ "desktop" "startup" "backend" ] "systemd";
   startupApps = get [ "desktop" "startup" "apps" ] defaultStartupApps;
   effectiveShellStartupCommand = startupCommand;
   shellStartupEnable = effectiveShellStartupCommand != null;
   appStartupEnable = startupApps != [ ];
+  appStartupSystemdEnable = appStartupEnable && startupBackend == "systemd";
 
   mkStartupService = index: command: {
     name = "tanos-startup-app-${toString index}";
@@ -79,6 +82,14 @@ in
           assertion = builtins.all (cmd: lib.isString cmd && cmd != "") startupApps;
           message = "desktop.startup.apps must be a list of non-empty command strings.";
         }
+        {
+          assertion = builtins.elem startupBackend [ "systemd" "niri" ];
+          message = "desktop.startup.backend must be one of: systemd, niri.";
+        }
+        {
+          assertion = !(appStartupEnable && startupBackend == "niri") || compositor == "niri";
+          message = "desktop.startup.backend = \"niri\" requires desktop.compositor = \"niri\".";
+        }
       ];
     }
     (lib.mkIf (desktopEnabled && sessionEnabled) {
@@ -134,7 +145,7 @@ in
             };
           };
         })
-        (lib.mkIf appStartupEnable startupAppServices)
+        (lib.mkIf appStartupSystemdEnable startupAppServices)
       ];
     })
   ];

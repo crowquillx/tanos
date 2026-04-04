@@ -68,5 +68,6 @@ normalize [
   (import ./noctalia.nix context)
   (import ./windowrules.nix context)
   (import ./config-fragments.nix context)
+  (import ./startup-apps.nix context)
   (import ./binds.nix context)
 ]

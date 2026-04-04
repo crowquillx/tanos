@@ -135,6 +135,7 @@
       "spotify"
       "equibop"
     ];
+    startup.backend = "niri";
   };
 
   features = {
