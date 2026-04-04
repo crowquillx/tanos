@@ -407,7 +407,6 @@
       ];
     };
     "language" = "";
-    "lockOnSuspend" = true;
     "lockScreenAnimations" = true;
     "lockScreenBlur" = 0.6;
     "lockScreenCountdownDuration" = 10000;
@@ -442,17 +441,8 @@
   };
   "idle" = {
     "customCommands" = "[]";
-    "enabled" = true;
     "fadeDuration" = 5;
-    "lockCommand" = "";
-    "lockTimeout" = 660;
-    "resumeLockCommand" = "";
-    "resumeScreenOffCommand" = "";
-    "resumeSuspendCommand" = "";
     "screenOffCommand" = "";
-    "screenOffTimeout" = 600;
-    "suspendCommand" = "";
-    "suspendTimeout" = 1800;
   };
   "location" = {
     "analogClockInCalendar" = false;

@@ -24,6 +24,20 @@ let
   noctaliaCommandWrapper = pkgs.writeShellScriptBin "tanos-noctalia-shell" ''
     set -eu
 
+    find_running_quickshell() {
+      ${pkgs.procps}/bin/pgrep -u "$USER" -o quickshell 2>/dev/null || true
+    }
+
+    running_quickshell_exe() {
+      local pid
+      pid="$(find_running_quickshell)"
+      if [ -z "$pid" ]; then
+        return 1
+      fi
+
+      ${pkgs.procps}/bin/ps -o cmd= -p "$pid" | ${pkgs.gawk}/bin/awk '{ print $1; exit }'
+    }
+
     ${lib.optionalString (immutableSettingsFile != null) ''
       export NOCTALIA_SETTINGS_FILE=${lib.escapeShellArg (toString immutableSettingsFile)}
     ''}
@@ -31,6 +45,18 @@ let
     ${exportSecret "NOCTALIA_AP_GOOGLE_API_KEY" googleApiKeyPath}
     ${exportSecret "NOCTALIA_AP_OPENAI_COMPATIBLE_API_KEY" openaiCompatibleApiKeyPath}
     ${exportSecret "NOCTALIA_AP_DEEPL_API_KEY" deeplApiKeyPath}
+
+    if [ "$#" -gt 0 ]; then
+      case "$1" in
+        ipc)
+          if exe="$(running_quickshell_exe)"; then
+            pid="$(find_running_quickshell)"
+            shift
+            exec "$exe" ipc --pid "$pid" "$@"
+          fi
+          ;;
+      esac
+    fi
 
     exec noctalia-shell "$@"
   '';

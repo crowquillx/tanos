@@ -4,6 +4,8 @@ let
   get = path: default: lib.attrByPath path default v;
   desktopEnabled = get [ "desktop" "enable" ] true;
   compositor = get [ "desktop" "compositor" ] "niri";
+  noctaliaEnable = get [ "desktop" "noctalia" "enable" ] (desktopEnabled && compositor == "niri");
+  noctaliaIdleManage = noctaliaEnable && compositor == "niri";
   sessionEnabled = get [ "desktop" "session" "enable" ] desktopEnabled;
   waylandTarget = config.wayland.systemd.target;
 
@@ -111,7 +113,7 @@ in
             };
           };
         })
-        (lib.mkIf lockEnable {
+        (lib.mkIf (lockEnable && !noctaliaIdleManage) {
           tanos-idle-lock = {
             Unit = {
               Description = "Tanos Idle Lock Service";

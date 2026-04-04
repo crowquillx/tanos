@@ -36,7 +36,7 @@
     profile = "nvidia";
     nvidia = {
       modesetting.enable = true;
-      powerManagement.enable = false;
+      powerManagement.enable = true;
       open = true;
     };
   };
@@ -124,11 +124,14 @@
       keyring.enable = true;
       lock = {
         enable = true;
-        # Replace with your shell-specific lock command if desired.
-        command = "loginctl lock-session";
-        idleSeconds = 600;
+        command = "tanos-noctalia-shell ipc call lockScreen lock";
+        idleSeconds = 300;
         beforeSleep = true;
         onLidClose = true;
+      };
+      idle = {
+        screenOffSeconds = 600;
+        suspendSeconds = 1800;
       };
     };
     shellStartupCommand = null;
