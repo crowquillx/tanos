@@ -56,6 +56,7 @@ in
 
     (lib.mkIf (profile == "nvidia") {
       services.xserver.videoDrivers = [ "nvidia" ];
+      boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
       hardware.nvidia = {
         modesetting.enable = nvidiaModesettingEnable;

@@ -5,6 +5,7 @@ let
   desktopEnabled = get [ "desktop" "enable" ] true;
   dm = get [ "desktop" "displayManager" ] "auto";
   compositor = get [ "desktop" "compositor" ] "niri";
+  sddmWaylandEnable = get [ "desktop" "sddm" "wayland" "enable" ] true;
   effectiveDm = if dm == "auto" then "sddm" else dm;
   defaultSession =
     if compositor == "plasma" then
@@ -20,7 +21,7 @@ in
       inherit defaultSession;
       sddm = {
         enable = true;
-        wayland.enable = true;
+        wayland.enable = sddmWaylandEnable;
       };
     };
   };

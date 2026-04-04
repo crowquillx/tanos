@@ -27,8 +27,12 @@
   };
 
   graphics = {
-    # "auto" resolves to "none" on non-VM hosts until you set "amd", "intel", or "nvidia".
-    profile = "auto";
+    profile = "nvidia";
+    nvidia = {
+      modesetting.enable = true;
+      powerManagement.enable = false;
+      open = true;
+    };
   };
 
   desktop = {
@@ -36,6 +40,7 @@
     compositor = "niri";
     extraCompositors = [ ];
     displayManager = "auto";
+    sddm.wayland.enable = false;
     browser = {
       default = "firefox";
       firefox.enable = true;
