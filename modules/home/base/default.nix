@@ -51,6 +51,20 @@ let
       xarchiver = lib.attrByPath [ "xarchiver" ] null pkgs;
     in
     if fileRoller != null then fileRoller else xarchiver;
+  statixPkg = lib.attrByPath [ "statix" ] null pkgs;
+  deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
+  alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
+  nixfmtPkg =
+    lib.findFirst (pkg: pkg != null) null [
+      (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
+      (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
+      (lib.attrByPath [ "nixfmt" ] null pkgs)
+    ];
+  nixLspPkg =
+    lib.findFirst (pkg: pkg != null) null [
+      (lib.attrByPath [ "nixd" ] null pkgs)
+      (lib.attrByPath [ "nil" ] null pkgs)
+    ];
   heliumPkg =
     lib.findFirst (pkg: pkg != null) null [
       (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
@@ -138,6 +152,26 @@ in
       message = "features.codingTools.enable is true, but nixpkgs package 'antigravity-fhs' (preferred) or 'antigravity' could not be resolved.";
     }
     {
+      assertion = !(codingToolsEnabled && statixPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'statix' could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && deadnixPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'deadnix' could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && alejandraPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'alejandra' could not be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && nixfmtPkg == null);
+      message = "features.codingTools.enable is true, but no nixfmt package could be resolved.";
+    }
+    {
+      assertion = !(codingToolsEnabled && nixLspPkg == null);
+      message = "features.codingTools.enable is true, but no Nix language server (nixd or nil) could be resolved.";
+    }
+    {
       assertion = !(thunarEnabled && thunarPkg == null);
       message = "features.fileManager.thunar.enable is true, but thunar package could not be resolved from nixpkgs.";
     }
@@ -192,6 +226,11 @@ in
     ++ lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
+    ++ lib.optionals (codingToolsEnabled && statixPkg != null) [ statixPkg ]
+    ++ lib.optionals (codingToolsEnabled && deadnixPkg != null) [ deadnixPkg ]
+    ++ lib.optionals (codingToolsEnabled && alejandraPkg != null) [ alejandraPkg ]
+    ++ lib.optionals (codingToolsEnabled && nixfmtPkg != null) [ nixfmtPkg ]
+    ++ lib.optionals (codingToolsEnabled && nixLspPkg != null) [ nixLspPkg ]
     ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
     ++ lib.optionals (thunarEnabled && thunarArchivePluginPkg != null) [ thunarArchivePluginPkg ]
     ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]

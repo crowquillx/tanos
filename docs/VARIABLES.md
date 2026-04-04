@@ -38,7 +38,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.codingTools.enable = true | false`
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`
-- `features.flatpak.enable = true | false`
+- `features.flatpak = { enable, packages = [ "<app-id>" ... ] }`
 - `features.gaming = { enable, steam.gamescopeSession.enable, steam.remotePlay.openFirewall, steam.dedicatedServer.openFirewall, steam.localNetworkGameTransfers.openFirewall }`
 - `features.virtualisation.vmHost = { enable, spiceUSBRedirection.enable }`
 - `features.virtualisation.containers = { podman.enable, docker.enable }`
@@ -154,8 +154,14 @@ features.nh = {
 ```nix
 features.flatpak = {
   enable = true;
+  packages = [
+    "com.spotify.Client"
+    "md.obsidian.Obsidian"
+  ];
 };
 ```
+
+Declared `features.flatpak.packages` entries are installed system-wide from Flathub during activation. If you later remove one from the list, the next rebuild removes that repo-managed Flatpak without touching unrelated manual installs.
 
 ### GTK / QT / Kitty
 

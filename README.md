@@ -75,6 +75,58 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 - Home Manager only (if needed):
   - `home-manager switch --flake .#<host>`
 
+## Installing New Apps
+
+Most user-facing apps in this repo should be installed through Home Manager by adding package names to the host's `users.extraPackages` list in `hosts/<host>/variables.nix`.
+
+Example:
+
+```nix
+users = {
+  primary = "tan";
+  extraPackages = [
+    "obsidian"
+    "mpv"
+    "python3Packages.ipython"
+  ];
+};
+```
+
+Notes:
+
+- Package names are resolved from `pkgs`, so nested attributes such as `"python3Packages.ipython"` work.
+- If a package name is wrong, evaluation fails with an `Unknown users.extraPackages entries` assertion.
+- After editing, apply the change with `tcli rebuild switch <host>` or test it first with `tcli rebuild build <host>`.
+
+If an app is not available in `nixpkgs`, you can manage it declaratively with Flatpak in `hosts/<host>/variables.nix`:
+
+```nix
+features.flatpak = {
+  enable = true;
+  packages = [
+    "com.spotify.Client"
+    "md.obsidian.Obsidian"
+  ];
+};
+```
+
+Behavior:
+
+- Declared entries in `features.flatpak.packages` are installed system-wide from Flathub during activation.
+- If you remove an entry from that list later, the next rebuild removes that repo-managed Flatpak.
+- Unrelated manually-installed Flatpaks are left alone.
+
+If you prefer a one-off manual install instead, enable Flatpak and then run `flatpak install flathub <app-id>`.
+
+If you want an installed app to launch automatically in your session, add its command to `desktop.startup.apps`. This does not install the app by itself; it only autostarts an already-available command.
+
+```nix
+desktop.startup.apps = [
+  "spotify"
+  "equibop"
+];
+```
+
 ## Documentation
 
 - Host variable reference and config snippets: `docs/VARIABLES.md`
