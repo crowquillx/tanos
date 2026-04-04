@@ -1,6 +1,6 @@
 {
   host = {
-    name = "tandesk-nix";
+    name = "tandesk";
     isVm = false;
     timeZone = "America/Boise";
     locale = "en_US.UTF-8";
