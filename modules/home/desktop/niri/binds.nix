@@ -1,8 +1,12 @@
-{ node, leaf, flag, ... }:
+{ lib, vars, node, leaf, flag, ... }:
+let
+  get = path: default: lib.attrByPath path default vars;
+  noctaliaCommand = get [ "desktop" "noctalia" "command" ] "noctalia-shell";
+in
 [
   (node "binds" [ ] [
     (node "Mod+D" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "launcher" "toggle" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "launcher" "toggle" ])
     ])
     (node "Mod+Space" { repeat = false; } [
       (flag "toggle-overview")
@@ -39,23 +43,23 @@
       (leaf "spawn" [ "equibop" "--toggle-mic" ])
     ])
     (node "Super+B" { "hotkey-overlay-title" = "Assistant Panel: Toggle"; } [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "plugin:assistant-panel" "toggle" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "plugin:assistant-panel" "toggle" ])
     ])
 
     (node "XF86AudioRaiseVolume" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "increase" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "increase" ])
     ])
     (node "XF86AudioLowerVolume" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "decrease" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "decrease" ])
     ])
     (node "XF86AudioMute" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "volume" "muteOutput" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "muteOutput" ])
     ])
     (node "XF86MonBrightnessUp" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "brightness" "increase" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "brightness" "increase" ])
     ])
     (node "XF86MonBrightnessDown" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "brightness" "decrease" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "brightness" "decrease" ])
     ])
 
     (node "Mod+Q" { repeat = false; } [
@@ -99,7 +103,7 @@
       (flag "focus-window-up")
     ])
     (node "Mod+L" [ ] [
-      (leaf "spawn" [ "noctalia-shell" "ipc" "call" "lockScreen" "lock" ])
+      (leaf "spawn" [ noctaliaCommand "ipc" "call" "lockScreen" "lock" ])
     ])
 
     (node "Mod+Shift+Left" [ ] [

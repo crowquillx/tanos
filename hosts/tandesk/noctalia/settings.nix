@@ -166,9 +166,10 @@
               "temperature" = 0.7;
             };
             "maxHistoryLength" = 100;
-            "panelDetached" = true;
+            "attachmentStyle" = "connected";
+            "panelDetached" = false;
             "panelHeightRatio" = 0.85;
-            "panelPosition" = "right";
+            "panelPosition" = "left";
             "panelWidth" = 520;
             "scale" = 1;
             "translator" = {
@@ -190,15 +191,6 @@
         }
       ];
       "right" = [
-        {
-          "defaultSettings" = {
-            "currentIconName" = "world-download";
-            "hideOnZero" = false;
-            "updateIntervalMinutes" = 30;
-            "updateTerminalCommand" = "foot -e";
-          };
-          "id" = "plugin:update-count";
-        }
         {
           "blacklist" = [ ];
           "chevronColor" = "none";

@@ -77,6 +77,11 @@ Read [docs/DENDRITIC.md](/home/tan/tanos/docs/DENDRITIC.md) before changing flak
 - `tcli update <host>`: update inputs then rebuild.
 - `statix check .`: lint.
 
+Agent restriction:
+- Do not run `switch`, `boot`, `test`, or `home-manager switch` as part of normal validation.
+- Do not apply live system or Home Manager changes on this machine unless the user explicitly asks for that exact command in the current turn.
+- Default to eval/build-only validation, even for the local host.
+
 Fallback commands:
 - `sudo nixos-rebuild build --flake .#<host>`
 - `sudo nixos-rebuild switch --flake .#<host>`
@@ -85,7 +90,7 @@ Fallback commands:
 ### Validation expectations
 - Validation is build- and eval-based; there is no dedicated unit-test suite.
 - At minimum, build affected hosts.
-- For runtime-sensitive changes, switch on the affected host and verify the relevant service or session behavior.
+- For runtime-sensitive changes, note that runtime verification may be needed, but do not perform `switch` or other live activation steps unless the user explicitly requests it in the current turn.
 - For portal, compositor, display manager, audio, boot, and graphics changes, prefer host-specific validation over assuming a successful eval is sufficient.
 
 ## Style

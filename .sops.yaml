@@ -2,5 +2,5 @@ creation_rules:
   - path_regex: secrets/.*\.ya?ml$
     key_groups:
       - age:
-          # Replace with your real age public key(s), then remove this placeholder.
-          - age1replacewithyourpublickeyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          # Add additional host public keys here as needed and run `sops updatekeys`.
+          - age1u73s6x5nrfeyl38svz82qry344udawft76vw6dgclr3q8nmvgqaqhs8jwh

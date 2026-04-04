@@ -2,9 +2,10 @@
 let
   get = path: default: lib.attrByPath path default vars;
   noctaliaSystemdEnabled = get [ "desktop" "noctalia" "systemd" "enable" ] true;
+  noctaliaCommand = get [ "desktop" "noctalia" "command" ] "noctalia-shell";
 in
 lib.optionals (!noctaliaSystemdEnabled) [
-  (leaf "spawn-at-startup" [ "noctalia-shell" ])
+  (leaf "spawn-at-startup" [ noctaliaCommand ])
 
   (plain "layer-rule" [
     (leaf "match" { namespace = "^noctalia-(background|launcher-overlay|dock)-.*$"; })

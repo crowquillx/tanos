@@ -19,6 +19,7 @@
     ../nixos/services/steam.nix
     ../nixos/services/virtualisation.nix
     ../nixos/services/keyring.nix
+    ../nixos/security/noctalia-secrets.nix
     ../nixos/security/sops.nix
     ../nixos/security/secure-boot.nix
     ../nixos/profiles/vm-guest.nix
@@ -37,6 +38,7 @@
     ../home/shell/zoxide.nix
     ../home/desktop/session-runtime.nix
     ../home/desktop/niri-user.nix
+    ../home/desktop/noctalia-command.nix
     ../home/desktop/noctalia-shell.nix
   ];
 }

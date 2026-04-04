@@ -27,10 +27,6 @@
       "enabled" = true;
       "sourceUrl" = "https://github.com/noctalia-dev/noctalia-plugins";
     };
-    "update-count" = {
-      "enabled" = true;
-      "sourceUrl" = "https://github.com/noctalia-dev/noctalia-plugins";
-    };
   };
   "version" = 2;
 }

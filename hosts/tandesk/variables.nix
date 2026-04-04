@@ -24,6 +24,7 @@
       "spotify"
       "mpv"
       "pywalfox-native"
+      "sops"
   ];
     git = {
       name = "tan";

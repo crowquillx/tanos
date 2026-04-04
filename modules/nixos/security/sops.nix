@@ -6,15 +6,17 @@ let
   ageKeyFile = get [ "security" "sops" "ageKeyFile" ] "/var/lib/sops-nix/key.txt";
 in
 {
-  config = lib.mkIf enabled (
-    {
-      sops = {
-        age.keyFile = ageKeyFile;
+  config = lib.mkIf enabled {
+    sops =
+      {
+        age = {
+          keyFile = lib.mkForce ageKeyFile;
+          sshKeyPaths = lib.mkForce [ ];
+        };
         validateSopsFiles = false;
+      }
+      // lib.optionalAttrs (defaultSopsFile != null) {
+        defaultSopsFile = defaultSopsFile;
       };
-    }
-    // lib.optionalAttrs (defaultSopsFile != null) {
-      sops.defaultSopsFile = defaultSopsFile;
-    }
-  );
+  };
 }

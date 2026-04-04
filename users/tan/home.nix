@@ -1,10 +1,9 @@
-{ combined, config, ... }:
+{ combined, ... }:
 {
   imports = combined.homeModules;
 
   home.username = "tan";
   home.homeDirectory = "/home/tan";
 
-  home.file."tanos/wallpapers".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Pictures/Wallpapers";
+  home.file."Pictures/Wallpapers".source = ../../wallpapers;
 }
