@@ -282,5 +282,7 @@ in
     ncg = "tcli gc";
     winblows = "systemctl reboot --boot-loader-entry=auto-windows";
     enterbios = "systemctl reboot --boot-loader-entry=auto-reboot-to-firmware-setup";
+    tanime = "ssh root@192.168.0.85";
+    tanmedia = "ssh tan@192.168.0.116";
   };
 }

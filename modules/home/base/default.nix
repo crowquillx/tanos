@@ -1,8 +1,17 @@
-{ lib, pkgs, vars ? { }, inputs, config, ... }:
+{
+  lib,
+  pkgs,
+  vars ? { },
+  inputs,
+  config,
+  ...
+}:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (get [ "desktop" "enable" ] true);
+  thunarEnabled = get [ "features" "fileManager" "thunar" "enable" ] (
+    get [ "desktop" "enable" ] true
+  );
   system = pkgs.stdenv.hostPlatform.system;
   gitUserName = get [ "users" "git" "name" ] null;
   gitUserEmail = get [ "users" "git" "email" ] null;
@@ -36,14 +45,18 @@ let
       xarchiver = lib.attrByPath [ "xarchiver" ] null pkgs;
     in
     if fileRoller != null then fileRoller else xarchiver;
-  heliumPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
-      (lib.attrByPath [ "helium2nix" "packages" system "helium" ] null inputs)
-      (lib.attrByPath [ "helium2nix" "packages" system "helium-browser" ] null inputs)
-    ];
+  heliumPkg = lib.findFirst (pkg: pkg != null) null [
+    (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
+    (lib.attrByPath [ "helium2nix" "packages" system "helium" ] null inputs)
+    (lib.attrByPath [ "helium2nix" "packages" system "helium-browser" ] null inputs)
+  ];
 
-  allowedBrowsers = [ "firefox" "zen" "chrome" "helium" ];
+  allowedBrowsers = [
+    "firefox"
+    "zen"
+    "chrome"
+    "helium"
+  ];
   browserEnabledMap = {
     firefox = firefoxEnabled;
     zen = zenEnabled;
@@ -56,8 +69,8 @@ let
     chrome = pkgs.google-chrome;
     helium = heliumPkg;
   };
-  desktopFileFor = pkg: fallback:
-    if pkg == null then fallback else (pkg.meta.desktopFileName or fallback);
+  desktopFileFor =
+    pkg: fallback: if pkg == null then fallback else (pkg.meta.desktopFileName or fallback);
   browserDesktopMap = {
     firefox = "firefox.desktop";
     zen = desktopFileFor zenPkg "zen.desktop";
@@ -74,11 +87,12 @@ let
     "x-scheme-handler/https"
     "x-scheme-handler/unknown"
   ];
-  browserAssociations =
-    builtins.listToAttrs (map (mime: {
+  browserAssociations = builtins.listToAttrs (
+    map (mime: {
       name = mime;
       value = browserDesktopFile;
-    }) browserMimeTypes);
+    }) browserMimeTypes
+  );
 in
 ({
   assertions = [
@@ -164,23 +178,30 @@ in
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
     ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
     ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
-    ++ lib.optionals (get [ "desktop" "enable" ] true) (with pkgs; [
-      # Desktop helpers commonly used by shell overlays.
-      libnotify
-    ]);
+    ++ lib.optionals (get [ "desktop" "enable" ] true) (
+      with pkgs;
+      [
+        # Desktop helpers commonly used by shell overlays.
+        libnotify
+      ]
+    );
 
-  programs.git =
-    {
-      enable = true;
-    }
-    // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
-      settings.user = {
-        name = gitUserName;
-        email = gitUserEmail;
-      };
+  programs.git = {
+    enable = true;
+  }
+  // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
+    settings.user = {
+      name = gitUserName;
+      email = gitUserEmail;
     };
+  };
   programs.bash.enable = true;
-  programs.fish.enable = fishEnabled;
+  programs.fish = {
+    enable = fishEnabled;
+    interactiveShellInit = ''
+      set -g fish_greeting
+    '';
+  };
 
   xdg = {
     enable = true;
