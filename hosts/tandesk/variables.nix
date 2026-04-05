@@ -25,6 +25,7 @@
       "mpv"
       "pywalfox-native"
       "sops"
+      "brave"
     ];
     git = {
       name = "tan";
@@ -36,7 +37,7 @@
     profile = "nvidia";
     nvidia = {
       modesetting.enable = true;
-      powerManagement.enable = true;
+      powerManagement.enable = false;
       open = true;
     };
   };
@@ -47,7 +48,7 @@
     extraCompositors = [ ];
     displayManager = "auto";
     sddm.wayland.enable = false;
-    sddm.background = "./wallpapers/1.jpg";
+    sddm.background = ../../wallpapers/1.jpg;
     browser = {
       default = "zen";
       firefox.enable = false;
