@@ -1,4 +1,10 @@
-{ lib, pkgs, vars ? { }, inputs, ... }:
+{
+  lib,
+  pkgs,
+  vars ? { },
+  inputs,
+  ...
+}:
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
@@ -21,25 +27,23 @@ let
   bubblewrapPkg = lib.attrByPath [ "bubblewrap" ] null pkgs;
   statixPkg = lib.attrByPath [ "statix" ] null pkgs;
   opencodePkg = lib.attrByPath [ "opencode" ] null pkgs;
+  uvPkg = lib.attrByPath [ "uv" ] null pkgs;
   deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
   alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
-  nixfmtPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "nixfmt" ] null pkgs)
-      (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
-      (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
-    ];
-  nixLspPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "nixd" ] null pkgs)
-      (lib.attrByPath [ "nil" ] null pkgs)
-    ];
-  t3DesktopPkg =
-    lib.findFirst (pkg: pkg != null) null [
-      (lib.attrByPath [ "t3code-nix" "packages" system "t3code" ] null inputs)
-      (lib.attrByPath [ "t3code-nix" "packages" system "t3code-desktop" ] null inputs)
-      (lib.attrByPath [ "t3code-nix" "packages" system "default" ] null inputs)
-    ];
+  nixfmtPkg = lib.findFirst (pkg: pkg != null) null [
+    (lib.attrByPath [ "nixfmt" ] null pkgs)
+    (lib.attrByPath [ "nixfmt-classic" ] null pkgs)
+    (lib.attrByPath [ "nixfmt-rfc-style" ] null pkgs)
+  ];
+  nixLspPkg = lib.findFirst (pkg: pkg != null) null [
+    (lib.attrByPath [ "nixd" ] null pkgs)
+    (lib.attrByPath [ "nil" ] null pkgs)
+  ];
+  t3DesktopPkg = lib.findFirst (pkg: pkg != null) null [
+    (lib.attrByPath [ "t3code-nix" "packages" system "t3code" ] null inputs)
+    (lib.attrByPath [ "t3code-nix" "packages" system "t3code-desktop" ] null inputs)
+    (lib.attrByPath [ "t3code-nix" "packages" system "default" ] null inputs)
+  ];
 in
 {
   assertions = [
@@ -89,6 +93,7 @@ in
     lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
     ++ lib.optionals (codingToolsEnabled && opencodePkg != null) [ opencodePkg ]
+    ++ lib.optionals (codingToolsEnabled && uvPkg != null) [ uvPkg ]
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
     ++ lib.optionals (codingToolsEnabled && bubblewrapPkg != null) [ bubblewrapPkg ]
     ++ lib.optionals (codingToolsEnabled && statixPkg != null) [ statixPkg ]

@@ -48,7 +48,7 @@
     extraCompositors = [ ];
     displayManager = "auto";
     sddm.wayland.enable = false;
-    sddm.background = ../../wallpapers/1.jpg;
+    sddm.background = ../../wallpapers/1.png;
     browser = {
       default = "zen";
       firefox.enable = false;
