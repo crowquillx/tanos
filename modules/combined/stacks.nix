@@ -3,6 +3,7 @@
     ../nixos/base/default.nix
     ../nixos/theme/stylix.nix
     ../nixos/hardware/graphics.nix
+    ../nixos/hardware/swap.nix
     ../nixos/desktop/niri.nix
     ../nixos/desktop/kde.nix
     ../nixos/desktop/sddm.nix
