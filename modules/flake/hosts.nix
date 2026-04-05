@@ -9,7 +9,8 @@ let
     tanlappy = "x86_64-linux";
   };
 
-  getNiriInput = vars:
+  getNiriInput =
+    vars:
     let
       useWip = lib.attrByPath [ "desktop" "niri" "useWip" ] false vars;
     in
@@ -19,7 +20,8 @@ let
   getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
   getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
 
-  mkHost = hostName: hostPlatform:
+  mkHost =
+    hostName: hostPlatform:
     let
       vars = import ../../hosts/${hostName}/variables.nix;
       niriOverlay = getNiriOverlay vars;
@@ -27,13 +29,20 @@ let
     in
     lib.nixosSystem {
       specialArgs = {
-        inherit self inputs vars hostName combined;
+        inherit
+          self
+          inputs
+          vars
+          hostName
+          combined
+          ;
       };
       modules = [
         {
           nixpkgs.hostPlatform = hostPlatform;
           nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
         }
+        inputs.determinate.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
         inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.sops-nix.nixosModules.sops
@@ -44,19 +53,24 @@ let
       ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
     };
 
-  mkCiHost = hostName: hostPlatform:
+  mkCiHost =
+    hostName: hostPlatform:
     (mkHost hostName hostPlatform).extendModules {
       modules = [
-        ({ lib, ... }: {
-          fileSystems."/" = lib.mkDefault {
-            device = "none";
-            fsType = "tmpfs";
-          };
-        })
+        (
+          { lib, ... }:
+          {
+            fileSystems."/" = lib.mkDefault {
+              device = "none";
+              fsType = "tmpfs";
+            };
+          }
+        )
       ];
     };
 
-  mkHome = hostName: hostPlatform:
+  mkHome =
+    hostName: hostPlatform:
     let
       vars = import ../../hosts/${hostName}/variables.nix;
       niriOverlay = getNiriOverlay vars;
@@ -69,7 +83,14 @@ let
         config.allowUnfree = true;
         overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
       };
-      extraSpecialArgs = { inherit self vars inputs combined; };
+      extraSpecialArgs = {
+        inherit
+          self
+          vars
+          inputs
+          combined
+          ;
+      };
       modules = [
         self.homeModules.${primaryUser}
         {

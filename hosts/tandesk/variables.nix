@@ -54,7 +54,7 @@
       firefox.enable = false;
       zen.enable = true;
       chrome.enable = false;
-      helium.enable = false;
+      helium.enable = true;
     };
     niri = {
       useWip = true;

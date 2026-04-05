@@ -35,7 +35,7 @@ in
       };
       programs.opencode = {
         enable = true;
-        package = null;
+        package = pkgs.opencode;
         enableMcpIntegration = nixosMcpEnabled;
       };
     })

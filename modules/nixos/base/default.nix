@@ -11,9 +11,11 @@ let
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 in
 {
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
+  nix.settings.extra-trusted-public-keys = [
+    "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+  ];
+  nix.settings.extra-substituters = [
+    "https://install.determinate.systems"
   ];
 
   time.timeZone = get [ "host" "timeZone" ] "America/Chicago";

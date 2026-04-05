@@ -49,6 +49,7 @@ let
     (lib.attrByPath [ "helium2nix" "packages" system "default" ] null inputs)
     (lib.attrByPath [ "helium2nix" "packages" system "helium" ] null inputs)
     (lib.attrByPath [ "helium2nix" "packages" system "helium-browser" ] null inputs)
+    (lib.attrByPath [ "helium2nix" "defaultPackage" system ] null inputs)
   ];
 
   allowedBrowsers = [

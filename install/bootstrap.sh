@@ -47,6 +47,8 @@ KEY_FILE="/var/lib/sops-nix/key.txt"
 NIX_EXPERIMENTAL_FEATURES="nix-command flakes"
 NIRI_SUBSTITUTER="https://niri.cachix.org"
 NIRI_PUBLIC_KEY="niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
+DETERMIMATE_SUBSTITUTER="https://install.determinate.systems"
+DETERMIMATE_PUBLIC_KEY="cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
 FLAKE_PATH="path:${REPO_ROOT}"
 NIXOS_FLAKE_REF="${FLAKE_PATH}#${HOST}"
 PRIMARY_USER="$(sed -nE 's/^[[:space:]]*primary[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "${HOST_DIR}/variables.nix" | head -n1)"
@@ -71,10 +73,11 @@ echo "Repo root: ${REPO_ROOT}"
 # Keep bootstrap self-contained even when /etc/nix/nix.conf is immutable
 # (common on NixOS where /etc is declaratively managed).
 export NIX_CONFIG="${NIX_CONFIG-}"$'\n'"experimental-features = ${NIX_EXPERIMENTAL_FEATURES}"
-export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-substituters = ${NIRI_SUBSTITUTER}"
-export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-trusted-public-keys = ${NIRI_PUBLIC_KEY}"
+export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-substituters = ${NIRI_SUBSTITUTER} ${DETERMIMATE_SUBSTITUTER}"
+export NIX_CONFIG="${NIX_CONFIG}"$'\n'"extra-trusted-public-keys = ${NIRI_PUBLIC_KEY} ${DETERMIMATE_PUBLIC_KEY}"
 echo "Using experimental features for this run: ${NIX_EXPERIMENTAL_FEATURES}"
 echo "Using Niri cache for this run: ${NIRI_SUBSTITUTER}"
+echo "Using Determinate cache for this run: ${DETERMIMATE_SUBSTITUTER}"
 
 if command -v nixos-generate-config >/dev/null 2>&1; then
   TMP_HW="$(mktemp)"
@@ -115,9 +118,12 @@ REBUILD_ACTION="switch"
 if ! findmnt -rn /boot >/dev/null 2>&1; then
   REBUILD_ACTION="test"
   echo "/boot is not mounted; using nixos-rebuild test to avoid bootloader install failure."
-  echo "Fix boot mounts, then run: sudo nixos-rebuild switch --accept-flake-config --flake ${NIXOS_FLAKE_REF}"
+  echo "Fix boot mounts, then run: sudo nixos-rebuild switch --accept-flake-config --option extra-substituters ${DETERMIMATE_SUBSTITUTER} --option extra-trusted-public-keys ${DETERMIMATE_PUBLIC_KEY} --flake ${NIXOS_FLAKE_REF}"
 fi
-nixos-rebuild "${REBUILD_ACTION}" --accept-flake-config --flake "${NIXOS_FLAKE_REF}"
+nixos-rebuild "${REBUILD_ACTION}" --accept-flake-config \
+  --option extra-substituters "${DETERMIMATE_SUBSTITUTER}" \
+  --option extra-trusted-public-keys "${DETERMIMATE_PUBLIC_KEY}" \
+  --flake "${NIXOS_FLAKE_REF}"
 
 echo "Running Home Manager activation for ${HOST} as ${PRIMARY_USER}"
 if ! id "${PRIMARY_USER}" >/dev/null 2>&1; then
@@ -136,4 +142,4 @@ echo
 echo "Bootstrap complete."
 echo "Next:"
 echo "1) Add encrypted secrets under ./secrets and update .sops.yaml recipients."
-echo "2) Re-run: sudo nixos-rebuild switch --accept-flake-config --flake ${NIXOS_FLAKE_REF}"
+echo "2) Re-run: sudo nixos-rebuild switch --accept-flake-config --option extra-substituters ${DETERMIMATE_SUBSTITUTER} --option extra-trusted-public-keys ${DETERMIMATE_PUBLIC_KEY} --flake ${NIXOS_FLAKE_REF}"

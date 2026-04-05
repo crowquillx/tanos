@@ -1,26 +1,32 @@
 { inputs, ... }:
 {
-  perSystem = { pkgs, system, ... }:
+  perSystem =
+    { pkgs, system, ... }:
     let
       lib = pkgs.lib;
       zenPkg = lib.attrByPath [ "packages" system "default" ] null inputs.zen-browser;
-      heliumPkg = lib.attrByPath [ "packages" system "default" ] null inputs.helium2nix;
+      heliumPkg =
+        let
+          fromPackages = lib.attrByPath [ "packages" system "default" ] null inputs.helium2nix;
+          fromLegacy = lib.attrByPath [ "defaultPackage" system ] null inputs.helium2nix;
+        in
+        if fromPackages != null then fromPackages else fromLegacy;
       wrappedNoctalia =
-        if inputs ? wrapper-modules
-        then
+        if inputs ? wrapper-modules then
           inputs.wrapper-modules.wrappers.noctalia-shell.wrap {
             inherit pkgs;
             settings = { };
           }
-        else null;
+        else
+          null;
       wrappedNiri =
-        if inputs ? wrapper-modules
-        then
+        if inputs ? wrapper-modules then
           inputs.wrapper-modules.wrappers.niri.wrap {
             inherit pkgs;
             settings = { };
           }
-        else null;
+        else
+          null;
     in
     {
       packages = lib.filterAttrs (_: value: value != null) {
