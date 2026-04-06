@@ -133,7 +133,7 @@
       };
       idle = {
         screenOffSeconds = 600;
-        suspendSeconds = 1800;
+        suspendSeconds = null;
       };
     };
     shellStartupCommand = null;

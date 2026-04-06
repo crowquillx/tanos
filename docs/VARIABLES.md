@@ -25,7 +25,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.session.polkit.enable = true | false`
 - `desktop.session.keyring.enable = true | false`
 - `desktop.session.lock = { enable, command, idleSeconds, beforeSleep, onLidClose }`
-- `desktop.session.idle = { screenOffSeconds, suspendSeconds }`
+- `desktop.session.idle = { screenOffSeconds, suspendSeconds }` (`suspendSeconds = null` disables auto-suspend while keeping lock and screen-off)
 - `users.git = { name, email }`
 - `users.extraPackages = [ "pkgName" "python3Packages.pip" ... ]`
 - `desktop.enable = true | false`
@@ -162,7 +162,7 @@ desktop.noctalia = {
 
 This is passed directly to Home Manager's `programs.noctalia-shell.*` options, so the shell stays fully HM-managed.
 When `desktop.noctalia.command` is set to a wrapper such as `tanos-noctalia-shell`, Niri startup and Noctalia IPC keybinds will use that command instead of plain `noctalia-shell`.
-On Noctalia-enabled Niri hosts, Noctalia is also the idle manager. Use `desktop.session.lock.command`, `desktop.session.lock.idleSeconds`, `desktop.session.idle.screenOffSeconds`, and `desktop.session.idle.suspendSeconds` as the source of truth instead of configuring `swayidle`.
+On Noctalia-enabled Niri hosts, Noctalia is also the idle manager. Use `desktop.session.lock.command`, `desktop.session.lock.idleSeconds`, `desktop.session.idle.screenOffSeconds`, and `desktop.session.idle.suspendSeconds` as the source of truth instead of configuring `swayidle`. Set `desktop.session.idle.suspendSeconds = null` if you want lock + screen-off with no automatic suspend.
 
 For per-monitor wallpaper rotation, set `desktop.noctalia.settings.wallpaper.setWallpaperOnAllMonitors = false;` and keep `wallpaperChangeMode = "random"`.
 

@@ -21,6 +21,7 @@ let
       lockCommand = lockCommand;
       lockTimeout = lockTimeout;
       screenOffTimeout = screenOffTimeout;
+    } // lib.optionalAttrs (suspendTimeout != null) {
       suspendTimeout = suspendTimeout;
     };
   };
