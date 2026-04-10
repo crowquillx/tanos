@@ -192,6 +192,7 @@
       enable = true;
       packages = [
         "org.upscayl.Upscayl"
+        "ru.linux_gaming.PortProton"
       ];
     };
     gaming = {
