@@ -162,7 +162,8 @@
               "openaiBaseUrl" = "https://api.openai.com/v1/chat/completions";
               "openaiLocal" = false;
               "provider" = "google";
-              "systemPrompt" = "You are a helpful assistant integrated into a Linux desktop shell. Be concise and helpful.";
+              "systemPrompt" =
+                "You are a helpful assistant integrated into a Linux desktop shell. Be concise and helpful.";
               "temperature" = 0.7;
             };
             "maxHistoryLength" = 100;
@@ -551,14 +552,14 @@
         "action" = "suspend";
         "command" = "";
         "countdownEnabled" = true;
-        "enabled" = true;
+        "enabled" = false;
         "keybind" = "2";
       }
       {
         "action" = "hibernate";
         "command" = "";
         "countdownEnabled" = true;
-        "enabled" = true;
+        "enabled" = false;
         "keybind" = "3";
       }
       {
@@ -612,7 +613,8 @@
     "diskCriticalThreshold" = 90;
     "diskWarningThreshold" = 80;
     "enableDgpuMonitoring" = true;
-    "externalMonitor" = "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
+    "externalMonitor" =
+      "resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitor";
     "gpuCriticalThreshold" = 90;
     "gpuWarningThreshold" = 80;
     "memCriticalThreshold" = 90;

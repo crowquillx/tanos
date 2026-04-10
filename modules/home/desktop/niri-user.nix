@@ -38,7 +38,13 @@ in
           }
         ];
 
-        home.packages = lib.optionals (rosePineCursorPkg != null) [ rosePineCursorPkg ];
+        home.pointerCursor = lib.mkIf (rosePineCursorPkg != null) {
+          name = "BreezeX-RosePine-Linux";
+          package = rosePineCursorPkg;
+          size = 32;
+          gtk.enable = true;
+          x11.enable = true;
+        };
 
         home.sessionVariables = {
           XDG_CURRENT_DESKTOP = lib.mkDefault "niri";
