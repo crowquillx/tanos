@@ -9,6 +9,8 @@ let
     tanlappy = "x86_64-linux";
   };
 
+  hostVars = lib.mapAttrs (hostName: _: import ../../hosts/${hostName}/variables.nix) hostPlatforms;
+
   getNiriInput =
     vars:
     let
@@ -20,10 +22,13 @@ let
   getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
   getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
 
+  millenniumEnabled =
+    vars: lib.attrByPath [ "features" "gaming" "steam" "millennium" "enable" ] false vars;
+
   mkHost =
     hostName: hostPlatform:
     let
-      vars = import ../../hosts/${hostName}/variables.nix;
+      vars = hostVars.${hostName};
       niriOverlay = getNiriOverlay vars;
       niriNixosModule = getNiriNixosModule vars;
     in
@@ -40,7 +45,9 @@ let
       modules = [
         {
           nixpkgs.hostPlatform = hostPlatform;
-          nixpkgs.overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
+          nixpkgs.overlays =
+            lib.optionals (niriOverlay != null) [ niriOverlay ]
+            ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
         }
         inputs.determinate.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
@@ -72,7 +79,7 @@ let
   mkHome =
     hostName: hostPlatform:
     let
-      vars = import ../../hosts/${hostName}/variables.nix;
+      vars = hostVars.${hostName};
       niriOverlay = getNiriOverlay vars;
       niriHmConfigModule = getNiriHmConfigModule vars;
       primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
@@ -81,7 +88,9 @@ let
       pkgs = import inputs.nixpkgs {
         system = hostPlatform;
         config.allowUnfree = true;
-        overlays = lib.optionals (niriOverlay != null) [ niriOverlay ];
+        overlays =
+          lib.optionals (niriOverlay != null) [ niriOverlay ]
+          ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
       };
       extraSpecialArgs = {
         inherit

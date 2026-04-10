@@ -1,16 +1,39 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
   enabled = get [ "features" "gaming" "enable" ] false;
   gamescopeSessionEnable = get [ "features" "gaming" "steam" "gamescopeSession" "enable" ] false;
   remotePlayOpenFirewall = get [ "features" "gaming" "steam" "remotePlay" "openFirewall" ] true;
-  dedicatedServerOpenFirewall = get [ "features" "gaming" "steam" "dedicatedServer" "openFirewall" ] true;
-  localTransfersOpenFirewall = get [ "features" "gaming" "steam" "localNetworkGameTransfers" "openFirewall" ] true;
+  dedicatedServerOpenFirewall = get [
+    "features"
+    "gaming"
+    "steam"
+    "dedicatedServer"
+    "openFirewall"
+  ] true;
+  localTransfersOpenFirewall = get [
+    "features"
+    "gaming"
+    "steam"
+    "localNetworkGameTransfers"
+    "openFirewall"
+  ] true;
+  millenniumEnable = get [ "features" "gaming" "steam" "millennium" "enable" ] false;
   lutrisPkg = if pkgs ? lutris then pkgs.lutris else null;
   heroicPkg = if pkgs ? heroic then pkgs.heroic else null;
   protonPlusPkg =
-    if pkgs ? protonplus then pkgs.protonplus else if pkgs ? "protonup-qt" then pkgs."protonup-qt" else null;
+    if pkgs ? protonplus then
+      pkgs.protonplus
+    else if pkgs ? "protonup-qt" then
+      pkgs."protonup-qt"
+    else
+      null;
 in
 {
   config = lib.mkMerge [
@@ -33,6 +56,7 @@ in
     (lib.mkIf enabled {
       programs.steam = {
         enable = true;
+        package = lib.mkIf millenniumEnable pkgs.millennium-steam;
         gamescopeSession.enable = gamescopeSessionEnable;
         remotePlay.openFirewall = remotePlayOpenFirewall;
         dedicatedServer.openFirewall = dedicatedServerOpenFirewall;

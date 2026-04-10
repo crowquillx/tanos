@@ -179,13 +179,9 @@ in
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
     ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
     ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
-    ++ lib.optionals (get [ "desktop" "enable" ] true) (
-      with pkgs;
-      [
-        # Desktop helpers commonly used by shell overlays.
-        libnotify
-      ]
-    );
+    ++ lib.optionals (get [ "desktop" "enable" ] true) [
+      pkgs.libnotify
+    ];
 
   programs.git = {
     enable = true;

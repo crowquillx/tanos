@@ -11,12 +11,21 @@ let
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
 in
 {
-  nix.settings.extra-trusted-public-keys = [
-    "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
-  ];
-  nix.settings.extra-substituters = [
-    "https://install.determinate.systems"
-  ];
+  nix.settings = {
+    extra-trusted-public-keys = [
+      "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+    ];
+    extra-substituters = [
+      "https://install.determinate.systems"
+    ];
+    auto-optimise-store = true;
+  };
+
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
 
   time.timeZone = get [ "host" "timeZone" ] "America/Chicago";
   i18n.defaultLocale = get [ "host" "locale" ] "en_US.UTF-8";
@@ -92,9 +101,7 @@ in
   };
 
   # Keep system-wide packages minimal; user-facing tooling lives in Home Manager.
-  environment.systemPackages = with pkgs; [
-    git
-  ];
+  environment.systemPackages = [ pkgs.git ];
 
   nixpkgs.config.allowUnfree = true;
 

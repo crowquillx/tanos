@@ -1,4 +1,12 @@
-{ lib, pkgs, config, vars, inputs, combined, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  vars,
+  inputs,
+  combined,
+  ...
+}:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
@@ -22,8 +30,8 @@ in
 {
   imports = [
     ./variables-schema.nix
-  ] ++ combined.nixosModules;
-
+  ]
+  ++ combined.nixosModules;
 
   tanos.variables = vars;
 
@@ -33,7 +41,10 @@ in
         let
           compositor = get [ "desktop" "compositor" ] "niri";
         in
-        builtins.elem compositor [ "niri" "plasma" ];
+        builtins.elem compositor [
+          "niri"
+          "plasma"
+        ];
       message = "desktop.compositor must be one of: niri, plasma.";
     }
     {
@@ -41,7 +52,13 @@ in
         let
           extraCompositors = get [ "desktop" "extraCompositors" ] [ ];
         in
-        builtins.all (c: builtins.elem c [ "niri" "plasma" ]) extraCompositors;
+        builtins.all (
+          c:
+          builtins.elem c [
+            "niri"
+            "plasma"
+          ]
+        ) extraCompositors;
       message = "desktop.extraCompositors may only include: niri, plasma.";
     }
     {
@@ -49,7 +66,10 @@ in
         let
           dm = get [ "desktop" "displayManager" ] "auto";
         in
-        builtins.elem dm [ "auto" "sddm" ];
+        builtins.elem dm [
+          "auto"
+          "sddm"
+        ];
       message = ''
         desktop.displayManager must be one of: auto, sddm.
       '';
@@ -63,7 +83,7 @@ in
     extraSpecialArgs = { inherit vars inputs combined; };
     sharedModules = lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
     users.${primaryUser} = {
-      imports = [ (import (../../users + "/${primaryUser}/home.nix")) ];
+      imports = [ ../../users/${primaryUser}/home.nix ];
       home.username = lib.mkForce primaryUser;
       home.homeDirectory = lib.mkForce "/home/${primaryUser}";
       xdg.configHome = lib.mkForce "/home/${primaryUser}/.config";

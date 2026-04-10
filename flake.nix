@@ -8,7 +8,6 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
-    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -34,14 +33,14 @@
 
     niri = {
       url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     niri-wip = {
       url = "github:sodiboo/niri-flake";
-      # Track niri-wm/niri PR head while keeping niri-flake wiring/overlay shape.
-      # Branch/ref can be changed later if a different WIP target is desired.
       inputs."niri-unstable".url = "github:niri-wm/niri?ref=pull/3483/head";
       inputs."niri-stable".url = "github:niri-wm/niri?ref=pull/3483/head";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     noctalia = {
@@ -76,6 +75,11 @@
 
     copilot-cli-nix = {
       url = "github:max-miller1204/copilot-cli-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    millennium = {
+      url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

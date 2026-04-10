@@ -21,13 +21,23 @@ let
   bg = scheme.base01 or "2a273f";
   text = scheme.base05 or "e0def4";
 
+  sddmBg =
+    if sddmBackground != null then
+      pkgs.runCommand "sddm-background" {
+        outputHashAlgo = "sha256";
+        outputHashMode = "flat";
+        outputHash = builtins.hashFile "sha256" sddmBackground;
+      } "cp ${sddmBackground} $out"
+    else
+      null;
+
   themeConfig = {
     HourFormat = "h:mm AP";
     FormPosition = "left";
     Blur = "4.0";
   }
-  // lib.optionalAttrs (sddmBackground != null) {
-    Background = toString sddmBackground;
+  // lib.optionalAttrs (sddmBg != null) {
+    Background = "${sddmBg}";
   }
   // lib.optionalAttrs stylixEnabled {
     HeaderTextColor = "#${text}";
