@@ -6,6 +6,18 @@
     locale = "en_US.UTF-8";
   };
 
+  storage.mounts = [
+    {
+      device = "/dev/disk/by-uuid/a93a28c3-8538-45f9-9031-1d740a0993f1";
+      mountPoint = "/mnt/games";
+      fsType = "ext4";
+      options = [
+        "defaults"
+        "nofail"
+      ];
+    }
+  ];
+
   boot.systemdBoot.enable = true;
   boot.secureBoot = {
     enable = true;
@@ -211,7 +223,7 @@
         spiceUSBRedirection.enable = true;
       };
       containers = {
-        podman.enable = false;
+        podman.enable = true;
         docker.enable = false;
       };
     };

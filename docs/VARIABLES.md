@@ -18,6 +18,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
+- `storage.mounts = [ { device, mountPoint, fsType ? "auto", options ? [ ] } ... ]`
 - `boot.secureBoot = { enable, includeMicrosoftKeys, autoEnroll, pkiBundle }` (Lanzaboote-based secure boot)
 - `desktop.shellStartupCommand = "<command>"`
 - `desktop.startup.backend = "systemd" | "niri"`
@@ -64,6 +65,22 @@ features.stylix = {
   enable = true;
   variant = "moon";
 };
+```
+
+### Persistent storage mount
+
+```nix
+storage.mounts = [
+  {
+    device = "/dev/disk/by-uuid/a93a28c3-8538-45f9-9031-1d740a0993f1";
+    mountPoint = "/mnt/games";
+    fsType = "ext4";
+    options = [
+      "defaults"
+      "nofail"
+    ];
+  }
+];
 ```
 
 ### Fish + starship + zoxide

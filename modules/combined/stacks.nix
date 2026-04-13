@@ -1,6 +1,7 @@
 {
   nixosModules = [
     ../nixos/base/default.nix
+    ../nixos/services/mounts.nix
     ../nixos/theme/stylix.nix
     ../nixos/hardware/graphics.nix
     ../nixos/hardware/swap.nix
