@@ -47,6 +47,7 @@ let
   ghPkg = lib.attrByPath [ "gh" ] null pkgs;
   skillsPkg = lib.attrByPath [ "skills" ] null pkgs;
   copilotCliPkg = lib.attrByPath [ "copilot-cli-nix" "packages" system "default" ] null inputs;
+  zedEditorPkg = lib.attrByPath [ "zed-editor" ] null pkgs;
 in
 {
   assertions = [
@@ -119,7 +120,8 @@ in
     ++ lib.optionals (codingToolsEnabled && t3DesktopPkg != null) [ t3DesktopPkg ]
     ++ lib.optionals (codingToolsEnabled && ghPkg != null) [ ghPkg ]
     ++ lib.optionals (codingToolsEnabled && skillsPkg != null) [ skillsPkg ]
-    ++ lib.optionals (codingToolsEnabled && copilotCliPkg != null) [ copilotCliPkg ];
+    ++ lib.optionals (codingToolsEnabled && copilotCliPkg != null) [ copilotCliPkg ]
+    ++ lib.optionals (codingToolsEnabled && zedEditorPkg != null) [ zedEditorPkg ];
 
   xdg.desktopEntries = lib.optionalAttrs (codingToolsEnabled && t3DesktopPkg != null) {
     t3code = {
