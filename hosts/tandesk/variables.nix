@@ -18,6 +18,7 @@
     }
   ];
 
+  boot.kernel = "zen";
   boot.systemdBoot.enable = true;
   boot.secureBoot = {
     enable = true;
@@ -38,6 +39,7 @@
       "pywalfox-native"
       "sops"
       "brave"
+      "qbittorrent"
     ];
     git = {
       name = "tan";

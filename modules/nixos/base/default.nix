@@ -35,6 +35,17 @@ in
   boot.loader.systemd-boot.consoleMode = lib.mkDefault "max";
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
+  boot.kernelPackages =
+    let
+      kernel = get [ "boot" "kernel" ] "default";
+    in
+    if kernel == "zen" then
+      pkgs.linuxPackages_zen
+    else if kernel == "latest" then
+      pkgs.linuxPackages_latest
+    else
+      pkgs.linuxPackages;
+
   networking.networkmanager.enable = lib.mkDefault false;
 
   security = {
