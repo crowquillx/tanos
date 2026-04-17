@@ -2,33 +2,38 @@
   host = {
     name = "tanlappy";
     isVm = false;
-    timeZone = "America/Chicago";
+    timeZone = "America/Boise";
     locale = "en_US.UTF-8";
   };
 
+  boot.kernel = "zen";
   boot.systemdBoot.enable = true;
   boot.secureBoot = {
     enable = false;
-    # Keep Microsoft UEFI CA/3rd-party keys available for dual-boot and vendor tooling.
     includeMicrosoftKeys = true;
-    # Set true after reading docs/SECURE_BOOT.md and confirming firmware setup steps.
     autoEnroll = false;
-    # Default sbctl/Lanzaboote PKI location.
     pkiBundle = "/etc/secureboot";
   };
 
   users = {
     primary = "tan";
-    extraPackages = [ ];
+    extraPackages = [
+      "equibop"
+      "spotify"
+      "mpv"
+      "pywalfox-native"
+      "sops"
+      "brave"
+      "qbittorrent"
+    ];
     git = {
-      name = null;
-      email = null;
+      name = "tan";
+      email = "tancodes@proton.me";
     };
   };
 
   graphics = {
-    # Keep neutral until hardware is confirmed. Set to "intel"/"amd"/"nvidia" when known.
-    profile = "auto";
+    profile = "amd";
   };
 
   desktop = {
@@ -36,28 +41,28 @@
     compositor = "niri";
     extraCompositors = [ ];
     displayManager = "auto";
+    sddm.wayland.enable = false;
+    sddm.background = ../../wallpapers/1.png;
     browser = {
       default = "zen";
-      firefox.enable = true;
+      firefox.enable = false;
       zen.enable = true;
       chrome.enable = false;
-      helium.enable = false;
+      helium.enable = true;
     };
     niri = {
       useWip = false;
-      # Populate output names with `niri msg outputs`.
+      blur = {
+        enable = true;
+        passes = 3;
+        offset = 3.0;
+        noise = 0.03;
+        saturation = 1.0;
+      };
       outputs = { };
       settings = { };
     };
-    noctalia = {
-      enable = true;
-      systemd.enable = true;
-      settings = { };
-      colors = { };
-      plugins = { };
-      pluginSettings = { };
-      userTemplates = { };
-    };
+    noctalia = import ./noctalia;
     session = {
       enable = true;
       polkit.enable = true;
@@ -71,10 +76,15 @@
       };
       idle = {
         screenOffSeconds = 600;
-        suspendSeconds = 1800;
+        suspendSeconds = null;
       };
     };
     shellStartupCommand = null;
+    startup.apps = [
+      "spotify"
+      "equibop"
+    ];
+    startup.backend = "niri";
   };
 
   features = {
@@ -123,6 +133,9 @@
     printing.enable = false;
     flatpak = {
       enable = true;
+      packages = [
+        "org.upscayl.Upscayl"
+      ];
     };
     gaming = {
       enable = false;
@@ -139,7 +152,7 @@
         spiceUSBRedirection.enable = true;
       };
       containers = {
-        podman.enable = false;
+        podman.enable = true;
         docker.enable = false;
       };
     };
@@ -147,9 +160,7 @@
     laptop = {
       enable = true;
 
-      # Helpful laptop defaults with explicit toggles per service.
       upower.enable = true;
-      # Keep TLP off while power-profiles-daemon is enabled to avoid the NixOS conflict assertion.
       tlp.enable = false;
       thermald.enable = true;
       powertop.enable = false;
@@ -164,7 +175,6 @@
   };
 
   security.sops = {
-    # Start disabled until tanlappy secrets are created.
     enable = false;
     defaultSopsFile = ../../secrets/tanlappy.yaml;
     ageKeyFile = "/var/lib/sops-nix/key.txt";
