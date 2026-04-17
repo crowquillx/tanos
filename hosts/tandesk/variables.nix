@@ -40,6 +40,7 @@
       "sops"
       "brave"
       "qbittorrent"
+      "localsend"
     ];
     git = {
       name = "tan";

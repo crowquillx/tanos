@@ -176,7 +176,5 @@
 
   security.sops = {
     enable = false;
-    defaultSopsFile = ../../secrets/tanlappy.yaml;
-    ageKeyFile = "/var/lib/sops-nix/key.txt";
   };
 }
