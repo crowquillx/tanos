@@ -22,7 +22,7 @@
       "spotify"
       "mpv"
       "pywalfox-native"
-#      "sops"
+      #      "sops"
       "brave"
       "qbittorrent"
     ];
@@ -124,6 +124,8 @@
     zoxide.enable = true;
     bluetooth.enable = true;
     networking.networkmanager.enable = true;
+
+    tailscale.exitNode = "tanime-1";
     portals.enable = true;
     services = {
       fstrim.enable = true;
