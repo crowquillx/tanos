@@ -22,7 +22,7 @@
       "spotify"
       "mpv"
       "pywalfox-native"
-      "sops"
+#      "sops"
       "brave"
       "qbittorrent"
     ];

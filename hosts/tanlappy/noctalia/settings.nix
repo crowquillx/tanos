@@ -152,36 +152,6 @@
         }
         {
           "defaultSettings" = {
-            "ai" = {
-              "apiKeys" = { };
-              "maxHistoryLength" = 100;
-              "model" = "gemini-2.5-flash";
-              "openaiBaseUrl" = "https://api.openai.com/v1/chat/completions";
-              "openaiLocal" = false;
-              "provider" = "google";
-              "systemPrompt" =
-                "You are a helpful assistant integrated into a Linux desktop shell. Be concise and helpful.";
-              "temperature" = 0.7;
-            };
-            "maxHistoryLength" = 100;
-            "attachmentStyle" = "connected";
-            "panelDetached" = false;
-            "panelHeightRatio" = 0.85;
-            "panelPosition" = "left";
-            "panelWidth" = 520;
-            "scale" = 1;
-            "translator" = {
-              "backend" = "google";
-              "deeplApiKey" = "";
-              "realTimeTranslation" = true;
-              "sourceLanguage" = "auto";
-              "targetLanguage" = "en";
-            };
-          };
-          "id" = "plugin:assistant-panel";
-        }
-        {
-          "defaultSettings" = {
             "hideBackground" = false;
             "minimumThreshold" = 10;
           };
@@ -205,6 +175,9 @@
           "id" = "NotificationHistory";
           "showUnreadBadge" = true;
           "unreadBadgeColor" = "primary";
+        }
+        {
+          "id" = "Battery";
         }
         {
           "displayMode" = "onhover";

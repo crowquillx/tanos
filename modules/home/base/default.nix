@@ -21,6 +21,7 @@ let
   chromeEnabled = get [ "desktop" "browser" "chrome" "enable" ] false;
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
+  noctaliaEnabled = get [ "desktop" "noctalia" "enable" ] false;
 
   zenPkg = lib.attrByPath [ "zen-browser" "packages" system "default" ] null inputs;
   thunarPkg =
@@ -198,6 +199,22 @@ in
     interactiveShellInit = ''
       set -g fish_greeting
     '';
+    functions = lib.mkIf noctaliaEnabled {
+      restart-noctalia = {
+        body = ''
+          for unit in noctalia-shell.service noctalia.service
+            if systemctl --user list-unit-files $unit --no-legend 2>/dev/null | read -l _
+              systemctl --user restart $unit
+              return
+            end
+          end
+
+          pkill -u $USER -x quickshell 2>/dev/null
+          nohup tanos-noctalia-shell >/dev/null 2>&1 &
+          disown
+        '';
+      };
+    };
   };
 
   xdg = {
