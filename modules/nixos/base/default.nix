@@ -14,9 +14,13 @@ in
   nix.settings = {
     extra-trusted-public-keys = [
       "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
     extra-substituters = [
       "https://install.determinate.systems"
+      "https://noctalia.cachix.org"
+      "https://nix-community.cachix.org"
     ];
     auto-optimise-store = true;
   };
