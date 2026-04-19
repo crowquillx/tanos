@@ -2,14 +2,31 @@
 let
   lib = inputs.nixpkgs.lib;
   combined = import ../combined/stacks.nix;
-  noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
-  hostPlatforms = {
-    tandesk = "x86_64-linux";
-    tanvm = "x86_64-linux";
-    tanlappy = "x86_64-linux";
+  hosts = {
+    tandesk = {
+      system = "x86_64-linux";
+      module = ../../hosts/tandesk/default.nix;
+      variables = ../../hosts/tandesk/variables.nix;
+    };
+    tanvm = {
+      system = "x86_64-linux";
+      module = ../../hosts/tanvm/default.nix;
+      variables = ../../hosts/tanvm/variables.nix;
+    };
+    tanlappy = {
+      system = "x86_64-linux";
+      module = ../../hosts/tanlappy/default.nix;
+      variables = ../../hosts/tanlappy/variables.nix;
+    };
   };
-
-  hostVars = lib.mapAttrs (hostName: _: import ../../hosts/${hostName}/variables.nix) hostPlatforms;
+  users = {
+    tan = ../../users/tan/home.nix;
+  };
+  noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
+  hostPlatforms = lib.mapAttrs (_: spec: spec.system) hosts;
+  hostVars = lib.mapAttrs (_: spec: import spec.variables) hosts;
+  nixosHostModules = lib.mapAttrs (_: spec: import spec.module) hosts;
+  homeUserModules = lib.mapAttrs (_: path: import path) users;
 
   getNiriInput =
     vars:
@@ -21,6 +38,14 @@ let
   getNiriOverlay = vars: lib.attrByPath [ "overlays" "niri" ] null (getNiriInput vars);
   getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
   getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
+  sharedOverlays =
+    vars:
+    lib.optionals (getNiriOverlay vars != null) [ (getNiriOverlay vars) ]
+    ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
+  sharedHomeModules =
+    vars:
+    lib.optionals (getNiriHmConfigModule vars != null) [ (getNiriHmConfigModule vars) ]
+    ++ lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
 
   millenniumEnabled =
     vars: lib.attrByPath [ "features" "gaming" "steam" "millennium" "enable" ] false vars;
@@ -29,7 +54,6 @@ let
     hostName: hostPlatform:
     let
       vars = hostVars.${hostName};
-      niriOverlay = getNiriOverlay vars;
       niriNixosModule = getNiriNixosModule vars;
     in
     lib.nixosSystem {
@@ -39,15 +63,14 @@ let
           inputs
           vars
           hostName
+          homeUserModules
           combined
           ;
       };
       modules = [
         {
           nixpkgs.hostPlatform = hostPlatform;
-          nixpkgs.overlays =
-            lib.optionals (niriOverlay != null) [ niriOverlay ]
-            ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
+          nixpkgs.overlays = sharedOverlays vars;
         }
         inputs.determinate.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
@@ -55,7 +78,7 @@ let
         inputs.sops-nix.nixosModules.sops
         inputs.stylix.nixosModules.stylix
         inputs.lanzaboote.nixosModules.lanzaboote
-        self.nixosModules.${hostName}
+        nixosHostModules.${hostName}
       ]
       ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
     };
@@ -80,17 +103,15 @@ let
     hostName: hostPlatform:
     let
       vars = hostVars.${hostName};
-      niriOverlay = getNiriOverlay vars;
-      niriHmConfigModule = getNiriHmConfigModule vars;
       primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
+      homeModule = lib.attrByPath [ primaryUser ] null homeUserModules;
     in
+    assert homeModule != null;
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = import inputs.nixpkgs {
         system = hostPlatform;
         config.allowUnfree = true;
-        overlays =
-          lib.optionals (niriOverlay != null) [ niriOverlay ]
-          ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
+        overlays = sharedOverlays vars;
       };
       extraSpecialArgs = {
         inherit
@@ -101,29 +122,22 @@ let
           ;
       };
       modules = [
-        self.homeModules.${primaryUser}
+        homeModule
         {
           home.username = primaryUser;
           home.homeDirectory = "/home/${primaryUser}";
         }
       ]
-      ++ lib.optionals (niriHmConfigModule != null) [ niriHmConfigModule ]
-      ++ lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
+      ++ sharedHomeModules vars;
     };
 in
 {
   systems = [ "x86_64-linux" ];
 
   flake = {
-    nixosModules = {
-      tandesk = import ../../hosts/tandesk/default.nix;
-      tanvm = import ../../hosts/tanvm/default.nix;
-      tanlappy = import ../../hosts/tanlappy/default.nix;
-    };
+    nixosModules = nixosHostModules;
 
-    homeModules = {
-      tan = import ../../users/tan/home.nix;
-    };
+    homeModules = homeUserModules;
 
     nixosConfigurations = lib.mapAttrs mkHost hostPlatforms;
     ciNixosConfigurations = lib.mapAttrs mkCiHost hostPlatforms;

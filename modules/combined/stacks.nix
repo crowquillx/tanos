@@ -1,4 +1,6 @@
 {
+  # Repo-owned shared module composition lives here.
+  # External flake modules and host-conditional upstream modules stay in modules/flake/hosts.nix.
   nixosModules = [
     ../nixos/base/default.nix
     ../nixos/services/mounts.nix

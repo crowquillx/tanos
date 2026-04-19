@@ -1,4 +1,8 @@
-{ lib, vars ? { }, ... }:
+{
+  lib,
+  vars ? { },
+  ...
+}:
 let
   get = path: default: lib.attrByPath path default vars;
   primaryUser = get [ "users" "primary" ] "tan";
@@ -6,7 +10,8 @@ let
   noctaliaEnabled = get [ "desktop" "noctalia" "enable" ] desktopEnabled;
   secrets = get [ "desktop" "noctalia" "assistantPanel" "secrets" ] { };
 
-  mkSecret = name:
+  mkSecret =
+    name:
     lib.nameValuePair name {
       owner = primaryUser;
       group = "users";
@@ -14,14 +19,11 @@ let
       path = "/run/secrets/${name}";
     };
 
-  configuredSecretNames =
-    builtins.filter
-      (name: lib.isString name && name != "")
-      [
-        (secrets.googleApiKey or "")
-        (secrets.openaiCompatibleApiKey or "")
-        (secrets.deeplApiKey or "")
-      ];
+  configuredSecretNames = builtins.filter (name: lib.isString name && name != "") [
+    (secrets.googleApiKey or "")
+    (secrets.openaiCompatibleApiKey or "")
+    (secrets.deeplApiKey or "")
+  ];
 in
 {
   config = lib.mkIf (noctaliaEnabled && configuredSecretNames != [ ]) {

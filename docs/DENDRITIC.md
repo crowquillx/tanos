@@ -21,7 +21,7 @@ This closely follows the video pattern (`mkFlake ... (import-tree ./modules)`).
 ## 2) Flake logic lives in `modules/flake/`
 
 - `modules/flake/hosts.nix`
-  - defines host map (`hostPlatforms`)
+  - defines the host registry (`hosts`) and published user modules (`users`)
   - publishes `flake.nixosModules.<host>` and `flake.homeModules.<user>`
   - builds `nixosConfigurations`, `ciNixosConfigurations`, `homeConfigurations`
 - `modules/flake/packages.nix`
@@ -30,12 +30,13 @@ This closely follows the video pattern (`mkFlake ... (import-tree ./modules)`).
 
 ## 3) Shared NixOS + Home stack wiring
 
-`modules/combined/stacks.nix` is the single source for shared module composition:
+`modules/combined/stacks.nix` is the single source for repo-owned shared module composition:
 
 - `nixosModules`: imported by `hosts/common/default.nix`
 - `homeModules`: imported by `users/tan/home.nix`
 
 `combined` is passed through special args from `modules/flake/hosts.nix` into both system and home evaluation paths.
+External upstream flake modules and host-conditional upstream modules stay in `modules/flake/hosts.nix`.
 
 ## Simplified file layout
 
@@ -81,14 +82,15 @@ Fallback:
 ### Add a new host
 
 1. Create `hosts/<newhost>/` files.
-2. Register `<newhost>` in `modules/flake/hosts.nix` (`hostPlatforms` + `flake.nixosModules`).
+2. Register `<newhost>` in the `hosts` attrset in `modules/flake/hosts.nix`.
 3. Build with `tcli rebuild build <newhost>`.
 
 ### Add/modify shared feature modules
 
 1. Update paths in `modules/combined/stacks.nix`.
 2. Keep NixOS/Home pairs aligned by feature domain.
-3. Build affected host(s).
+3. If the change needs an upstream flake module or overlay, wire that in `modules/flake/hosts.nix` instead.
+4. Build affected host(s).
 
 ### Add package outputs (wrapped/custom)
 

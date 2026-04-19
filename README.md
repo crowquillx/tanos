@@ -13,8 +13,8 @@ All hosts currently use username `tan`.
 ## Layout
 
 - `flake.nix`: parts-wrapped flake entrypoint (via `flake-parts`)
-- `modules/flake/*`: parts-wrapped flake modules (hosts + packages + output assembly)
-- `modules/combined/stacks.nix`: shared stack wiring for both NixOS + Home Manager modules
+- `modules/flake/*`: parts-wrapped flake modules (host registry, external module injection, packages, output assembly)
+- `modules/combined/stacks.nix`: repo-owned shared stack wiring for both NixOS + Home Manager modules
 - `hosts/<host>/variables.nix`: host toggles and values
 - `hosts/<host>/default.nix`: host-specific wiring
 - `modules/nixos/*`: system modules
@@ -41,6 +41,8 @@ It handles both system + Home Manager through one rebuild path, now backed by `n
 
 1. NixOS rebuild (`nh os`)
 2. Home Manager activation via NixOS `home-manager` module integration
+
+`bootstrap.sh` and `tcli nh home` still use `homeConfigurations.<host>`, but that path now reuses the same published user entrypoint as the integrated `home-manager.users` path.
 
 Commands:
 
@@ -141,6 +143,7 @@ desktop.startup.apps = [
 ## Notes
 
 - `hardware-configuration.nix` placeholders are overwritten by bootstrap.
+- Standalone and NixOS-integrated Home Manager paths now share the same `flake.homeModules.<user>` entrypoint, which keeps bootstrap, `tcli nh home`, and normal rebuilds aligned.
 - `tanvm` defaults disable bluetooth and use `graphics.profile = "vm"` for software-rendering reliability.
 - `tanlappy` enables laptop defaults and leaves Niri output layout ready to define in `hosts/tanlappy/variables.nix`.
 - This setup targets `nixpkgs-unstable`.

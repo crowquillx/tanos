@@ -93,3 +93,4 @@ Shell aliases are set by Home Manager (bash + fish):
 2. Home Manager activation package (`homeConfigurations.<host>.activationPackage`)
 
 So bootstrap and `tcli` both enforce full system + HM activation, but via different command paths.
+Both paths consume the same published user module entrypoint from `flake.homeModules`.

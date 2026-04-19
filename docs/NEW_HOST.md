@@ -31,9 +31,9 @@ sudo ./install/bootstrap.sh <newhost> --update-hardware
 
 Option B: manually generate and place `hosts/<newhost>/hardware-configuration.nix`.
 
-## 4) Register host in flake outputs
+## 4) Register host in the flake host registry
 
-Add `<newhost>` in `modules/flake/hosts.nix` under `hostPlatforms` so both outputs are generated:
+Add `<newhost>` in the `hosts` attrset in `modules/flake/hosts.nix` with its system, host module path, and variables path so both outputs are generated:
 
 - `nixosConfigurations.<newhost>`
 - `homeConfigurations.<newhost>`
