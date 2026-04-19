@@ -72,7 +72,6 @@
       helium.enable = true;
     };
     niri = {
-      useWip = true;
       blur = {
         enable = true;
         passes = 3;

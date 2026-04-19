@@ -1,9 +1,15 @@
-{ lib, vars, useWip, plain, leaf, ... }:
+{
+  lib,
+  vars,
+  plain,
+  leaf,
+  ...
+}:
 let
   blur = lib.attrByPath [ "desktop" "niri" "blur" ] { } vars;
   enabled = blur.enable or true;
 in
-if !useWip || !enabled then
+if !enabled then
   [ ]
 else
   [

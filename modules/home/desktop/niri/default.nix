@@ -1,14 +1,23 @@
-{ lib, inputs, vars, ... }:
+{
+  lib,
+  inputs,
+  vars,
+  ...
+}:
 let
   get = path: default: lib.attrByPath path default vars;
-  useWip = get [ "desktop" "niri" "useWip" ] false;
-  niriInput = if useWip then inputs."niri-wip" else inputs.niri;
-  inherit (niriInput.lib.kdl) node plain leaf flag;
+  inherit (inputs.niri.lib.kdl)
+    node
+    plain
+    leaf
+    flag
+    ;
 
   optionalNode = cond: value: if cond then value else null;
   normalize = values: builtins.filter (value: value != null) (lib.flatten values);
 
-  formatMode = mode:
+  formatMode =
+    mode:
     if builtins.isAttrs mode then
       let
         base = "${toString mode.width}x${toString mode.height}";
@@ -18,33 +27,41 @@ let
     else
       mode;
 
-  formatTransform = transform:
+  formatTransform =
+    transform:
     if builtins.isAttrs transform then
       let
         rotation = toString (transform.rotation or 0);
         flipped = transform.flipped or false;
         base = if rotation == "0" then "normal" else rotation;
       in
-      if flipped then
-        if rotation == "0" then "flipped" else "flipped-${rotation}"
-      else
-        base
+      if flipped then if rotation == "0" then "flipped" else "flipped-${rotation}" else base
     else
       transform;
 
-  mkOutput = name: output:
+  mkOutput =
+    name: output:
     node "output" name (normalize [
       (optionalNode ((output.enable or true) == false) (flag "off"))
       (optionalNode (output ? mode && output.mode != null) (leaf "mode" (formatMode output.mode)))
       (optionalNode (output ? scale && output.scale != null) (leaf "scale" output.scale))
-      (optionalNode (output ? transform && output.transform != null) (leaf "transform" (formatTransform output.transform)))
-      (optionalNode (output ? position && output.position != null) (leaf "position" output.position))
-      (optionalNode (output ? variableRefreshRate && output.variableRefreshRate != null && output.variableRefreshRate != false) (
-        if output.variableRefreshRate == "on-demand" then
-          leaf "variable-refresh-rate" { on-demand = true; }
-        else
-          leaf "variable-refresh-rate" output.variableRefreshRate
+      (optionalNode (output ? transform && output.transform != null) (
+        leaf "transform" (formatTransform output.transform)
       ))
+      (optionalNode (output ? position && output.position != null) (leaf "position" output.position))
+      (optionalNode
+        (
+          output ? variableRefreshRate
+          && output.variableRefreshRate != null
+          && output.variableRefreshRate != false
+        )
+        (
+          if output.variableRefreshRate == "on-demand" then
+            leaf "variable-refresh-rate" { on-demand = true; }
+          else
+            leaf "variable-refresh-rate" output.variableRefreshRate
+        )
+      )
       (optionalNode (output.focusAtStartup or false) (flag "focus-at-startup"))
     ]);
 
@@ -56,7 +73,19 @@ let
   };
 
   context = {
-    inherit lib vars inputs useWip node plain leaf flag optionalNode normalize mkOutput rgbaApps;
+    inherit
+      lib
+      vars
+      inputs
+      node
+      plain
+      leaf
+      flag
+      optionalNode
+      normalize
+      mkOutput
+      rgbaApps
+      ;
   };
 in
 normalize [

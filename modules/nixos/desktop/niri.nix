@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
@@ -13,7 +18,7 @@ in
     assertions = [
       {
         assertion = niriPackage != null;
-        message = "pkgs.niri-unstable is unavailable. Ensure inputs.niri.overlays.niri is applied (desktop.niri.useWip selects stable or the WIP override target).";
+        message = "pkgs.niri-unstable is unavailable. Ensure inputs.niri.overlays.niri is applied.";
       }
     ];
 

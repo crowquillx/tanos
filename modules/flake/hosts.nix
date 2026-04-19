@@ -28,23 +28,16 @@ let
   nixosHostModules = lib.mapAttrs (_: spec: import spec.module) hosts;
   homeUserModules = lib.mapAttrs (_: path: import path) users;
 
-  getNiriInput =
-    vars:
-    let
-      useWip = lib.attrByPath [ "desktop" "niri" "useWip" ] false vars;
-    in
-    if useWip then inputs."niri-wip" else inputs.niri;
-
-  getNiriOverlay = vars: lib.attrByPath [ "overlays" "niri" ] null (getNiriInput vars);
-  getNiriNixosModule = vars: lib.attrByPath [ "nixosModules" "niri" ] null (getNiriInput vars);
-  getNiriHmConfigModule = vars: lib.attrByPath [ "homeModules" "config" ] null (getNiriInput vars);
+  niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
+  niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
+  niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
   sharedOverlays =
     vars:
-    lib.optionals (getNiriOverlay vars != null) [ (getNiriOverlay vars) ]
+    lib.optionals (niriOverlay != null) [ niriOverlay ]
     ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
   sharedHomeModules =
     vars:
-    lib.optionals (getNiriHmConfigModule vars != null) [ (getNiriHmConfigModule vars) ]
+    lib.optionals (niriHmConfigModule != null) [ niriHmConfigModule ]
     ++ lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
 
   millenniumEnabled =
@@ -54,7 +47,7 @@ let
     hostName: hostPlatform:
     let
       vars = hostVars.${hostName};
-      niriNixosModule = getNiriNixosModule vars;
+      niriNixosModule' = niriNixosModule;
     in
     lib.nixosSystem {
       specialArgs = {
@@ -80,7 +73,7 @@ let
         inputs.lanzaboote.nixosModules.lanzaboote
         nixosHostModules.${hostName}
       ]
-      ++ lib.optionals (niriNixosModule != null) [ niriNixosModule ];
+      ++ lib.optionals (niriNixosModule' != null) [ niriNixosModule' ];
     };
 
   mkCiHost =
