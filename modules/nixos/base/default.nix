@@ -25,11 +25,7 @@ in
     auto-optimise-store = true;
   };
 
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
-  };
+  nix.gc.automatic = false;
 
   time.timeZone = get [ "host" "timeZone" ] "America/Chicago";
   i18n.defaultLocale = get [ "host" "locale" ] "en_US.UTF-8";
