@@ -24,6 +24,7 @@
     ../nixos/services/virtualisation.nix
     ../nixos/services/keyring.nix
     ../nixos/services/tailscale.nix
+    ../nixos/services/localsend.nix
     ../nixos/security/noctalia-secrets.nix
     ../nixos/security/sops.nix
     ../nixos/security/secure-boot.nix
