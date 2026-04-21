@@ -343,7 +343,7 @@
     "autoStartAuth" = false;
     "avatarImage" = "/home/tan/.face";
     "boxRadiusRatio" = 1;
-    "clockFormat" = "hh\\nmmh:mm AP ";
+    "clockFormat" = "hh\\nmm";
     "clockStyle" = "custom";
     "compactLockScreen" = false;
     "dimmerOpacity" = 0.2;

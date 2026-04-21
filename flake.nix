@@ -71,6 +71,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    code-cursor-nix = {
+      url = "github:jacopone/code-cursor-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     millennium = {
       url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";
