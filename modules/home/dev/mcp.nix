@@ -12,7 +12,16 @@ let
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   nixosMcpEnabled = get [ "features" "mcp" "nixos" "enable" ] codingToolsEnabled;
   system = pkgs.stdenv.hostPlatform.system;
-  codexPkg = lib.attrByPath [ "codex-cli-nix" "packages" system "default" ] null inputs;
+  rawCodexPkg = lib.attrByPath [ "codex-cli-nix" "packages" system "default" ] null inputs;
+  codexPkg = pkgs.symlinkJoin {
+    name = "codex";
+    paths = [ rawCodexPkg ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/codex \
+        --add-flags "-m gpt-5.4 --dangerously-bypass-approvals-and-sandbox"
+    '';
+  };
   copilotCliPkg = lib.attrByPath [ "copilot-cli-nix" "packages" system "default" ] null inputs;
   jsonFormat = pkgs.formats.json { };
 in
