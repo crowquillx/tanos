@@ -26,7 +26,6 @@ let
     if fhsPkg != null then fhsPkg else nativePkg;
   bubblewrapPkg = lib.attrByPath [ "bubblewrap" ] null pkgs;
   statixPkg = lib.attrByPath [ "statix" ] null pkgs;
-  opencodePkg = lib.attrByPath [ "opencode" ] null pkgs;
   uvPkg = lib.attrByPath [ "uv" ] null pkgs;
   deadnixPkg = lib.attrByPath [ "deadnix" ] null pkgs;
   alejandraPkg = lib.attrByPath [ "alejandra" ] null pkgs;
@@ -48,6 +47,7 @@ let
   skillsPkg = lib.attrByPath [ "skills" ] null pkgs;
   copilotCliPkg = lib.attrByPath [ "copilot-cli-nix" "packages" system "default" ] null inputs;
   cursorPkg = lib.attrByPath [ "code-cursor-nix" "packages" system "cursor" ] null inputs;
+  cursorCliPkg = lib.attrByPath [ "cursor-cli" ] null pkgs;
   zedEditorPkg = lib.attrByPath [ "zed-editor" ] null pkgs;
   nilPkg = lib.attrByPath [ "nil" ] null pkgs;
 in
@@ -109,12 +109,15 @@ in
       assertion = !(codingToolsEnabled && cursorPkg == null);
       message = "features.codingTools.enable is true, but no Cursor package could be resolved from code-cursor-nix.";
     }
+    {
+      assertion = !(codingToolsEnabled && cursorCliPkg == null);
+      message = "features.codingTools.enable is true, but nixpkgs package 'cursor-cli' could not be resolved.";
+    }
   ];
 
   home.packages =
     lib.optionals (codingToolsEnabled && vscodePkg != null) [ vscodePkg ]
     ++ lib.optionals (codingToolsEnabled && geminiCliPkg != null) [ geminiCliPkg ]
-    ++ lib.optionals (codingToolsEnabled && opencodePkg != null) [ opencodePkg ]
     ++ lib.optionals (codingToolsEnabled && uvPkg != null) [ uvPkg ]
     ++ lib.optionals (codingToolsEnabled && antigravityPkg != null) [ antigravityPkg ]
     ++ lib.optionals (codingToolsEnabled && bubblewrapPkg != null) [ bubblewrapPkg ]
@@ -128,6 +131,7 @@ in
     ++ lib.optionals (codingToolsEnabled && skillsPkg != null) [ skillsPkg ]
     ++ lib.optionals (codingToolsEnabled && copilotCliPkg != null) [ copilotCliPkg ]
     ++ lib.optionals (codingToolsEnabled && cursorPkg != null) [ cursorPkg ]
+    ++ lib.optionals (codingToolsEnabled && cursorCliPkg != null) [ cursorCliPkg ]
     ++ lib.optionals (codingToolsEnabled && zedEditorPkg != null) [ zedEditorPkg ]
     ++ lib.optionals (codingToolsEnabled && nilPkg != null) [ nilPkg ];
 

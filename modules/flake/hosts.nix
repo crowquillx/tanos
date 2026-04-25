@@ -31,10 +31,25 @@ let
   niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
   niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
   niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
+  aioboto3NoCheckOverlay = final: prev: {
+    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: { doCheck = false; });
+    });
+    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
+      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: { doCheck = false; });
+    });
+  };
+
+  openldapNoCheckOverlay = final: prev: {
+    openldap = prev.openldap.overrideAttrs (_: { doCheck = false; });
+  };
+
   sharedOverlays =
     vars:
     lib.optionals (niriOverlay != null) [ niriOverlay ]
-    ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default;
+    ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default
+    ++ [ aioboto3NoCheckOverlay ]
+    ++ [ openldapNoCheckOverlay ];
   sharedHomeModules =
     vars:
     lib.optionals (niriHmConfigModule != null) [ niriHmConfigModule ]
