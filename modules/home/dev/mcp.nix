@@ -12,7 +12,7 @@ let
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   nixosMcpEnabled = get [ "features" "mcp" "nixos" "enable" ] codingToolsEnabled;
   system = pkgs.stdenv.hostPlatform.system;
-  opencodePkg = import ../../lib/opencode-package.nix { inherit inputs lib pkgs; };
+  opencodePkg = inputs.opencode.packages.${system}.default;
   rawCodexPkg = lib.attrByPath [ "codex-cli-nix" "packages" system "default" ] null inputs;
   codexPkg = pkgs.symlinkJoin {
     name = "codex";

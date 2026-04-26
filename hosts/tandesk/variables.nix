@@ -50,10 +50,13 @@
 
   graphics = {
     profile = "nvidia";
+    enable32Bit = true;
     nvidia = {
       modesetting.enable = true;
       powerManagement.enable = false;
       open = true;
+      nvidiaSettings = true;
+      useLatestDriver = true;
     };
   };
 

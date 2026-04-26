@@ -19,6 +19,9 @@ let
   nvidiaModesettingEnable = get [ "graphics" "nvidia" "modesetting" "enable" ] true;
   nvidiaPowerManagementEnable = get [ "graphics" "nvidia" "powerManagement" "enable" ] false;
   nvidiaOpenEnable = get [ "graphics" "nvidia" "open" ] false;
+  nvidiaSettingsEnable = get [ "graphics" "nvidia" "nvidiaSettings" ] true;
+  nvidiaUseLatest = get [ "graphics" "nvidia" "useLatestDriver" ] false;
+  enable32Bit = get [ "graphics" "enable32Bit" ] false;
 in
 {
   config = lib.mkMerge [
@@ -40,6 +43,7 @@ in
 
     (lib.mkIf (profile != "none") {
       hardware.graphics.enable = lib.mkDefault true;
+      hardware.graphics.enable32Bit = lib.mkDefault enable32Bit;
     })
 
     (lib.mkIf (resolvedExtraPackages != [ ]) {
@@ -62,6 +66,8 @@ in
         modesetting.enable = nvidiaModesettingEnable;
         powerManagement.enable = nvidiaPowerManagementEnable;
         open = nvidiaOpenEnable;
+        nvidiaSettings = nvidiaSettingsEnable;
+        package = lib.mkIf nvidiaUseLatest config.boot.kernelPackages.nvidiaPackages.latest;
       };
     })
 

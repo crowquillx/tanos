@@ -34,6 +34,16 @@ let
       pkgs."protonup-qt"
     else
       null;
+  winePkg =
+    if pkgs ? wineWow64Packages && pkgs.wineWow64Packages ? wayland then
+      pkgs.wineWow64Packages.wayland
+    else if pkgs ? wine then
+      pkgs.wine
+    else
+      null;
+  winetricksPkg = if pkgs ? winetricks then pkgs.winetricks else null;
+  vulkanToolsPkg = if pkgs ? vulkan-tools then pkgs.vulkan-tools else null;
+  pciutilsPkg = if pkgs ? pciutils then pkgs.pciutils else null;
 in
 {
   config = lib.mkMerge [
@@ -51,6 +61,22 @@ in
           assertion = !enabled || protonPlusPkg != null;
           message = "features.gaming.enable is true, but neither 'protonplus' nor fallback 'protonup-qt' could be resolved.";
         }
+        {
+          assertion = !enabled || winePkg != null;
+          message = "features.gaming.enable is true, but nixpkgs package 'wineWow64Packages.wayland' (or fallback 'wine') could not be resolved.";
+        }
+        {
+          assertion = !enabled || winetricksPkg != null;
+          message = "features.gaming.enable is true, but nixpkgs package 'winetricks' could not be resolved.";
+        }
+        {
+          assertion = !enabled || vulkanToolsPkg != null;
+          message = "features.gaming.enable is true, but nixpkgs package 'vulkan-tools' could not be resolved.";
+        }
+        {
+          assertion = !enabled || pciutilsPkg != null;
+          message = "features.gaming.enable is true, but nixpkgs package 'pciutils' could not be resolved.";
+        }
       ];
     }
     (lib.mkIf enabled {
@@ -67,6 +93,10 @@ in
         lutrisPkg
         heroicPkg
         protonPlusPkg
+        winePkg
+        winetricksPkg
+        vulkanToolsPkg
+        pciutilsPkg
       ];
     })
   ];

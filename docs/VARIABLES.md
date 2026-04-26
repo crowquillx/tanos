@@ -16,7 +16,8 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.niri.useWip = true | false` (switches niri input from stable to the WIP override target in `flake.nix`, currently `niri-wm/niri` PR `#3483`)
 - `desktop.noctalia = { enable, command, systemd.enable, assistantPanel.secrets, settings, colors, plugins, pluginSettings, userTemplates }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
-- `graphics.nvidia = { modesetting.enable, powerManagement.enable, open }`
+- `graphics.enable32Bit = true | false`
+- `graphics.nvidia = { modesetting.enable, powerManagement.enable, open, nvidiaSettings, useLatestDriver }`
 - `graphics.extraPackages = [ "pkgAttr.path" ... ]`
 - `storage.mounts = [ { device, mountPoint, fsType ? "auto", options ? [ ] } ... ]`
 - `boot.secureBoot = { enable, includeMicrosoftKeys, autoEnroll, pkiBundle }` (Lanzaboote-based secure boot)
