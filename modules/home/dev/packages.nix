@@ -45,7 +45,6 @@ let
   ];
   ghPkg = lib.attrByPath [ "gh" ] null pkgs;
   skillsPkg = lib.attrByPath [ "skills" ] null pkgs;
-  copilotCliPkg = lib.attrByPath [ "copilot-cli-nix" "packages" system "default" ] null inputs;
   cursorPkg = lib.attrByPath [ "code-cursor-nix" "packages" system "cursor" ] null inputs;
   cursorCliPkg = lib.attrByPath [ "cursor-cli" ] null pkgs;
   zedEditorPkg = lib.attrByPath [ "zed-editor" ] null pkgs;
@@ -102,10 +101,6 @@ in
       message = "features.codingTools.enable is true, but nixpkgs package 'skills' could not be resolved.";
     }
     {
-      assertion = !(codingToolsEnabled && copilotCliPkg == null);
-      message = "features.codingTools.enable is true, but no Copilot CLI package could be resolved from copilot-cli-nix.";
-    }
-    {
       assertion = !(codingToolsEnabled && cursorPkg == null);
       message = "features.codingTools.enable is true, but no Cursor package could be resolved from code-cursor-nix.";
     }
@@ -129,7 +124,6 @@ in
     ++ lib.optionals (codingToolsEnabled && t3DesktopPkg != null) [ t3DesktopPkg ]
     ++ lib.optionals (codingToolsEnabled && ghPkg != null) [ ghPkg ]
     ++ lib.optionals (codingToolsEnabled && skillsPkg != null) [ skillsPkg ]
-    ++ lib.optionals (codingToolsEnabled && copilotCliPkg != null) [ copilotCliPkg ]
     ++ lib.optionals (codingToolsEnabled && cursorPkg != null) [ cursorPkg ]
     ++ lib.optionals (codingToolsEnabled && cursorCliPkg != null) [ cursorCliPkg ]
     ++ lib.optionals (codingToolsEnabled && zedEditorPkg != null) [ zedEditorPkg ]

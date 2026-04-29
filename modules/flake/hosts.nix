@@ -40,6 +40,42 @@ let
     });
   };
 
+  fastmcpNoCheckOverlay = final: prev: {
+    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: { doCheck = false; });
+    });
+    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
+      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: { doCheck = false; });
+    });
+  };
+
+  lupaBundleOverlay = final: prev: {
+    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+      lupa = pyPrev.lupa.overridePythonAttrs (old: {
+        src = final.fetchPypi {
+          pname = "lupa";
+          version = "2.8";
+          hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
+        };
+        env = { };
+        buildInputs = [ ];
+        nativeBuildInputs = [ ];
+      });
+    });
+    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
+      lupa = pyPrev.lupa.overridePythonAttrs (old: {
+        src = final.fetchPypi {
+          pname = "lupa";
+          version = "2.8";
+          hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
+        };
+        env = { };
+        buildInputs = [ ];
+        nativeBuildInputs = [ ];
+      });
+    });
+  };
+
   openldapNoCheckOverlay = final: prev: {
     openldap = prev.openldap.overrideAttrs (_: { doCheck = false; });
   };
@@ -49,6 +85,8 @@ let
     lib.optionals (niriOverlay != null) [ niriOverlay ]
     ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default
     ++ [ aioboto3NoCheckOverlay ]
+    ++ [ fastmcpNoCheckOverlay ]
+    ++ [ lupaBundleOverlay ]
     ++ [ openldapNoCheckOverlay ];
   sharedHomeModules =
     vars:

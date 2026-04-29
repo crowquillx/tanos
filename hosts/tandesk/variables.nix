@@ -41,6 +41,7 @@
       "brave"
       "qbittorrent"
       "localsend"
+      "proton-vpn"
     ];
     git = {
       name = "tan";

@@ -27,9 +27,13 @@ let
   thunarPkg =
     let
       topLevelPkg = lib.attrByPath [ "thunar" ] null pkgs;
+      archivePlugin = lib.attrByPath [ "thunar-archive-plugin" ] null pkgs;
     in
-    topLevelPkg;
-  thunarArchivePluginPkg =
+    if topLevelPkg != null && archivePlugin != null then
+      topLevelPkg.override { thunarPlugins = [ archivePlugin ]; }
+    else
+      topLevelPkg;
+  archivePluginPkg =
     let
       topLevelPkg = lib.attrByPath [ "thunar-archive-plugin" ] null pkgs;
     in
@@ -127,7 +131,7 @@ in
       message = "features.fileManager.thunar.enable is true, but thunar package could not be resolved from nixpkgs.";
     }
     {
-      assertion = !(thunarEnabled && thunarArchivePluginPkg == null);
+      assertion = !(thunarEnabled && archivePluginPkg == null);
       message = "features.fileManager.thunar.enable is true, but thunar-archive-plugin package could not be resolved from nixpkgs.";
     }
     {
@@ -165,6 +169,9 @@ in
       fd
       unzip
       zip
+      p7zip
+      unar
+      unrar
       vim
       neovim
       htop
@@ -174,7 +181,6 @@ in
     ])
     ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
     ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
-    ++ lib.optionals (thunarEnabled && thunarArchivePluginPkg != null) [ thunarArchivePluginPkg ]
     ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
     ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
     ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]

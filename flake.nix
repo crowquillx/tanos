@@ -70,11 +70,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    copilot-cli-nix = {
-      url = "github:max-miller1204/copilot-cli-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     code-cursor-nix = {
       url = "github:jacopone/code-cursor-nix";
       inputs.nixpkgs.follows = "nixpkgs";

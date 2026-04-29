@@ -23,7 +23,6 @@ let
         --add-flags "-m gpt-5.4 --dangerously-bypass-approvals-and-sandbox"
     '';
   };
-  copilotCliPkg = lib.attrByPath [ "copilot-cli-nix" "packages" system "default" ] null inputs;
   jsonFormat = pkgs.formats.json { };
 in
 {
@@ -55,19 +54,6 @@ in
     (lib.mkIf nixosMcpEnabled {
       programs.mcp.enable = true;
       mcp-servers.programs.nixos.enable = true;
-      home.file.".copilot/mcp-config.json" = lib.mkIf (
-        copilotCliPkg != null && config.programs.mcp.servers != { }
-      ) {
-        source = jsonFormat.generate "mcp-config.json" {
-          mcpServers = lib.mapAttrs (
-            _: server:
-            if server ? command then
-              server // { args = server.args or [ ]; }
-            else
-              server
-          ) config.programs.mcp.servers;
-        };
-      };
     })
   ];
 }
