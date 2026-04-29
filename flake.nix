@@ -80,6 +80,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    comfyui-nix = {
+      url = "github:utensils/comfyui-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   outputs =

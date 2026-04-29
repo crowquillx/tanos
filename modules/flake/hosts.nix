@@ -124,6 +124,7 @@ let
         inputs.sops-nix.nixosModules.sops
         inputs.stylix.nixosModules.stylix
         inputs.lanzaboote.nixosModules.lanzaboote
+        inputs.comfyui-nix.nixosModules.default
         nixosHostModules.${hostName}
       ]
       ++ lib.optionals (niriNixosModule' != null) [ niriNixosModule' ];

@@ -233,6 +233,18 @@
         docker.enable = false;
       };
     };
+    ai = {
+      enable = true;
+      comfyui = {
+        enable = true;
+      };
+      ollama = {
+        enable = true;
+      };
+      openWebui = {
+        enable = true;
+      };
+    };
   };
 
   security.sops = {
