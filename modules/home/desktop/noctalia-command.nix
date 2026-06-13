@@ -5,7 +5,7 @@ let
   compositor = get [ "desktop" "compositor" ] "niri";
   noctaliaEnabled = get [ "desktop" "noctalia" "enable" ] (desktopEnabled && compositor == "niri");
   secrets = get [ "desktop" "noctalia" "assistantPanel" "secrets" ] { };
-  immutableSettingsFile = lib.attrByPath [ "xdg" "configFile" "noctalia/settings.json" "source" ] null config;
+  immutableSettingsFile = lib.attrByPath [ "xdg" "configFile" "noctalia/config.toml" "source" ] null config;
 
   mkSecretPath = name:
     if lib.isString name && name != "" then "/run/secrets/${name}" else null;

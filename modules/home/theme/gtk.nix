@@ -34,7 +34,6 @@ in
     ];
 
     gtk = {
-      gtk4.theme = null;
       iconTheme = {
         name = iconThemeName;
         package = iconThemePkg;

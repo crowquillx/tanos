@@ -28,14 +28,18 @@ let
 in
 {
   config = lib.mkIf (desktopEnabled && compositor == "niri" && noctaliaEnable) {
-    programs.noctalia-shell = {
+    programs.noctalia = {
       enable = true;
       systemd.enable = get [ "desktop" "noctalia" "systemd" "enable" ] true;
-      settings = forceIfConfigured (lib.recursiveUpdate noctaliaSettings managedIdleSettings);
-      colors = forceIfConfigured (get [ "desktop" "noctalia" "colors" ] { });
-      plugins = forceIfConfigured (get [ "desktop" "noctalia" "plugins" ] { });
-      pluginSettings = forceIfConfigured (get [ "desktop" "noctalia" "pluginSettings" ] { });
-      user-templates = forceIfConfigured (get [ "desktop" "noctalia" "userTemplates" ] { });
+      settings = noctaliaSettings // managedIdleSettings;
+      customPalettes =
+        let
+          palettes = get [ "desktop" "noctalia" "colors" ] { };
+        in
+        if palettes == { } then
+          { }
+        else
+          { "default" = palettes; };
     };
   };
 }

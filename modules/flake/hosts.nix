@@ -118,7 +118,6 @@ let
           nixpkgs.hostPlatform = hostPlatform;
           nixpkgs.overlays = sharedOverlays vars;
         }
-        inputs.determinate.nixosModules.default
         inputs.home-manager.nixosModules.home-manager
         inputs.nix-flatpak.nixosModules.nix-flatpak
         inputs.sops-nix.nixosModules.sops

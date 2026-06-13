@@ -12,7 +12,12 @@ let
   codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
   nixosMcpEnabled = get [ "features" "mcp" "nixos" "enable" ] codingToolsEnabled;
   system = pkgs.stdenv.hostPlatform.system;
-  opencodePkg = inputs.opencode.packages.${system}.default;
+  opencodePkg = (inputs.opencode.packages.${system}.default).overrideAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace packages/script/src/index.ts \
+        --replace-fail "if (!semver.satisfies(process.versions.bun, expectedBunVersionRange))" "if (false)"
+    '';
+  });
   rawCodexPkg = lib.attrByPath [ "codex-cli-nix" "packages" system "default" ] null inputs;
   codexPkg = pkgs.symlinkJoin {
     name = "codex";
