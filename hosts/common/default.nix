@@ -7,13 +7,12 @@
   homeUserModules,
   combined,
   ...
-}:
-let
+}: let
   v = config.tanos.variables;
   get = path: default: lib.attrByPath path default v;
-  primaryUser = get [ "users" "primary" ] "tan";
-  homeModule = lib.attrByPath [ primaryUser ] null homeUserModules;
-  noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
+  primaryUser = get ["users" "primary"] "tan";
+  homeModule = lib.attrByPath [primaryUser] null homeUserModules;
+  noctaliaHmModule = lib.attrByPath ["noctalia" "homeModules" "default"] null inputs;
   hmBackupCommand = pkgs.writeShellScript "home-manager-backup" ''
     set -eu
 
@@ -28,12 +27,12 @@ let
 
     exec ${pkgs.coreutils}/bin/mv "$target_path" "$backup_path"
   '';
-in
-{
-  imports = [
-    ./variables-schema.nix
-  ]
-  ++ combined.nixosModules;
+in {
+  imports =
+    [
+      ./variables-schema.nix
+    ]
+    ++ combined.nixosModules;
 
   tanos.variables = vars;
 
@@ -47,22 +46,20 @@ in
       message = "users.primary must be a non-empty string.";
     }
     {
-      assertion =
-        let
-          extraPackages = get [ "users" "extraPackages" ] [ ];
-        in
+      assertion = let
+        extraPackages = get ["users" "extraPackages"] [];
+      in
         builtins.isList extraPackages && builtins.all lib.isString extraPackages;
       message = "users.extraPackages must be a list of package attribute strings.";
     }
     {
-      assertion = builtins.isBool (get [ "desktop" "enable" ] true);
+      assertion = builtins.isBool (get ["desktop" "enable"] true);
       message = "desktop.enable must be a boolean.";
     }
     {
-      assertion =
-        let
-          compositor = get [ "desktop" "compositor" ] "niri";
-        in
+      assertion = let
+        compositor = get ["desktop" "compositor"] "niri";
+      in
         builtins.elem compositor [
           "niri"
           "plasma"
@@ -70,26 +67,25 @@ in
       message = "desktop.compositor must be one of: niri, plasma.";
     }
     {
-      assertion =
-        let
-          extraCompositors = get [ "desktop" "extraCompositors" ] [ ];
-        in
+      assertion = let
+        extraCompositors = get ["desktop" "extraCompositors"] [];
+      in
         builtins.isList extraCompositors
         && builtins.all lib.isString extraCompositors
         && builtins.all (
           c:
-          builtins.elem c [
-            "niri"
-            "plasma"
-          ]
-        ) extraCompositors;
+            builtins.elem c [
+              "niri"
+              "plasma"
+            ]
+        )
+        extraCompositors;
       message = "desktop.extraCompositors may only include: niri, plasma.";
     }
     {
-      assertion =
-        let
-          dm = get [ "desktop" "displayManager" ] "auto";
-        in
+      assertion = let
+        dm = get ["desktop" "displayManager"] "auto";
+      in
         builtins.elem dm [
           "auto"
           "sddm"
@@ -99,16 +95,72 @@ in
       '';
     }
     {
-      assertion =
-        let
-          startupApps = get [ "desktop" "startup" "apps" ] [ ];
-        in
+      assertion = let
+        startupApps = get ["desktop" "startup" "apps"] [];
+      in
         builtins.isList startupApps && builtins.all lib.isString startupApps;
       message = "desktop.startup.apps must be a list of command strings.";
     }
     {
-      assertion = builtins.isBool (get [ "security" "sops" "enable" ] true);
+      assertion = builtins.isBool (get ["security" "sops" "enable"] true);
       message = "security.sops.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (get ["features" "codingTools" "enable"] true);
+      message = "features.codingTools.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "editors" "enable"] (get ["features" "codingTools" "enable"] true)
+      );
+      message = "features.codingTools.editors.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "aiCli" "enable"] (get ["features" "codingTools" "enable"] true)
+      );
+      message = "features.codingTools.aiCli.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "aiCli" "codex" "enable"] (
+          get ["features" "codingTools" "aiCli" "enable"] (get ["features" "codingTools" "enable"] true)
+        )
+      );
+      message = "features.codingTools.aiCli.codex.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "aiCli" "opencode" "enable"] (
+          get ["features" "codingTools" "aiCli" "enable"] (get ["features" "codingTools" "enable"] true)
+        )
+      );
+      message = "features.codingTools.aiCli.opencode.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "aiCli" "gemini" "enable"] (
+          get ["features" "codingTools" "aiCli" "enable"] (get ["features" "codingTools" "enable"] true)
+        )
+      );
+      message = "features.codingTools.aiCli.gemini.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (
+        get ["features" "codingTools" "nixTools" "enable"] (get ["features" "codingTools" "enable"] true)
+      );
+      message = "features.codingTools.nixTools.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (get ["features" "tailscale" "enable"] true);
+      message = "features.tailscale.enable must be a boolean.";
+    }
+    {
+      assertion = let
+        exitNode = get ["features" "tailscale" "exitNode"] null;
+      in
+        exitNode == null || (builtins.isString exitNode && exitNode != "");
+      message = "features.tailscale.exitNode must be null or a non-empty string.";
     }
   ];
 
@@ -116,10 +168,10 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     backupCommand = hmBackupCommand;
-    extraSpecialArgs = { inherit vars inputs combined; };
-    sharedModules = lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
+    extraSpecialArgs = {inherit vars inputs combined;};
+    sharedModules = lib.optionals (noctaliaHmModule != null) [noctaliaHmModule];
     users.${primaryUser} = {
-      imports = [ homeModule ];
+      imports = [homeModule];
       home.username = lib.mkForce primaryUser;
       home.homeDirectory = lib.mkForce "/home/${primaryUser}";
       xdg.configHome = lib.mkForce "/home/${primaryUser}/.config";

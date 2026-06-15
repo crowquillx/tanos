@@ -3,7 +3,7 @@
   perSystem =
     { pkgs, system, ... }:
     let
-      lib = pkgs.lib;
+      inherit (pkgs) lib;
       zenPkg = lib.attrByPath [ "packages" system "default" ] null inputs.zen-browser;
       heliumPkg =
         let

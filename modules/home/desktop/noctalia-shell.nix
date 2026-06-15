@@ -2,7 +2,6 @@
 let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  forceIfConfigured = value: if value == { } then value else lib.mkForce value;
   desktopEnabled = get [ "desktop" "enable" ] true;
   compositor = get [ "desktop" "compositor" ] "niri";
   noctaliaEnable = get [ "desktop" "noctalia" "enable" ] (desktopEnabled && compositor == "niri");
@@ -18,11 +17,9 @@ let
     };
     idle = {
       enabled = lockEnable;
-      lockCommand = lockCommand;
-      lockTimeout = lockTimeout;
-      screenOffTimeout = screenOffTimeout;
+      inherit lockCommand lockTimeout screenOffTimeout;
     } // lib.optionalAttrs (suspendTimeout != null) {
-      suspendTimeout = suspendTimeout;
+      inherit suspendTimeout;
     };
   };
 in

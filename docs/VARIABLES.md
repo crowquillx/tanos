@@ -41,7 +41,14 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.bluetooth.enable = true | false`
 - `features.portals.enable = true | false`
 - `features.codingTools.enable = true | false`
+- `features.codingTools.editors.enable = true | false`
+- `features.codingTools.aiCli.enable = true | false`
+- `features.codingTools.aiCli.codex.enable = true | false`
+- `features.codingTools.aiCli.opencode.enable = true | false`
+- `features.codingTools.aiCli.gemini.enable = true | false`
+- `features.codingTools.nixTools.enable = true | false`
 - `features.mcp.nixos.enable = true | false`
+- `features.tailscale = { enable, exitNode }`
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`
 - `features.flatpak = { enable, packages = [ "<app-id>" ... ] }`

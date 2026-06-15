@@ -19,7 +19,7 @@
 
   users = {
     primary = "tan";
-    extraPackages = [ ];
+    extraPackages = [];
     git = {
       name = null;
       email = null;
@@ -33,7 +33,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
-    extraCompositors = [ ];
+    extraCompositors = [];
     displayManager = "auto";
     browser = {
       default = "firefox";
@@ -44,17 +44,17 @@
     };
     niri = {
       # Populate output names with `niri msg outputs`.
-      outputs = { };
-      settings = { };
+      outputs = {};
+      settings = {};
     };
     noctalia = {
       enable = true;
       systemd.enable = true;
-      settings = { };
-      colors = { };
-      plugins = { };
-      pluginSettings = { };
-      userTemplates = { };
+      settings = {};
+      colors = {};
+      plugins = {};
+      pluginSettings = {};
+      userTemplates = {};
     };
     session = {
       enable = true;
@@ -95,8 +95,19 @@
     };
 
     audio.enable = true;
-    codingTools.enable = true;
+    codingTools = {
+      enable = true;
+      editors.enable = true;
+      aiCli = {
+        enable = true;
+        codex.enable = true;
+        opencode.enable = true;
+        gemini.enable = true;
+      };
+      nixTools.enable = true;
+    };
     mcp.nixos.enable = true;
+    tailscale.enable = true;
     fileManager.thunar.enable = true;
     terminals.kitty.enable = true;
     theme = {

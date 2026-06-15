@@ -1,5 +1,8 @@
-{ self, inputs, ... }:
-let
+{
+  self,
+  inputs,
+  ...
+}: let
   lib = inputs.nixpkgs.lib;
   combined = import ../combined/stacks.nix;
   hosts = {
@@ -22,30 +25,30 @@ let
   users = {
     tan = ../../users/tan/home.nix;
   };
-  noctaliaHmModule = lib.attrByPath [ "noctalia" "homeModules" "default" ] null inputs;
+  noctaliaHmModule = lib.attrByPath ["noctalia" "homeModules" "default"] null inputs;
   hostPlatforms = lib.mapAttrs (_: spec: spec.system) hosts;
   hostVars = lib.mapAttrs (_: spec: import spec.variables) hosts;
   nixosHostModules = lib.mapAttrs (_: spec: import spec.module) hosts;
-  homeUserModules = lib.mapAttrs (_: path: import path) users;
+  homeUserModules = lib.mapAttrs (_: import) users;
 
-  niriOverlay = lib.attrByPath [ "niri" "overlays" "niri" ] null inputs;
-  niriNixosModule = lib.attrByPath [ "niri" "nixosModules" "niri" ] null inputs;
-  niriHmConfigModule = lib.attrByPath [ "niri" "homeModules" "config" ] null inputs;
+  niriOverlay = lib.attrByPath ["niri" "overlays" "niri"] null inputs;
+  niriNixosModule = lib.attrByPath ["niri" "nixosModules" "niri"] null inputs;
+  niriHmConfigModule = lib.attrByPath ["niri" "homeModules" "config"] null inputs;
   aioboto3NoCheckOverlay = final: prev: {
     python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: { doCheck = false; });
+      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: {doCheck = false;});
     });
     python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
-      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: { doCheck = false; });
+      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: {doCheck = false;});
     });
   };
 
   fastmcpNoCheckOverlay = final: prev: {
     python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: { doCheck = false; });
+      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: {doCheck = false;});
     });
     python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
-      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: { doCheck = false; });
+      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: {doCheck = false;});
     });
   };
 
@@ -57,9 +60,9 @@ let
           version = "2.8";
           hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
         };
-        env = { };
-        buildInputs = [ ];
-        nativeBuildInputs = [ ];
+        env = {};
+        buildInputs = [];
+        nativeBuildInputs = [];
       });
     });
     python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
@@ -69,39 +72,47 @@ let
           version = "2.8";
           hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
         };
-        env = { };
-        buildInputs = [ ];
-        nativeBuildInputs = [ ];
+        env = {};
+        buildInputs = [];
+        nativeBuildInputs = [];
       });
     });
   };
 
   openldapNoCheckOverlay = final: prev: {
-    openldap = prev.openldap.overrideAttrs (_: { doCheck = false; });
+    openldap = prev.openldap.overrideAttrs (_: {doCheck = false;});
   };
 
-  sharedOverlays =
-    vars:
-    lib.optionals (niriOverlay != null) [ niriOverlay ]
+  sharedOverlays = vars:
+    lib.optionals (niriOverlay != null) [niriOverlay]
     ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default
-    ++ [ aioboto3NoCheckOverlay ]
-    ++ [ fastmcpNoCheckOverlay ]
-    ++ [ lupaBundleOverlay ]
-    ++ [ openldapNoCheckOverlay ];
-  sharedHomeModules =
-    vars:
-    lib.optionals (niriHmConfigModule != null) [ niriHmConfigModule ]
-    ++ lib.optionals (noctaliaHmModule != null) [ noctaliaHmModule ];
+    ++ lib.optionals (nixosMcpEnabled vars) [
+      aioboto3NoCheckOverlay
+      fastmcpNoCheckOverlay
+      lupaBundleOverlay
+      openldapNoCheckOverlay
+    ];
+  sharedHomeModules = vars:
+    lib.optionals (niriHmConfigModule != null) [niriHmConfigModule]
+    ++ lib.optionals (noctaliaHmModule != null) [noctaliaHmModule];
 
-  millenniumEnabled =
-    vars: lib.attrByPath [ "features" "gaming" "steam" "millennium" "enable" ] false vars;
+  millenniumEnabled = vars: lib.attrByPath ["features" "gaming" "steam" "millennium" "enable"] false vars;
+  nixosMcpEnabled = vars:
+    lib.attrByPath ["features" "mcp" "nixos" "enable"] (
+      lib.attrByPath ["features" "codingTools" "aiCli" "enable"] (
+        lib.attrByPath ["features" "codingTools" "enable"] true vars
+      )
+      vars
+    )
+    vars;
+  comfyuiEnabled = vars:
+    (lib.attrByPath ["features" "ai" "enable"] false vars)
+    && (lib.attrByPath ["features" "ai" "comfyui" "enable"] false vars);
 
-  mkHost =
-    hostName: hostPlatform:
-    let
-      vars = hostVars.${hostName};
-      niriNixosModule' = niriNixosModule;
-    in
+  mkHost = hostName: hostPlatform: let
+    vars = hostVars.${hostName};
+    niriNixosModule' = niriNixosModule;
+  in
     lib.nixosSystem {
       specialArgs = {
         inherit
@@ -113,29 +124,28 @@ let
           combined
           ;
       };
-      modules = [
-        {
-          nixpkgs.hostPlatform = hostPlatform;
-          nixpkgs.overlays = sharedOverlays vars;
-        }
-        inputs.home-manager.nixosModules.home-manager
-        inputs.nix-flatpak.nixosModules.nix-flatpak
-        inputs.sops-nix.nixosModules.sops
-        inputs.stylix.nixosModules.stylix
-        inputs.lanzaboote.nixosModules.lanzaboote
-        inputs.comfyui-nix.nixosModules.default
-        nixosHostModules.${hostName}
-      ]
-      ++ lib.optionals (niriNixosModule' != null) [ niriNixosModule' ];
+      modules =
+        [
+          {
+            nixpkgs.hostPlatform = hostPlatform;
+            nixpkgs.overlays = sharedOverlays vars;
+          }
+          inputs.home-manager.nixosModules.home-manager
+          inputs.nix-flatpak.nixosModules.nix-flatpak
+          inputs.sops-nix.nixosModules.sops
+          inputs.stylix.nixosModules.stylix
+          inputs.lanzaboote.nixosModules.lanzaboote
+          nixosHostModules.${hostName}
+        ]
+        ++ lib.optionals (comfyuiEnabled vars) [inputs.comfyui-nix.nixosModules.default]
+        ++ lib.optionals (niriNixosModule' != null) [niriNixosModule'];
     };
 
-  mkCiHost =
-    hostName: hostPlatform:
+  mkCiHost = hostName: hostPlatform:
     (mkHost hostName hostPlatform).extendModules {
       modules = [
         (
-          { lib, ... }:
-          {
+          {lib, ...}: {
             fileSystems."/" = lib.mkDefault {
               device = "none";
               fsType = "tmpfs";
@@ -145,40 +155,38 @@ let
       ];
     };
 
-  mkHome =
-    hostName: hostPlatform:
-    let
-      vars = hostVars.${hostName};
-      primaryUser = lib.attrByPath [ "users" "primary" ] "tan" vars;
-      homeModule = lib.attrByPath [ primaryUser ] null homeUserModules;
-    in
+  mkHome = hostName: hostPlatform: let
+    vars = hostVars.${hostName};
+    primaryUser = lib.attrByPath ["users" "primary"] "tan" vars;
+    homeModule = lib.attrByPath [primaryUser] null homeUserModules;
+  in
     assert homeModule != null;
-    inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import inputs.nixpkgs {
-        system = hostPlatform;
-        config.allowUnfree = true;
-        overlays = sharedOverlays vars;
+      inputs.home-manager.lib.homeManagerConfiguration {
+        pkgs = import inputs.nixpkgs {
+          system = hostPlatform;
+          config.allowUnfree = true;
+          overlays = sharedOverlays vars;
+        };
+        extraSpecialArgs = {
+          inherit
+            self
+            vars
+            inputs
+            combined
+            ;
+        };
+        modules =
+          [
+            homeModule
+            {
+              home.username = primaryUser;
+              home.homeDirectory = "/home/${primaryUser}";
+            }
+          ]
+          ++ sharedHomeModules vars;
       };
-      extraSpecialArgs = {
-        inherit
-          self
-          vars
-          inputs
-          combined
-          ;
-      };
-      modules = [
-        homeModule
-        {
-          home.username = primaryUser;
-          home.homeDirectory = "/home/${primaryUser}";
-        }
-      ]
-      ++ sharedHomeModules vars;
-    };
-in
-{
-  systems = [ "x86_64-linux" ];
+in {
+  systems = ["x86_64-linux"];
 
   flake = {
     nixosModules = nixosHostModules;

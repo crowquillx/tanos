@@ -19,9 +19,11 @@ in
       ];
     }
     {
-      services.fstrim.enable = fstrimEnabled;
-      services.resolved.enable = resolvedEnabled;
-      services.power-profiles-daemon.enable = powerProfilesEnabled;
+      services = {
+        fstrim.enable = fstrimEnabled;
+        resolved.enable = resolvedEnabled;
+        power-profiles-daemon.enable = powerProfilesEnabled;
+      };
     }
   ];
 }

@@ -1,36 +1,20 @@
 {
   lib,
   pkgs,
-  config,
-  vars ? { },
+  vars ? {},
   inputs,
   ...
-}:
-let
+}: let
   v = vars;
   get = path: default: lib.attrByPath path default v;
-  codingToolsEnabled = get [ "features" "codingTools" "enable" ] true;
-  nixosMcpEnabled = get [ "features" "mcp" "nixos" "enable" ] codingToolsEnabled;
-  system = pkgs.stdenv.hostPlatform.system;
-  opencodePkg = (inputs.opencode.packages.${system}.default).overrideAttrs (old: {
-    postPatch = (old.postPatch or "") + ''
-      substituteInPlace packages/script/src/index.ts \
-        --replace-fail "if (!semver.satisfies(process.versions.bun, expectedBunVersionRange))" "if (false)"
-    '';
-  });
-  rawCodexPkg = lib.attrByPath [ "codex-cli-nix" "packages" system "default" ] null inputs;
-  codexPkg = pkgs.symlinkJoin {
-    name = "codex";
-    paths = [ rawCodexPkg ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/codex \
-        --add-flags "-m gpt-5.4 --dangerously-bypass-approvals-and-sandbox"
-    '';
-  };
-  jsonFormat = pkgs.formats.json { };
-in
-{
+  codingToolsEnabled = get ["features" "codingTools" "enable"] true;
+  aiCliEnabled = get ["features" "codingTools" "aiCli" "enable"] codingToolsEnabled;
+  codexEnabled = get ["features" "codingTools" "aiCli" "codex" "enable"] aiCliEnabled;
+  opencodeEnabled = get ["features" "codingTools" "aiCli" "opencode" "enable"] aiCliEnabled;
+  nixosMcpEnabled = get ["features" "mcp" "nixos" "enable"] aiCliEnabled;
+  opencodePkg = lib.attrByPath ["opencode"] null pkgs;
+  codexPkg = lib.attrByPath ["codex"] null pkgs;
+in {
   imports = [
     inputs.mcp-servers-nix.homeManagerModules.default
   ];
@@ -39,17 +23,23 @@ in
     {
       assertions = [
         {
-          assertion = !(codingToolsEnabled && codexPkg == null);
-          message = "features.codingTools.enable is true, but no Codex package could be resolved from codex-cli-nix.";
+          assertion = !(codexEnabled && codexPkg == null);
+          message = "features.codingTools.aiCli.codex.enable is true, but nixpkgs package 'codex' could not be resolved.";
+        }
+        {
+          assertion = !(opencodeEnabled && opencodePkg == null);
+          message = "features.codingTools.aiCli.opencode.enable is true, but nixpkgs package 'opencode' could not be resolved.";
         }
       ];
     }
-    (lib.mkIf codingToolsEnabled {
+    (lib.mkIf codexEnabled {
       programs.codex = {
         enable = true;
         package = codexPkg;
         enableMcpIntegration = nixosMcpEnabled;
       };
+    })
+    (lib.mkIf opencodeEnabled {
       programs.opencode = {
         enable = true;
         package = opencodePkg;

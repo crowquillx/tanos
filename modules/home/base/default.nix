@@ -70,7 +70,7 @@ let
     helium = heliumEnabled;
   };
   browserPackageMap = {
-    firefox = pkgs.firefox;
+    inherit (pkgs) firefox;
     zen = zenPkg;
     chrome = pkgs.google-chrome;
     helium = heliumPkg;
@@ -100,7 +100,7 @@ let
     }) browserMimeTypes
   );
 in
-({
+{
   assertions = [
     {
       assertion = builtins.elem browserDefault allowedBrowsers;
@@ -144,81 +144,88 @@ in
     }
   ];
 
-  home.stateVersion = "25.05";
-  programs.home-manager.enable = true;
-
-  home.packages =
-    (with pkgs; [
-      # General user tooling should be HM-managed.
-      alacritty
-      foot
-      fuzzel
-      wl-clipboard
-      cliphist
-      pavucontrol
-      brightnessctl
-      playerctl
-      grim
-      slurp
-      networkmanagerapplet
-      fzf
-      bat
-      eza
-      jq
-      ripgrep
-      fd
-      unzip
-      zip
-      p7zip
-      unar
-      unrar
-      vim
-      neovim
-      htop
-      fastfetch
-      wget
-      curl
-    ])
-    ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
-    ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
-    ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
-    ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
-    ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
-    ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
-    ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
-    ++ lib.optionals (get [ "desktop" "enable" ] true) [
-      pkgs.libnotify
-    ];
-
-  programs.git = {
-    enable = true;
-  }
-  // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
-    settings.user = {
-      name = gitUserName;
-      email = gitUserEmail;
+  home = {
+    stateVersion = "25.05";
+    packages =
+      (with pkgs; [
+        # General user tooling should be HM-managed.
+        alacritty
+        foot
+        fuzzel
+        wl-clipboard
+        cliphist
+        pavucontrol
+        brightnessctl
+        playerctl
+        grim
+        slurp
+        networkmanagerapplet
+        fzf
+        bat
+        eza
+        jq
+        ripgrep
+        fd
+        unzip
+        zip
+        p7zip
+        unar
+        unrar
+        vim
+        neovim
+        htop
+        fastfetch
+        wget
+        curl
+      ])
+      ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
+      ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
+      ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
+      ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
+      ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
+      ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
+      ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
+      ++ lib.optionals (get [ "desktop" "enable" ] true) [
+        pkgs.libnotify
+      ];
+    sessionVariables = {
+      TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
+      QT_STYLE_OVERRIDE = lib.mkForce "";
     };
   };
-  programs.bash.enable = true;
-  programs.fish = {
-    enable = fishEnabled;
-    interactiveShellInit = ''
-      set -g fish_greeting
-    '';
-    functions = lib.mkIf noctaliaEnabled {
-      restart-noctalia = {
-        body = ''
-          for unit in noctalia-shell.service noctalia.service
-            if systemctl --user list-unit-files $unit --no-legend 2>/dev/null | read -l _
-              systemctl --user restart $unit
-              return
-            end
-          end
 
-          pkill -u $USER -x quickshell 2>/dev/null
-          nohup tanos-noctalia-shell >/dev/null 2>&1 &
-          disown
-        '';
+  programs = {
+    home-manager.enable = true;
+    git = {
+      enable = true;
+    }
+    // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
+      settings.user = {
+        name = gitUserName;
+        email = gitUserEmail;
+      };
+    };
+    bash.enable = true;
+    fish = {
+      enable = fishEnabled;
+      interactiveShellInit = ''
+        set -g fish_greeting
+      '';
+      functions = lib.mkIf noctaliaEnabled {
+        restart-noctalia = {
+          body = ''
+            for unit in noctalia-shell.service noctalia.service
+              if systemctl --user list-unit-files $unit --no-legend 2>/dev/null | read -l _
+                systemctl --user restart $unit
+                return
+              end
+            end
+
+            pkill -u $USER -x quickshell 2>/dev/null
+            nohup tanos-noctalia-shell >/dev/null 2>&1 &
+            disown
+          '';
+        };
       };
     };
   };
@@ -238,10 +245,6 @@ in
     };
   };
 
-  home.sessionVariables = {
-    TANOS_FLAKE_DIR = "${config.home.homeDirectory}/tanos";
-    QT_STYLE_OVERRIDE = lib.mkForce "";
-  };
   systemd.user.sessionVariables = {
     QT_STYLE_OVERRIDE = lib.mkForce "";
   };
@@ -249,4 +252,4 @@ in
   gtk = lib.mkIf (get [ "desktop" "enable" ] true) {
     enable = true;
   };
-})
+}

@@ -6,13 +6,15 @@
     locale = "en_US.UTF-8";
   };
 
-  boot.kernel = "zen";
-  boot.systemdBoot.enable = true;
-  boot.secureBoot = {
-    enable = false;
-    includeMicrosoftKeys = true;
-    autoEnroll = false;
-    pkiBundle = "/etc/secureboot";
+  boot = {
+    kernel = "zen";
+    systemdBoot.enable = true;
+    secureBoot = {
+      enable = false;
+      includeMicrosoftKeys = true;
+      autoEnroll = false;
+      pkiBundle = "/etc/secureboot";
+    };
   };
 
   users = {
@@ -39,7 +41,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
-    extraCompositors = [ ];
+    extraCompositors = [];
     displayManager = "auto";
     sddm.wayland.enable = false;
     sddm.background = ../../wallpapers/1.png;
@@ -58,8 +60,8 @@
         noise = 0.03;
         saturation = 1.0;
       };
-      outputs = { };
-      settings = { };
+      outputs = {};
+      settings = {};
     };
     noctalia = import ./noctalia;
     session = {
@@ -106,7 +108,17 @@
     };
 
     audio.enable = true;
-    codingTools.enable = true;
+    codingTools = {
+      enable = true;
+      editors.enable = true;
+      aiCli = {
+        enable = true;
+        codex.enable = true;
+        opencode.enable = true;
+        gemini.enable = true;
+      };
+      nixTools.enable = true;
+    };
     mcp.nixos.enable = true;
     fileManager.thunar.enable = true;
     terminals.kitty.enable = true;
@@ -124,7 +136,10 @@
     bluetooth.enable = true;
     networking.networkmanager.enable = true;
 
-    tailscale.exitNode = "tanime-1";
+    tailscale = {
+      enable = true;
+      exitNode = "tanime-1";
+    };
     portals.enable = true;
     services = {
       fstrim.enable = true;

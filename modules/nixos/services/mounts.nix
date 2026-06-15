@@ -34,9 +34,7 @@ in
         map (mount: {
           name = mount.mountPath;
           value = {
-            device = mount.device;
-            fsType = mount.fsType;
-            options = mount.options;
+            inherit (mount) device fsType options;
           };
         }) normalizedMounts
       );

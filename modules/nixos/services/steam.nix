@@ -25,25 +25,17 @@ let
     "openFirewall"
   ] true;
   millenniumEnable = get [ "features" "gaming" "steam" "millennium" "enable" ] false;
-  lutrisPkg = if pkgs ? lutris then pkgs.lutris else null;
-  heroicPkg = if pkgs ? heroic then pkgs.heroic else null;
-  protonPlusPkg =
-    if pkgs ? protonplus then
-      pkgs.protonplus
-    else if pkgs ? "protonup-qt" then
-      pkgs."protonup-qt"
-    else
-      null;
+  lutrisPkg = pkgs.lutris or null;
+  heroicPkg = pkgs.heroic or null;
+  protonPlusPkg = pkgs.protonplus or pkgs."protonup-qt" or null;
   winePkg =
     if pkgs ? wineWow64Packages && pkgs.wineWow64Packages ? wayland then
       pkgs.wineWow64Packages.wayland
-    else if pkgs ? wine then
-      pkgs.wine
     else
-      null;
-  winetricksPkg = if pkgs ? winetricks then pkgs.winetricks else null;
-  vulkanToolsPkg = if pkgs ? vulkan-tools then pkgs.vulkan-tools else null;
-  pciutilsPkg = if pkgs ? pciutils then pkgs.pciutils else null;
+      pkgs.wine or null;
+  winetricksPkg = pkgs.winetricks or null;
+  vulkanToolsPkg = pkgs.vulkan-tools or null;
+  pciutilsPkg = pkgs.pciutils or null;
 in
 {
   config = lib.mkMerge [

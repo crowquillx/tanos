@@ -26,19 +26,20 @@ in
       ];
     }
     (lib.mkIf enabled {
-      services.upower.enable = upowerEnable;
-      services.thermald.enable = thermaldEnable;
-      services.tlp.enable = tlpEnable;
-      powerManagement.powertop.enable = powertopEnable;
-      services.fwupd.enable = fwupdEnable;
-
-      services.logind.settings = {
-        Login = {
-          HandleLidSwitch = lidSwitch;
-          HandleLidSwitchExternalPower = lidSwitchExternalPower;
-          HandleLidSwitchDocked = lidSwitchDocked;
+      services = {
+        upower.enable = upowerEnable;
+        thermald.enable = thermaldEnable;
+        tlp.enable = tlpEnable;
+        fwupd.enable = fwupdEnable;
+        logind.settings = {
+          Login = {
+            HandleLidSwitch = lidSwitch;
+            HandleLidSwitchExternalPower = lidSwitchExternalPower;
+            HandleLidSwitchDocked = lidSwitchDocked;
+          };
         };
       };
+      powerManagement.powertop.enable = powertopEnable;
     })
   ];
 }

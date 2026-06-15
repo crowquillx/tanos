@@ -20,9 +20,11 @@ in
       ];
     }
     (lib.mkIf enabled {
-      services.flatpak.enable = true;
-      services.flatpak.packages = packageRefs;
-      services.flatpak.uninstallUnmanaged = true;
+      services.flatpak = {
+        enable = true;
+        packages = packageRefs;
+        uninstallUnmanaged = true;
+      };
     })
   ];
 }

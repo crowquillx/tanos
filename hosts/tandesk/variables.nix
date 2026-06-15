@@ -18,16 +18,18 @@
     }
   ];
 
-  boot.kernel = "zen";
-  boot.systemdBoot.enable = true;
-  boot.secureBoot = {
-    enable = true;
-    # Keep Microsoft UEFI CA/3rd-party keys available for dual-boot and vendor tooling.
-    includeMicrosoftKeys = true;
-    # Set true after reading docs/SECURE_BOOT.md and confirming firmware setup steps.
-    autoEnroll = false;
-    # Default sbctl/Lanzaboote PKI location.
-    pkiBundle = "/var/lib/sbctl";
+  boot = {
+    kernel = "zen";
+    systemdBoot.enable = true;
+    secureBoot = {
+      enable = true;
+      # Keep Microsoft UEFI CA/3rd-party keys available for dual-boot and vendor tooling.
+      includeMicrosoftKeys = true;
+      # Set true after reading docs/SECURE_BOOT.md and confirming firmware setup steps.
+      autoEnroll = false;
+      # Default sbctl/Lanzaboote PKI location.
+      pkiBundle = "/var/lib/sbctl";
+    };
   };
 
   users = {
@@ -64,7 +66,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
-    extraCompositors = [ ];
+    extraCompositors = [];
     displayManager = "auto";
     sddm.wayland.enable = false;
     sddm.background = ../../wallpapers/1.png;
@@ -135,7 +137,7 @@
           };
         };
       };
-      settings = { };
+      settings = {};
     };
     noctalia = import ./noctalia;
     session = {
@@ -182,8 +184,19 @@
     };
 
     audio.enable = true;
-    codingTools.enable = true;
+    codingTools = {
+      enable = true;
+      editors.enable = true;
+      aiCli = {
+        enable = true;
+        codex.enable = true;
+        opencode.enable = true;
+        gemini.enable = true;
+      };
+      nixTools.enable = true;
+    };
     mcp.nixos.enable = true;
+    tailscale.enable = true;
     fileManager.thunar.enable = true;
     terminals.kitty.enable = true;
     theme = {
