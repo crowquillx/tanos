@@ -261,8 +261,6 @@
   };
 
   security.sops = {
-    enable = true;
-    defaultSopsFile = ../../secrets/tandesk.yaml;
-    ageKeyFile = "/var/lib/sops-nix/key.txt";
+    enable = false;
   };
 }
