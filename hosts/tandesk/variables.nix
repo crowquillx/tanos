@@ -40,6 +40,10 @@
       "mpv"
       "pywalfox-native"
       "sops"
+      "age"
+      "gnupg"
+      "yubikey-manager"
+      "pinentry-bemenu"
       "brave"
       "qbittorrent"
       "localsend"
@@ -146,7 +150,7 @@
       keyring.enable = true;
       lock = {
         enable = true;
-        command = "tanos-noctalia-shell ipc call lockScreen lock";
+        command = "tanos-noctalia-shell msg session lock";
         idleSeconds = 300;
         beforeSleep = true;
         onLidClose = true;
@@ -247,20 +251,30 @@
       };
     };
     ai = {
-      enable = true;
+      enable = false;
       comfyui = {
-        enable = true;
+        enable = false;
       };
       ollama = {
-        enable = true;
+        enable = false;
       };
       openWebui = {
-        enable = true;
+        enable = false;
       };
     };
   };
 
   security.sops = {
-    enable = false;
+    enable = true;
+    defaultSopsFile = ../../secrets/tandesk.yaml;
+    ageKeyFile = "/var/lib/sops-nix/key.txt";
+    # Path to a GnuPG home containing a PGP key (e.g. on a Yubikey).
+    # Leave null to disable PGP/Yubikey decryption.
+    # gnupgHome = "/var/lib/sops-nix/gnupg";
+    sshKey = {
+      enable = true;
+      name = "ssh_key";
+      pubName = "ssh_key_pub";
+    };
   };
 }

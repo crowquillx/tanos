@@ -214,14 +214,12 @@ in
       functions = lib.mkIf noctaliaEnabled {
         restart-noctalia = {
           body = ''
-            for unit in noctalia-shell.service noctalia.service
-              if systemctl --user list-unit-files $unit --no-legend 2>/dev/null | read -l _
-                systemctl --user restart $unit
-                return
-              end
+            if systemctl --user list-unit-files noctalia.service --no-legend 2>/dev/null | read -l _
+              systemctl --user restart noctalia.service
+              return
             end
 
-            pkill -u $USER -x quickshell 2>/dev/null
+            pkill -u $USER -x noctalia 2>/dev/null
             nohup tanos-noctalia-shell >/dev/null 2>&1 &
             disown
           '';

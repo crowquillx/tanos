@@ -70,6 +70,7 @@ let
     fileManagers = "^thunar$|^org\\.kde\\.dolphin$|^dolphin$|^org\\.gnome\\.Nautilus$|^nautilus$|^nemo$|^pcmanfm$";
     chats = "^equibop$|^vesktop$|^dev\\.vencord\\.Vesktop$|^discord$|^com\\.discordapp\\.Discord$|^org\\.telegram\\.desktop$|^telegram-desktop$|^element$|^im\\.riot\\.Riot$|^comet$|^org\\.gnome\\.Fractal$|^fractal$";
     editors = "^code$|^code-url-handler$|^com\\.visualstudio\\.code$|^code-oss$|^codium$|^vscodium$|^cursor$|^zed$|^dev\\.zed\\.Zed$|^t3-code$|^T3 Code.*$|^windsurf$|^jetbrains-.*$|^android-studio$|^neovide$|^emacs$|^micro$";
+    mediaPlayers = "(?i)^spotify$";
   };
 
   context = {

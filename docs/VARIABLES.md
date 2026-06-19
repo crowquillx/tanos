@@ -63,6 +63,14 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.laptop.fwupd.enable = true | false`
 - `features.laptop.logind = { lidSwitch, lidSwitchExternalPower, lidSwitchDocked }`
 - `security.sops.enable = true | false`
+- `security.sops.defaultSopsFile = "<path>"` (defaults to `null`; required when `enable = true`)
+- `security.sops.ageKeyFile = "<path>"` (defaults to `/var/lib/sops-nix/key.txt`)
+- `security.sops.gnupgHome = "<path>"` (defaults to `null`; set to a GnuPG home containing a PGP key, e.g. on a Yubikey, to enable PGP/Yubikey decryption alongside age)
+- `security.sops.sshKey.enable = true | false` (materialize the user's SSH key from sops at boot)
+- `security.sops.sshKey.name = "<sops-file-key>"` (default `"ssh_key"`)
+- `security.sops.sshKey.pubName = "<sops-file-key>"` (default `"ssh_key_pub"`)
+- `security.sops.sshKey.privateMode = "0600"` (octal mode for the materialized private key)
+- `security.sops.sshKey.publicMode = "0644"` (octal mode for the materialized public key)
 
 ## Common snippets
 

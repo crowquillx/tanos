@@ -34,64 +34,20 @@
   niriOverlay = lib.attrByPath ["niri" "overlays" "niri"] null inputs;
   niriNixosModule = lib.attrByPath ["niri" "nixosModules" "niri"] null inputs;
   niriHmConfigModule = lib.attrByPath ["niri" "homeModules" "config"] null inputs;
-  aioboto3NoCheckOverlay = final: prev: {
-    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: {doCheck = false;});
+  # mcp-nixos-2.4.3 ships a flaky store test that scans /nix/store and
+  # asserts a random text file does not contain the word "Error". The
+  # upstream package disables it on Darwin but not Linux. Mirror the
+  # same skip here so the install check phase passes.
+  mcpNixosOverlay = final: prev: {
+    mcp-nixos = prev.mcp-nixos.overridePythonAttrs (old: {
+      disabledTests = (old.disabledTests or []) ++ ["test_read_text_file"];
     });
-    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
-      aioboto3 = pyPrev.aioboto3.overridePythonAttrs (_: {doCheck = false;});
-    });
-  };
-
-  fastmcpNoCheckOverlay = final: prev: {
-    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: {doCheck = false;});
-    });
-    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
-      fastmcp = pyPrev.fastmcp.overridePythonAttrs (_: {doCheck = false;});
-    });
-  };
-
-  lupaBundleOverlay = final: prev: {
-    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-      lupa = pyPrev.lupa.overridePythonAttrs (old: {
-        src = final.fetchPypi {
-          pname = "lupa";
-          version = "2.8";
-          hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
-        };
-        env = {};
-        buildInputs = [];
-        nativeBuildInputs = [];
-      });
-    });
-    python3Packages = prev.python3Packages.overrideScope (pyFinal: pyPrev: {
-      lupa = pyPrev.lupa.overridePythonAttrs (old: {
-        src = final.fetchPypi {
-          pname = "lupa";
-          version = "2.8";
-          hash = "sha256-2AImQbnsjs8sXsvp9H5acOC4fEta6SG5LLAqY44KzQg=";
-        };
-        env = {};
-        buildInputs = [];
-        nativeBuildInputs = [];
-      });
-    });
-  };
-
-  openldapNoCheckOverlay = final: prev: {
-    openldap = prev.openldap.overrideAttrs (_: {doCheck = false;});
   };
 
   sharedOverlays = vars:
     lib.optionals (niriOverlay != null) [niriOverlay]
     ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default
-    ++ lib.optionals (nixosMcpEnabled vars) [
-      aioboto3NoCheckOverlay
-      fastmcpNoCheckOverlay
-      lupaBundleOverlay
-      openldapNoCheckOverlay
-    ];
+    ++ lib.optionals (nixosMcpEnabled vars) [mcpNixosOverlay];
   sharedHomeModules = vars:
     lib.optionals (niriHmConfigModule != null) [niriHmConfigModule]
     ++ lib.optionals (noctaliaHmModule != null) [noctaliaHmModule];

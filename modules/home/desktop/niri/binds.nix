@@ -1,12 +1,12 @@
 { lib, vars, node, leaf, flag, ... }:
 let
   get = path: default: lib.attrByPath path default vars;
-  noctaliaCommand = get [ "desktop" "noctalia" "command" ] "noctalia-shell";
+  noctaliaCommand = get [ "desktop" "noctalia" "command" ] "noctalia";
 in
 [
   (node "binds" [ ] [
     (node "Mod+D" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "launcher" "toggle" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "panel-toggle" "launcher" ])
     ])
     (node "Mod+Space" { repeat = false; } [
       (flag "toggle-overview")
@@ -43,23 +43,23 @@ in
       (leaf "spawn" [ "equibop" "--toggle-mic" ])
     ])
     (node "Super+B" { "hotkey-overlay-title" = "Assistant Panel: Toggle"; } [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "plugin:assistant-panel" "toggle" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "panel-toggle" "control-center" ])
     ])
 
     (node "XF86AudioRaiseVolume" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "increase" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "volume-up" ])
     ])
     (node "XF86AudioLowerVolume" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "decrease" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "volume-down" ])
     ])
     (node "XF86AudioMute" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "volume" "muteOutput" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "volume-mute" ])
     ])
     (node "XF86MonBrightnessUp" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "brightness" "increase" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "brightness-up" ])
     ])
     (node "XF86MonBrightnessDown" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "brightness" "decrease" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "brightness-down" ])
     ])
 
     (node "Mod+Q" { repeat = false; } [
@@ -103,7 +103,7 @@ in
       (flag "focus-window-up")
     ])
     (node "Mod+L" [ ] [
-      (leaf "spawn" [ noctaliaCommand "ipc" "call" "lockScreen" "lock" ])
+      (leaf "spawn" [ noctaliaCommand "msg" "session" "lock" ])
     ])
 
     (node "Mod+Shift+Left" [ ] [

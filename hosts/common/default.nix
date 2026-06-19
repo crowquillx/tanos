@@ -106,6 +106,71 @@ in {
       message = "security.sops.enable must be a boolean.";
     }
     {
+      assertion = let
+        defaultSopsFile = get ["security" "sops" "defaultSopsFile"] null;
+      in
+        defaultSopsFile == null
+        || (builtins.isString defaultSopsFile && defaultSopsFile != "")
+        || builtins.isPath defaultSopsFile;
+      message = "security.sops.defaultSopsFile must be null or a non-empty string/path.";
+    }
+    {
+      assertion = let
+        ageKeyFile = get ["security" "sops" "ageKeyFile"] null;
+      in
+        ageKeyFile == null || (builtins.isString ageKeyFile && ageKeyFile != "");
+      message = "security.sops.ageKeyFile must be null or a non-empty string.";
+    }
+    {
+      assertion = let
+        gnupgHome = get ["security" "sops" "gnupgHome"] null;
+      in
+        gnupgHome == null || (builtins.isString gnupgHome && gnupgHome != "");
+      message = "security.sops.gnupgHome must be null or a non-empty string.";
+    }
+    {
+      assertion = builtins.isBool (get ["security" "sops" "sshKey" "enable"] false);
+      message = "security.sops.sshKey.enable must be a boolean.";
+    }
+    {
+      assertion = let
+        name = get ["security" "sops" "sshKey" "name"] "ssh_key";
+      in
+        builtins.isString name && name != "";
+      message = "security.sops.sshKey.name must be a non-empty string.";
+    }
+    {
+      assertion = let
+        pubName = get ["security" "sops" "sshKey" "pubName"] "ssh_key_pub";
+      in
+        builtins.isString pubName && pubName != "";
+      message = "security.sops.sshKey.pubName must be a non-empty string.";
+    }
+    {
+      assertion = let
+        privMode = get ["security" "sops" "sshKey" "privateMode"] "0600";
+      in
+        builtins.isString privMode && builtins.match "0[0-7]{3}" privMode != null;
+      message = "security.sops.sshKey.privateMode must be an octal mode string (e.g. \"0600\").";
+    }
+    {
+      assertion = let
+        pubMode = get ["security" "sops" "sshKey" "publicMode"] "0644";
+      in
+        builtins.isString pubMode && builtins.match "0[0-7]{3}" pubMode != null;
+      message = "security.sops.sshKey.publicMode must be an octal mode string (e.g. \"0644\").";
+    }
+    {
+      assertion = let
+        enabled = get ["security" "sops" "enable"] true;
+        sshKeyEnabled = get ["security" "sops" "sshKey" "enable"] false;
+        priv = get ["security" "sops" "sshKey" "name"] "ssh_key";
+        pub = get ["security" "sops" "sshKey" "pubName"] "ssh_key_pub";
+      in
+        !(enabled && sshKeyEnabled && priv == pub);
+      message = "security.sops.sshKey.name and pubName must differ.";
+    }
+    {
       assertion = builtins.isBool (get ["features" "codingTools" "enable"] true);
       message = "features.codingTools.enable must be a boolean.";
     }

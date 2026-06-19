@@ -49,7 +49,7 @@
     };
     noctalia = {
       enable = true;
-      systemd.enable = true;
+      systemd.enable = false;
       settings = {};
       colors = {};
       plugins = {};
@@ -62,7 +62,7 @@
       keyring.enable = true;
       lock = {
         enable = true;
-        command = "tanos-noctalia-shell ipc call lockScreen lock";
+        command = "tanos-noctalia-shell msg session lock";
         idleSeconds = 300;
         beforeSleep = true;
         onLidClose = true;
@@ -95,17 +95,7 @@
     };
 
     audio.enable = true;
-    codingTools = {
-      enable = true;
-      editors.enable = true;
-      aiCli = {
-        enable = true;
-        codex.enable = true;
-        opencode.enable = true;
-        gemini.enable = true;
-      };
-      nixTools.enable = true;
-    };
+    codingTools.enable = false;
     mcp.nixos.enable = true;
     tailscale.enable = true;
     fileManager.thunar.enable = true;

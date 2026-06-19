@@ -3,4 +3,4 @@ creation_rules:
     key_groups:
       - age:
           # Add additional host public keys here as needed and run `sops updatekeys`.
-          - age1u73s6x5nrfeyl38svz82qry344udawft76vw6dgclr3q8nmvgqaqhs8jwh
+          - age16x7tq5ndgm3hr55gqfh2ujecq4hypyjn3vrmm36vam7y0fu5ffes7qt20s

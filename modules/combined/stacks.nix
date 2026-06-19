@@ -47,5 +47,6 @@
     ../home/desktop/niri-user.nix
     ../home/desktop/noctalia-command.nix
     ../home/desktop/noctalia-shell.nix
+    ../home/security/ssh-key.nix
   ];
 }
