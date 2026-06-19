@@ -268,13 +268,25 @@
     enable = true;
     defaultSopsFile = ../../secrets/tandesk.yaml;
     ageKeyFile = "/var/lib/sops-nix/key.txt";
-    # Path to a GnuPG home containing a PGP key (e.g. on a Yubikey).
-    # Leave null to disable PGP/Yubikey decryption.
-    # gnupgHome = "/var/lib/sops-nix/gnupg";
+    # sops-nix is mutually exclusive between gnupgHome and ageKeyFile at
+    # runtime, so we use the age key file for unattended boot. The Yubikey
+    # PGP key is still a recipient in the sops file (added via
+    # `sops updatekeys`); gpg-agent uses it when you run `sops` manually.
     sshKey = {
       enable = true;
       name = "ssh_key";
       pubName = "ssh_key_pub";
     };
+  };
+
+  security.yubikey = {
+    enable = true;
+  };
+
+  home.security.yubikey = {
+    # Path to the ASCII-armored PGP public key. The HM activation script
+    # imports it into ~/.gnupg so gpg-agent can use the Yubikey for sops
+    # CLI and any other GPG operations.
+    pgpPublicKey = ../../secrets/yubikey-pgp-pub.asc;
   };
 }

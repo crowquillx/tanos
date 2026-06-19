@@ -129,6 +129,19 @@ in {
       message = "security.sops.gnupgHome must be null or a non-empty string.";
     }
     {
+      assertion = let
+        gnupgPublicKey = get ["security" "sops" "gnupgPublicKey"] null;
+      in
+        gnupgPublicKey == null
+        || (builtins.isString gnupgPublicKey && gnupgPublicKey != "")
+        || builtins.isPath gnupgPublicKey;
+      message = "security.sops.gnupgPublicKey must be null, a non-empty string, or a path.";
+    }
+    {
+      assertion = builtins.isBool (get ["security" "yubikey" "enable"] false);
+      message = "security.yubikey.enable must be a boolean.";
+    }
+    {
       assertion = builtins.isBool (get ["security" "sops" "sshKey" "enable"] false);
       message = "security.sops.sshKey.enable must be a boolean.";
     }

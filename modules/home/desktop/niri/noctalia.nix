@@ -8,7 +8,7 @@ lib.optionals (!noctaliaSystemdEnabled) [
   (leaf "spawn-at-startup" [ noctaliaCommand ])
 
   (plain "layer-rule" [
-    (leaf "match" { namespace = "^noctalia-(background|launcher-overlay|dock)-.*$"; })
+    (leaf "match" { namespace = "^noctalia-(background|launcher-overlay|dock|wallpaper)-.*$"; })
     (plain "background-effect" [
       (leaf "xray" false)
     ])

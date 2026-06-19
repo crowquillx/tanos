@@ -1,6 +1,11 @@
 creation_rules:
   - path_regex: secrets/.*\.ya?ml$
     key_groups:
+      # Single key group: any one recipient can decrypt (OR semantics).
+      # Age key on disk for unattended boot + Yubikey PGP for sops CLI.
       - age:
           # Add additional host public keys here as needed and run `sops updatekeys`.
           - age16x7tq5ndgm3hr55gqfh2ujecq4hypyjn3vrmm36vam7y0fu5ffes7qt20s
+        pgp:
+          # Yubikey 5 — private key on hardware token, never leaves device.
+          - B7873777D243B2011C50F7B83DF8B7D2772745D9

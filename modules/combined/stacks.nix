@@ -28,6 +28,8 @@
     ../nixos/services/localsend.nix
     ../nixos/security/noctalia-secrets.nix
     ../nixos/security/sops.nix
+    ../nixos/security/sops-gnupg.nix
+    ../nixos/security/yubikey.nix
     ../nixos/security/secure-boot.nix
     ../nixos/profiles/vm-guest.nix
     ../nixos/profiles/laptop.nix
@@ -48,5 +50,6 @@
     ../home/desktop/noctalia-command.nix
     ../home/desktop/noctalia-shell.nix
     ../home/security/ssh-key.nix
+    ../home/security/gpg-agent.nix
   ];
 }

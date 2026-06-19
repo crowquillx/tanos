@@ -90,29 +90,107 @@ manual `sops` CLI usage, not for runtime secret materialization.
 
 ## Optional: Yubikey PGP ("yubikey" option)
 
-To make sops decryptable via a PGP key on a Yubikey:
+This repo has first-class Yubikey support. The same setup works on every
+host because the PGP key lives on the Yubikey itself; only the public
+key is committed to the repo.
 
-1. Install `gnupg` and `yubikey-manager` (already in `users.extraPackages`
-   on hosts that opt in to sops).
-2. Generate a PGP key on an offline machine and move the *public* key to
-   this host, OR generate the key directly on the Yubikey via:
+### Design
+
+`security.sops` runtime uses **one** source per host. sops-nix
+explicitly rejects combining `gnupgHome` and `ageKeyFile` in the same
+manifest — they are mutually exclusive at boot. So the practical split
+is:
+
+- **Yubikey for sops CLI** (interactive): `gpg-agent` in your user
+  session talks to the Yubikey via `pcscd`. The sops file is encrypted
+  to a `pgp` key group containing the Yubikey's fingerprint, and `sops`
+  will tap the Yubikey (or fall through to the age key if the Yubikey
+  isn't plugged in / hasn't been tapped).
+- **Age key for unattended boot**: `sops-install-secrets` reads
+  `/var/lib/sops-nix/key.txt` and decrypts without any human
+  interaction. This is what makes reboots work even when you're not at
+  the keyboard or have forgotten the Yubikey.
+
+Hosts where you want unattended boot use `ageKeyFile` only. The Yubikey
+is purely a CLI / manual-decrypt option on those hosts. If you want the
+Yubikey to be the *only* way to decrypt (no fallback), set
+`gnupgHome` and unset `ageKeyFile` — but the host will not boot without
+the Yubikey plugged in.
+
+### One-time: generate a PGP key on the Yubikey
+
+1. Plug in the Yubikey.
+2. Initialize the OpenPGP applet (default admin PIN is `12345678`):
    ```bash
+   ykman openpgp info
    ykman openpgp keys reset
-   gpg --card-edit
-   # inside the card-edit prompt: generate, save
    ```
-3. Find the fingerprint:
+3. Generate the key directly on the Yubikey. The private key never
+   leaves the device:
+   ```bash
+   gpg --card-edit
+   # inside the card-edit prompt:
+   #   admin
+   #   generate
+   # answer the prompts (no expiry recommended for a long-lived key)
+   ```
+4. Note the long fingerprint:
    ```bash
    gpg --list-secret-keys --keyid-format=long
    ```
-4. Add a `pgp` key group to `.sops.yaml` with the fingerprint.
-5. In the host's `variables.nix`, set:
-   ```nix
-   security.sops.gnupgHome = "/var/lib/sops-nix/gnupg";
+5. Export the armored public key into the repo (safe to commit):
+   ```bash
+   gpg --armor --export <FINGERPRINT> > secrets/yubikey-pgp-pub.asc
    ```
-6. Make sure the Yubikey is plugged in at boot. `sops-install-secrets`
-   will use the PGP key (or fall back to the age key file if the
-   Yubikey is absent).
+
+### Wire the Yubikey into the repo
+
+In `.sops.yaml`, add a `pgp` key group alongside the existing `age`
+group. Each key group is an OR (any one can decrypt), and the keys
+within a group are an AND (all must be present to use that group):
+
+```yaml
+creation_rules:
+  - path_regex: secrets/.*\.ya?ml$
+    key_groups:
+      - age:
+          - age16x7tq5ndgm3hr55gqfh2ujecq4hypyjn3vrmm36vam7y0fu5ffes7qt20s
+      - pgp:
+          - <FINGERPRINT>
+```
+
+Re-encrypt existing files to include the new recipient:
+
+```bash
+sops updatekeys -y secrets/*.yaml
+```
+
+### Per-host configuration
+
+In every host that should accept the Yubikey, set:
+
+```nix
+security.yubikey.enable = true;  # enables pcscd + yubikey-manager udev rules
+security.sops = {
+  enable = true;
+  defaultSopsFile = ../../secrets/<host>.yaml;
+  ageKeyFile = "/var/lib/sops-nix/key.txt";  # runtime source (mutually exclusive with gnupgHome)
+  sshKey = { ... };
+};
+home.security.yubikey.pgpPublicKey = ../../secrets/yubikey-pgp-pub.asc;
+```
+
+`modules/nixos/security/yubikey.nix` enables `services.pcscd` and the
+yubikey-manager udev rules. `modules/home/security/gpg-agent.nix`
+configures user-side `gpg-agent` with `pinentry-bemenu` and `scdaemon`
+support, plus SSH-agent forwarding; its activation script imports the
+PGP public key into `~/.gnupg` so gpg-agent can find it.
+
+`modules/nixos/security/sops-gnupg.nix` is *not* used in the default
+flow. It is available for hosts that want to use the Yubikey for
+runtime decryption (no age key file at all). Set both
+`security.sops.gnupgHome` and `security.sops.gnupgPublicKey` to
+opt in, and unset `security.sops.ageKeyFile`.
 
 ## Notes
 
