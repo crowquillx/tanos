@@ -67,6 +67,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `security.sops.ageKeyFile = "<path>"` (defaults to `/var/lib/sops-nix/key.txt`)
 - `security.sops.gnupgHome = "<path>"` (defaults to `null`; set to a GnuPG home containing a PGP key, e.g. on a Yubikey, to enable PGP/Yubikey decryption alongside age)
 - `security.sops.gnupgPublicKey = "<path>"` (defaults to `null`; path to the ASCII-armored PGP public key that `sops-gnupg.nix` imports into `gnupgHome` at activation. Note: `gnupgHome` and `ageKeyFile` are mutually exclusive in sops-nix; this only applies when `gnupgHome` is set)
+- `security.sops.administrativeGroup = "<group>"` (defaults to `null`. If set, creates the group, adds the primary user to it, and chown's the age key file to `root:<group>` with mode 0640. Lets `sops` CLI read the key without sudo or a `/tmp` copy.)
 - `security.yubikey.enable = true | false` (enables `services.pcscd` + yubikey-manager udev rules; required for any Yubikey-based sops PGP decrypt or sops CLI gpg-agent use)
 - `home.security.yubikey.pgpPublicKey = "<path>"` (HM-side: path to the PGP public key to import into `~/.gnupg` at HM activation. Works alongside `security.yubikey.enable = true` regardless of sops runtime source)
 - `security.sops.sshKey.enable = true | false` (materialize the user's SSH key from sops at boot)

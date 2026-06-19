@@ -29,8 +29,7 @@
   "audio" = {
     "mprisBlacklist" = [
       "zen"
-      "firefox"
-      "brave"
+      "mullvad-browser"
     ];
     "preferredPlayer" = "spotify";
     "spectrumFrameRate" = 60;
@@ -477,7 +476,7 @@
     "sounds" = {
       "criticalSoundFile" = "";
       "enabled" = false;
-      "excludedApps" = "discord,firefox,chrome,chromium,edge";
+      "excludedApps" = "discord,mullvad-browser,chrome,chromium,edge";
       "lowSoundFile" = "";
       "normalSoundFile" = "";
       "separateSounds" = false;

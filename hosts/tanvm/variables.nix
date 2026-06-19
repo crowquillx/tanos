@@ -19,7 +19,9 @@
 
   users = {
     primary = "tan";
-    extraPackages = [];
+    extraPackages = [
+      "mullvad"
+    ];
     git = {
       name = null;
       email = null;
@@ -36,11 +38,10 @@
     extraCompositors = [];
     displayManager = "auto";
     browser = {
-      default = "firefox";
-      firefox.enable = true;
+      default = "mullvadBrowser";
       zen.enable = false;
-      chrome.enable = false;
       helium.enable = false;
+      mullvadBrowser.enable = true;
     };
     niri = {
       # Populate output names with `niri msg outputs`.

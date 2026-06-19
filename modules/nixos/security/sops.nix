@@ -9,6 +9,7 @@ let
   defaultSopsFile = get [ "security" "sops" "defaultSopsFile" ] null;
   ageKeyFile = get [ "security" "sops" "ageKeyFile" ] "/var/lib/sops-nix/key.txt";
   gnupgHome = get [ "security" "sops" "gnupgHome" ] null;
+  administrativeGroup = get [ "security" "sops" "administrativeGroup" ] null;
   primaryUser = get [ "users" "primary" ] "tan";
   sshKey = {
     enable = get [ "security" "sops" "sshKey" "enable" ] false;
@@ -62,6 +63,29 @@ in
         group = "users";
         mode = sshKey.pubMode;
         path = "/run/secrets/${sshKey.pubName}";
+      };
+    })
+    (lib.optionalAttrs (enabled && administrativeGroup != null) {
+      # Grant the primary user read access to /var/lib/sops-nix/key.txt
+      # so `sops` CLI usage doesn't require sudo or a /tmp copy. The
+      # file stays root-owned but group-readable; the user is added to
+      # the group so sops decrypts work in interactive shells.
+      users.groups.${administrativeGroup} = { };
+      users.users.${primaryUser}.extraGroups = [ administrativeGroup ];
+
+      system.activationScripts.chownSopsKeyFile = {
+        text = ''
+          keyFile=${lib.escapeShellArg ageKeyFile}
+          group=${lib.escapeShellArg administrativeGroup}
+          if [ -f "$keyFile" ]; then
+            chown "root:$group" "$keyFile"
+            chmod 0640 "$keyFile"
+          fi
+        '';
+        # Must run after the `groups` activation script creates the
+        # administrative group, otherwise chown fails with
+        # "invalid group: 'root:sops'".
+        deps = [ "groups" ];
       };
     })
   ];

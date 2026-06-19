@@ -6,7 +6,7 @@ in
 [
   (node "binds" [ ] [
     (node "Mod+D" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "panel-toggle" "launcher" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg panel-toggle launcher")
     ])
     (node "Mod+Space" { repeat = false; } [
       (flag "toggle-overview")
@@ -39,27 +39,30 @@ in
     (node "Mod+Z" { "hotkey-overlay-title" = "Zen Browser"; } [
       (leaf "spawn" [ "zen" ])
     ])
+    (node "Mod+Shift+Z" { "hotkey-overlay-title" = "Mullvad Browser"; } [
+      (leaf "spawn" [ "mullvad-browser" ])
+    ])
     (node "MouseForward" { "hotkey-overlay-title" = "Equibop: Toggle"; } [
       (leaf "spawn" [ "equibop" "--toggle-mic" ])
     ])
     (node "Super+B" { "hotkey-overlay-title" = "Assistant Panel: Toggle"; } [
-      (leaf "spawn" [ noctaliaCommand "msg" "panel-toggle" "control-center" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg panel-toggle control-center")
     ])
 
     (node "XF86AudioRaiseVolume" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "volume-up" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg volume-up")
     ])
     (node "XF86AudioLowerVolume" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "volume-down" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg volume-down")
     ])
     (node "XF86AudioMute" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "volume-mute" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg volume-mute")
     ])
     (node "XF86MonBrightnessUp" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "brightness-up" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg brightness-up")
     ])
     (node "XF86MonBrightnessDown" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "brightness-down" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg brightness-down")
     ])
 
     (node "Mod+Q" { repeat = false; } [
@@ -103,7 +106,7 @@ in
       (flag "focus-window-up")
     ])
     (node "Mod+L" [ ] [
-      (leaf "spawn" [ noctaliaCommand "msg" "session" "lock" ])
+      (leaf "spawn-sh" "${noctaliaCommand} msg session lock")
     ])
 
     (node "Mod+Shift+Left" [ ] [

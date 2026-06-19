@@ -25,8 +25,8 @@
       "mpv"
       "pywalfox-native"
       #      "sops"
-      "brave"
       "qbittorrent"
+      "mullvad"
     ];
     git = {
       name = "tan";
@@ -47,19 +47,11 @@
     sddm.background = ../../wallpapers/1.png;
     browser = {
       default = "zen";
-      firefox.enable = false;
       zen.enable = true;
-      chrome.enable = false;
       helium.enable = true;
+      mullvadBrowser.enable = true;
     };
     niri = {
-      blur = {
-        enable = true;
-        passes = 3;
-        offset = 3.0;
-        noise = 0.03;
-        saturation = 1.0;
-      };
       outputs = {};
       settings = {};
     };

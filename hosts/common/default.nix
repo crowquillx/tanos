@@ -138,6 +138,14 @@ in {
       message = "security.sops.gnupgPublicKey must be null, a non-empty string, or a path.";
     }
     {
+      assertion = let
+        administrativeGroup = get ["security" "sops" "administrativeGroup"] null;
+      in
+        administrativeGroup == null
+        || (builtins.isString administrativeGroup && administrativeGroup != "");
+      message = "security.sops.administrativeGroup must be null or a non-empty string.";
+    }
+    {
       assertion = builtins.isBool (get ["security" "yubikey" "enable"] false);
       message = "security.yubikey.enable must be a boolean.";
     }

@@ -15,11 +15,10 @@ let
   system = pkgs.stdenv.hostPlatform.system;
   gitUserName = get [ "users" "git" "name" ] null;
   gitUserEmail = get [ "users" "git" "email" ] null;
-  browserDefault = get [ "desktop" "browser" "default" ] "firefox";
-  firefoxEnabled = get [ "desktop" "browser" "firefox" "enable" ] true;
+  browserDefault = get [ "desktop" "browser" "default" ] "zen";
   zenEnabled = get [ "desktop" "browser" "zen" "enable" ] false;
-  chromeEnabled = get [ "desktop" "browser" "chrome" "enable" ] false;
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
+  mullvadBrowserEnabled = get [ "desktop" "browser" "mullvadBrowser" "enable" ] false;
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
   noctaliaEnabled = get [ "desktop" "noctalia" "enable" ] false;
 
@@ -58,33 +57,29 @@ let
   ];
 
   allowedBrowsers = [
-    "firefox"
     "zen"
-    "chrome"
     "helium"
+    "mullvadBrowser"
   ];
   browserEnabledMap = {
-    firefox = firefoxEnabled;
     zen = zenEnabled;
-    chrome = chromeEnabled;
     helium = heliumEnabled;
+    mullvadBrowser = mullvadBrowserEnabled;
   };
   browserPackageMap = {
-    inherit (pkgs) firefox;
     zen = zenPkg;
-    chrome = pkgs.google-chrome;
     helium = heliumPkg;
+    mullvadBrowser = pkgs.mullvad-browser;
   };
   desktopFileFor =
     pkg: fallback: if pkg == null then fallback else (pkg.meta.desktopFileName or fallback);
   browserDesktopMap = {
-    firefox = "firefox.desktop";
     zen = desktopFileFor zenPkg "zen.desktop";
-    chrome = "google-chrome.desktop";
     helium = desktopFileFor heliumPkg "helium.desktop";
+    mullvadBrowser = desktopFileFor pkgs.mullvad-browser "mullvad-browser.desktop";
   };
   browserPkg = lib.attrByPath [ browserDefault ] null browserPackageMap;
-  browserDesktopFile = lib.attrByPath [ browserDefault ] "firefox.desktop" browserDesktopMap;
+  browserDesktopFile = lib.attrByPath [ browserDefault ] "zen.desktop" browserDesktopMap;
   browserMimeTypes = [
     "application/xhtml+xml"
     "text/html"
@@ -104,7 +99,7 @@ in
   assertions = [
     {
       assertion = builtins.elem browserDefault allowedBrowsers;
-      message = "Unsupported desktop.browser.default \"${browserDefault}\". Allowed values: firefox, zen, chrome, helium.";
+      message = "Unsupported desktop.browser.default \"${browserDefault}\". Allowed values: zen, helium, mullvadBrowser.";
     }
     {
       assertion = lib.attrByPath [ browserDefault ] false browserEnabledMap;
@@ -178,13 +173,12 @@ in
         wget
         curl
       ])
-      ++ lib.optionals firefoxEnabled [ pkgs.firefox ]
       ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
       ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
       ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]
       ++ lib.optionals (zenEnabled && zenPkg != null) [ zenPkg ]
-      ++ lib.optionals chromeEnabled [ pkgs.google-chrome ]
       ++ lib.optionals (heliumEnabled && heliumPkg != null) [ heliumPkg ]
+      ++ lib.optionals mullvadBrowserEnabled [ pkgs.mullvad-browser ]
       ++ lib.optionals (get [ "desktop" "enable" ] true) [
         pkgs.libnotify
       ];

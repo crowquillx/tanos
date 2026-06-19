@@ -20,8 +20,24 @@ let
 in
 [
   (plain "window-rule" [
-    (leaf "match" { app-id = "firefox$"; title = "^Picture-in-Picture$"; })
+    (leaf "match" { app-id = "mullvad-browser$"; title = "^Picture-in-Picture$"; })
     (leaf "open-floating" true)
+  ])
+
+  (plain "window-rule" [
+    (leaf "match" { app-id = "zen$"; title = "^Picture-in-Picture$"; })
+    (leaf "open-floating" true)
+  ])
+
+  (plain "window-rule" [
+    (leaf "match" { app-id = "dev.noctalia.Noctalia.Settings"; })
+    (leaf "open-floating" true)
+    (plain "default-column-width" [
+      (leaf "fixed" 1080)
+    ])
+    (plain "default-window-height" [
+      (leaf "fixed" 920)
+    ])
   ])
 
   (plain "window-rule" [

@@ -44,10 +44,10 @@
       "gnupg"
       "yubikey-manager"
       "pinentry-bemenu"
-      "brave"
       "qbittorrent"
       "localsend"
       "proton-vpn"
+      "mullvad"
     ];
     git = {
       name = "tan";
@@ -76,19 +76,11 @@
     sddm.background = ../../wallpapers/1.png;
     browser = {
       default = "zen";
-      firefox.enable = false;
       zen.enable = true;
-      chrome.enable = false;
       helium.enable = true;
+      mullvadBrowser.enable = true;
     };
     niri = {
-      blur = {
-        enable = true;
-        passes = 3;
-        offset = 3.0;
-        noise = 0.03;
-        saturation = 1.0;
-      };
       outputs = {
         "DP-3" = {
           mode = {
@@ -268,6 +260,9 @@
     enable = true;
     defaultSopsFile = ../../secrets/tandesk.yaml;
     ageKeyFile = "/var/lib/sops-nix/key.txt";
+    # Make the age key group-readable so sops CLI doesn't need sudo or
+    # a /tmp copy. The user is added to this group at activation.
+    administrativeGroup = "sops";
     # sops-nix is mutually exclusive between gnupgHome and ageKeyFile at
     # runtime, so we use the age key file for unattended boot. The Yubikey
     # PGP key is still a recipient in the sops file (added via
