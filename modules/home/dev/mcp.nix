@@ -12,8 +12,21 @@
   codexEnabled = get ["features" "codingTools" "aiCli" "codex" "enable"] aiCliEnabled;
   opencodeEnabled = get ["features" "codingTools" "aiCli" "opencode" "enable"] aiCliEnabled;
   nixosMcpEnabled = get ["features" "mcp" "nixos" "enable"] aiCliEnabled;
-  opencodePkg = lib.attrByPath ["opencode"] null pkgs;
+  opencodePkg = lib.attrByPath ["codex"] null pkgs;
   codexPkg = lib.attrByPath ["codex"] null pkgs;
+
+  codexTrustedDirs = get ["features" "codingTools" "aiCli" "codex" "trustedDirectories"] [];
+  codexModel = get ["features" "codingTools" "aiCli" "codex" "model"] "gpt-5.5";
+  codexModelReasoningEffort = get ["features" "codingTools" "aiCli" "codex" "modelReasoningEffort"] "low";
+  codexPlanModeReasoningEffort = get ["features" "codingTools" "aiCli" "codex" "planModeReasoningEffort"] "high";
+
+  codexSettings = {
+    model = codexModel;
+    model_reasoning_effort = codexModelReasoningEffort;
+    plan_mode_reasoning_effort = codexPlanModeReasoningEffort;
+  } // lib.optionalAttrs (codexTrustedDirs != []) {
+    projects = lib.genAttrs codexTrustedDirs (_: { trust_level = "trusted"; });
+  };
 in {
   imports = [
     inputs.mcp-servers-nix.homeManagerModules.default
@@ -37,6 +50,7 @@ in {
         enable = true;
         package = codexPkg;
         enableMcpIntegration = nixosMcpEnabled;
+        settings = codexSettings;
       };
     })
     (lib.mkIf opencodeEnabled {

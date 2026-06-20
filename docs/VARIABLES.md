@@ -44,6 +44,10 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.codingTools.editors.enable = true | false`
 - `features.codingTools.aiCli.enable = true | false`
 - `features.codingTools.aiCli.codex.enable = true | false`
+- `features.codingTools.aiCli.codex.trustedDirectories = [ "<absolute-path>" ... ]` (directories pre-trusted in `config.toml` so codex doesn't try to persist trust at runtime; required because HM manages `~/.codex/config.toml` as a read-only store symlink)
+- `features.codingTools.aiCli.codex.model = "<model-id>"` (defaults to `gpt-5.5`)
+- `features.codingTools.aiCli.codex.modelReasoningEffort = "minimal" | "low" | "medium" | "high" | "xhigh"` (defaults to `low`)
+- `features.codingTools.aiCli.codex.planModeReasoningEffort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh"` (defaults to `high`)
 - `features.codingTools.aiCli.opencode.enable = true | false`
 - `features.codingTools.aiCli.gemini.enable = true | false`
 - `features.codingTools.nixTools.enable = true | false`

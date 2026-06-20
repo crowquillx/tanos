@@ -186,7 +186,10 @@
       editors.enable = true;
       aiCli = {
         enable = true;
-        codex.enable = true;
+        codex = {
+          enable = true;
+          trustedDirectories = [ "/home/tan/tanos" ];
+        };
         opencode.enable = true;
         gemini.enable = true;
       };
