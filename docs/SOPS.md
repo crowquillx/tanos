@@ -192,6 +192,88 @@ runtime decryption (no age key file at all). Set both
 `security.sops.gnupgHome` and `security.sops.gnupgPublicKey` to
 opt in, and unset `security.sops.ageKeyFile`.
 
+## Sops file validation (`validateSopsFiles`)
+
+`sops.validateSopsFiles` is **enabled** in `modules/nixos/security/sops.nix`.
+
+With the pinned `sops-nix`, validation runs `sops-install-secrets
+-check-mode=sopsfile` inside the manifest derivation's `checkPhase` at
+**build time**. It:
+
+- parses each encrypted sops file (YAML/JSON/ini/dotenv/binary),
+- verifies every declared `sops.secrets.<name>` key actually exists in the
+  encrypted file,
+- validates mode/owner/group strings.
+
+It does **not** decrypt secret values and does **not** need the age/GPG
+key at build time, so it works in the Nix sandbox and in CI. This catches
+malformed sops files and missing declared keys *before* boot instead of
+failing silently at activation. Keep it on.
+
+## Per-host recipient separation (manual migration)
+
+Today `.sops.yaml` uses a single catch-all rule encrypted to one age key
+plus the Yubikey PGP key. Every host that has a sops file can decrypt
+every other host's file. True per-host recipient separation requires a
+**distinct age key per host**, and only one age public key is currently
+committed — so this migration is manual and must be done on each host.
+
+The `security.sops.agePublicKey` host variable is reserved as schema
+groundwork for this: set it to the host's age public key so the value is
+declarative and discoverable, then mirror it into `.sops.yaml`.
+
+### Steps (per host, one at a time)
+
+1. **Ensure the host has its own age key** (skip if it already has a
+   distinct one you want to keep):
+   ```bash
+   sudo mkdir -p /var/lib/sops-nix
+   sudo nix shell nixpkgs#age --command age-keygen -o /var/lib/sops-nix/key.txt
+   sudo chmod 600 /var/lib/sops-nix/key.txt
+   sudo grep '^# public key:' /var/lib/sops-nix/key.txt | cut -d' ' -f4
+   ```
+2. **Record the public key** in that host's `variables.nix`:
+   ```nix
+   security.sops.agePublicKey = "age1<...that host's public key...>";
+   ```
+3. **Add a per-host rule** in `.sops.yaml`, with the host's age key and the
+   Yubikey PGP fingerprint as separate `key_groups` (OR semantics — either
+   recipient can decrypt):
+   ```yaml
+   creation_rules:
+     - path_regex: secrets/tandesk\.ya?ml$
+       key_groups:
+         - age:
+             - age1<...tandesk public key...>
+         - pgp:
+             - B7873777D243B2011C50F7B83DF8B7D2772745D9
+     - path_regex: secrets/tanvm\.ya?ml$
+       key_groups:
+         - age:
+             - age1<...tanvm public key...>
+         - pgp:
+             - B7873777D243B2011C50F7B83DF8B7D2772745D9
+     # ...one rule per host...
+   ```
+4. **Re-encrypt each host's file to its new recipient set**:
+   ```bash
+   sops updatekeys -y secrets/<host>.yaml
+   ```
+5. **Boot the host once** and confirm unattended decrypt still works
+   (`/run/secrets` populated, services start) **before** removing any old
+   recipient from `.sops.yaml`. Do not rotate or remove a recipient until
+   every host that needs it has been migrated and verified.
+
+### Safety invariants
+
+- Never remove a recipient without a verified migration path that
+  preserves unattended boot decryption.
+- `gnupgHome` and `ageKeyFile` are mutually exclusive at runtime in
+  sops-nix; keep using `ageKeyFile` for unattended boot and the Yubikey
+  PGP key only as a CLI/manual recipient.
+- Do not commit plaintext secrets or private age keys. Only public keys
+  and the armored PGP public key belong in the repo.
+
 ## Notes
 
 - Bootstrap auto-creates `/var/lib/sops-nix/key.txt` if missing.
@@ -200,3 +282,5 @@ opt in, and unset `security.sops.ageKeyFile`.
   both `security.sops.enable` and `security.sops.sshKey.enable` are true.
   It enforces `~/.ssh` mode 0700 and symlinks the materialized secrets
   into place.
+- `sops.validateSopsFiles` is on; builds fail on malformed sops files or
+  missing declared keys. See the "Sops file validation" section above.

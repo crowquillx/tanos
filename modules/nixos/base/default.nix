@@ -64,7 +64,6 @@ in
 
   services = {
     dbus.enable = true;
-    openssh.enable = lib.mkDefault true;
   };
 
   users.users.${primaryUser} = {

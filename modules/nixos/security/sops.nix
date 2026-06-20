@@ -43,7 +43,14 @@ in
         # nixos-rebuild switch time, which is not enough for a workstation
         # that boots daily.
         useSystemdActivation = true;
-        validateSopsFiles = false;
+        # Validate sops files at build time. The pinned sops-nix runs
+        # `sops-install-secrets -check-mode=sopsfile` in the manifest
+        # derivation's checkPhase: it parses the encrypted YAML/JSON and
+        # verifies each declared secret key exists, but it does NOT decrypt
+        # and does NOT need the age/GPG key at build time. This catches
+        # malformed sops files and missing declared keys before boot instead
+        # of failing silently at activation.
+        validateSopsFiles = true;
       };
     })
     (lib.optionalAttrs (gnupgHome != null) {

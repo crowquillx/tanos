@@ -278,6 +278,57 @@ in {
         exitNode == null || (builtins.isString exitNode && exitNode != "");
       message = "features.tailscale.exitNode must be null or a non-empty string.";
     }
+    {
+      assertion = builtins.isBool (get ["features" "ssh" "enable"] true);
+      message = "features.ssh.enable must be a boolean.";
+    }
+    {
+      assertion = builtins.isBool (get ["features" "ssh" "openFirewall"] true);
+      message = "features.ssh.openFirewall must be a boolean.";
+    }
+    {
+      assertion = let
+        port = get ["features" "ssh" "port"] 22;
+      in
+        builtins.isInt port && port > 0 && port <= 65535;
+      message = "features.ssh.port must be an integer in 1..65535.";
+    }
+    {
+      assertion = builtins.isBool (get ["features" "ssh" "passwordAuthentication"] true);
+      message = "features.ssh.passwordAuthentication must be a boolean.";
+    }
+    {
+      assertion = let
+        valid = ["prohibit-password" "without-password" "forced-commands-only" "no"];
+        permitRootLogin = get ["features" "ssh" "permitRootLogin"] "prohibit-password";
+      in
+        builtins.elem permitRootLogin valid;
+      message = "features.ssh.permitRootLogin must be one of: prohibit-password, without-password, forced-commands-only, no (never \"yes\").";
+    }
+    {
+      assertion = let
+        keys = get ["features" "ssh" "authorizedKeys"] [];
+      in
+        builtins.isList keys && builtins.all (k: builtins.isString k && k != "") keys;
+      message = "features.ssh.authorizedKeys must be a list of non-empty string public keys.";
+    }
+    {
+      # Lockout guard at the schema layer: key-only SSH requires declared keys.
+      assertion = let
+        sshEnabled = get ["features" "ssh" "enable"] true;
+        pwdAuth = get ["features" "ssh" "passwordAuthentication"] true;
+        keys = get ["features" "ssh" "authorizedKeys"] [];
+      in
+        !(sshEnabled && !pwdAuth && keys == []);
+      message = "features.ssh.passwordAuthentication = false requires a non-empty features.ssh.authorizedKeys, otherwise the user is locked out of SSH.";
+    }
+    {
+      assertion = let
+        agePublicKey = get ["security" "sops" "agePublicKey"] null;
+      in
+        agePublicKey == null || (builtins.isString agePublicKey && agePublicKey != "");
+      message = "security.sops.agePublicKey must be null or a non-empty string (the host's age public key for future per-host .sops.yaml templating).";
+    }
   ];
 
   home-manager = {

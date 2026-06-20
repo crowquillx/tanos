@@ -15,6 +15,8 @@
     ../nixos/services/core.nix
     ../nixos/services/bluetooth.nix
     ../nixos/services/networking.nix
+    ../nixos/services/ssh.nix
+    ../nixos/services/firewall.nix
     ../nixos/services/portals.nix
     ../nixos/services/filemanager.nix
     ../nixos/services/printing.nix

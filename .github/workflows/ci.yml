@@ -15,12 +15,14 @@ jobs:
       - name: Enable binary cache
         uses: DeterminateSystems/magic-nix-cache-action@v13
 
+      # Blocking lint: statix failures now fail CI.
       - name: Run statix
-        continue-on-error: true
         run: nix run nixpkgs#statix -- check .
 
-      - name: Flake checks
-        run: nix flake check --accept-flake-config
+      # Eval-only flake validation (no expensive builds here; builds run in
+      # the build-hosts job via the standard checks.x86_64-linux output).
+      - name: Flake checks (eval-only)
+        run: nix flake check --no-build --accept-flake-config
 
   build-hosts:
     runs-on: ubuntu-latest
@@ -37,5 +39,12 @@ jobs:
       - name: Enable binary cache
         uses: DeterminateSystems/magic-nix-cache-action@v13
 
+      # Build the NixOS toplevel for this host from the standard checks
+      # output. This also exercises sops file validation at build time.
       - name: Build NixOS configuration
-        run: nix build --accept-flake-config .#ciNixosConfigurations.${{ matrix.host }}.config.system.build.toplevel
+        run: nix build --accept-flake-config .#checks.x86_64-linux.nixos-${{ matrix.host }}
+
+      # Build the standalone Home Manager activation package for this host
+      # from the standard checks output.
+      - name: Build Home Manager activation
+        run: nix build --accept-flake-config .#checks.x86_64-linux.home-${{ matrix.host }}

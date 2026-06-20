@@ -53,6 +53,13 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.codingTools.nixTools.enable = true | false`
 - `features.mcp.nixos.enable = true | false`
 - `features.tailscale = { enable, exitNode }`
+- `features.ssh = { enable, openFirewall, port, passwordAuthentication, permitRootLogin, authorizedKeys }`
+  - `enable` (bool, default `true`): enable the OpenSSH daemon.
+  - `openFirewall` (bool, default `true`): open the SSH port in the firewall.
+  - `port` (int 1–65535, default `22`): the SSH listen port.
+  - `passwordAuthentication` (bool, default `true`): allow password auth. **Set `false` for key-only mode.** An assertion forbids `false` unless `authorizedKeys` is non-empty (lockout guard).
+  - `permitRootLogin` (one of `prohibit-password`, `without-password`, `forced-commands-only`, `no`; default `prohibit-password`): root login policy. `yes` is never allowed (root stays no less restrictive than the NixOS default).
+  - `authorizedKeys` (list of non-empty string public keys, default `[]`): authorized for the primary user. Required when `passwordAuthentication = false`.
 - `features.fileManager.thunar.enable = true | false`
 - `features.services = { fstrim.enable, resolved.enable, powerProfilesDaemon.enable }`
 - `features.flatpak = { enable, packages = [ "<app-id>" ... ] }`
@@ -69,6 +76,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `security.sops.enable = true | false`
 - `security.sops.defaultSopsFile = "<path>"` (defaults to `null`; required when `enable = true`)
 - `security.sops.ageKeyFile = "<path>"` (defaults to `/var/lib/sops-nix/key.txt`)
+- `security.sops.agePublicKey = "<age-pubkey>"` (defaults to `null`; optional. The host's age *public* key, reserved for future per-host `.sops.yaml` templating. Setting it does not change runtime decryption — see `docs/SOPS.md` for the manual per-host recipient migration.)
 - `security.sops.gnupgHome = "<path>"` (defaults to `null`; set to a GnuPG home containing a PGP key, e.g. on a Yubikey, to enable PGP/Yubikey decryption alongside age)
 - `security.sops.gnupgPublicKey = "<path>"` (defaults to `null`; path to the ASCII-armored PGP public key that `sops-gnupg.nix` imports into `gnupgHome` at activation. Note: `gnupgHome` and `ageKeyFile` are mutually exclusive in sops-nix; this only applies when `gnupgHome` is set)
 - `security.sops.administrativeGroup = "<group>"` (defaults to `null`. If set, creates the group, adds the primary user to it, and chown's the age key file to `root:<group>` with mode 0640. Lets `sops` CLI read the key without sudo or a `/tmp` copy.)
@@ -285,6 +293,48 @@ features.virtualisation = {
   };
 };
 ```
+
+### SSH
+
+```nix
+features.ssh = {
+  enable = true;
+  openFirewall = true;          # keep port 22 open in the firewall
+  port = 22;
+  # Key-only mode: disable password + keyboard-interactive auth.
+  # Requires a non-empty authorizedKeys (enforced by assertion).
+  passwordAuthentication = false;
+  permitRootLogin = "prohibit-password"; # "yes" is never allowed
+  authorizedKeys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@host"
+  ];
+};
+```
+
+The SSH daemon is owned by `modules/nixos/services/ssh.nix` and is fully host-configurable. The lockout-guard assertion fails the build if `passwordAuthentication = false` is set without any `authorizedKeys`, so flipping to key-only is safe.
+
+### Firewall port reference
+
+`modules/nixos/services/firewall.nix` pins `networking.firewall.enable = true` explicitly and documents every exposed port. No port is opened or closed by that module; each feature module owns its own ports.
+
+| Host   | Port         | Proto          | Owner (variable)                                                |
+|--------|--------------|----------------|-----------------------------------------------------------------|
+| all    | 22           | tcp            | `features.ssh.openFirewall`                                     |
+| all    | 41641        | udp            | `features.tailscale.enable` (`services.tailscale.openFirewall`) |
+| tandesk| 27015        | tcp + udp      | `features.gaming.steam.dedicatedServer.openFirewall`            |
+| tandesk| 27036        | tcp + udp      | `features.gaming.steam.remotePlay.openFirewall` + transfers     |
+| tandesk| 27037        | tcp            | `features.gaming.steam.remotePlay.openFirewall`                 |
+| tandesk| 27040        | tcp            | `features.gaming.steam.localNetworkGameTransfers.openFirewall`  |
+| tandesk| 10400, 10401 | udp            | `features.gaming.steam.remotePlay.openFirewall`                 |
+| tandesk| 27031–27035  | udp range      | `features.gaming.steam.remotePlay.openFirewall`                 |
+| tandesk| 53317        | tcp + udp      | `localsend` in `users.extraPackages`                            |
+
+Notes:
+
+- Steam ports only take effect where `features.gaming.enable = true` (tandesk). On tanvm/tanlappy gaming is disabled, so `features.gaming.steam.*.openFirewall` is inert and should be set `false` to reflect honest intent.
+- mullvad-vpn, ollama, open-webui, and comfyui bind to `127.0.0.1` and open no firewall ports.
+- ICMP echo (`allowPing`) is left at the NixOS default (`true`) for diagnostics; it is not a TCP/UDP port and can be tightened separately.
+- No interface-scoped restrictions are used: NetworkManager connection names and Wi-Fi/Ethernet/VPN/Tailscale interfaces vary, so narrowing to a guessed interface name would break LAN features non-deterministically.
 
 ### Laptop defaults
 

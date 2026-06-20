@@ -141,16 +141,55 @@
           ]
           ++ sharedHomeModules vars;
       };
+
+  nixosConfigs = lib.mapAttrs mkHost hostPlatforms;
+  ciNixosConfigs = lib.mapAttrs mkCiHost hostPlatforms;
+  homeConfigs = lib.mapAttrs mkHome hostPlatforms;
 in {
   systems = ["x86_64-linux"];
+
+  perSystem = {
+    pkgs,
+    system,
+    ...
+  }: let
+    inherit (pkgs) lib;
+    # Standard checks.x86_64-linux.* output. Each entry is a build-only
+    # derivation; no live activation or privileged commands run here.
+    # Reuses the same builders as the published configurations so the host
+    # list stays DRY and the checks never drift from real outputs.
+    nixosChecks = lib.mapAttrs' (
+      hostName: _:
+        lib.nameValuePair "nixos-${hostName}" ciNixosConfigs.${hostName}.config.system.build.toplevel
+    ) ciNixosConfigs;
+
+    homeChecks = lib.mapAttrs' (
+      hostName: _:
+        lib.nameValuePair "home-${hostName}" homeConfigs.${hostName}.activationPackage
+    ) homeConfigs;
+
+    # Blocking lint: statix over the flake source. Copies the source so
+    # statix.toml (ignore rules) is honored the same as a local run.
+    statixCheck = pkgs.runCommandLocal "statix-check" {
+      nativeBuildInputs = [pkgs.statix];
+    } ''
+      cp -r --no-preserve=mode ${self}/. .
+      statix check .
+      touch $out
+    '';
+  in {
+    checks = nixosChecks // homeChecks // {
+      statix = statixCheck;
+    };
+  };
 
   flake = {
     nixosModules = nixosHostModules;
 
     homeModules = homeUserModules;
 
-    nixosConfigurations = lib.mapAttrs mkHost hostPlatforms;
-    ciNixosConfigurations = lib.mapAttrs mkCiHost hostPlatforms;
-    homeConfigurations = lib.mapAttrs mkHome hostPlatforms;
+    nixosConfigurations = nixosConfigs;
+    ciNixosConfigurations = ciNixosConfigs;
+    homeConfigurations = homeConfigs;
   };
 }
