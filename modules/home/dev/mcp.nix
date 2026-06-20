@@ -12,7 +12,7 @@
   codexEnabled = get ["features" "codingTools" "aiCli" "codex" "enable"] aiCliEnabled;
   opencodeEnabled = get ["features" "codingTools" "aiCli" "opencode" "enable"] aiCliEnabled;
   nixosMcpEnabled = get ["features" "mcp" "nixos" "enable"] aiCliEnabled;
-  opencodePkg = lib.attrByPath ["codex"] null pkgs;
+  opencodePkg = lib.attrByPath ["opencode"] null pkgs;
   codexPkg = lib.attrByPath ["codex"] null pkgs;
 
   codexTrustedDirs = get ["features" "codingTools" "aiCli" "codex" "trustedDirectories"] [];
