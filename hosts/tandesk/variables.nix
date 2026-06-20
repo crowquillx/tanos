@@ -48,6 +48,7 @@
       "localsend"
       "proton-vpn"
       "mullvad"
+      "brave"
     ];
     git = {
       name = "tan";
@@ -70,7 +71,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
-    extraCompositors = [];
+    extraCompositors = [ ];
     displayManager = "auto";
     sddm.wayland.enable = false;
     sddm.background = ../../wallpapers/1.png;
@@ -133,7 +134,7 @@
           };
         };
       };
-      settings = {};
+      settings = { };
     };
     noctalia = import ./noctalia;
     session = {
