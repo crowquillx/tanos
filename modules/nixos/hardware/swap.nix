@@ -1,16 +1,27 @@
-_:
+{ lib, config, ... }:
+let
+  v = config.tanos.variables;
+  zram = v.features.swap.zram;
+  disk = v.features.swap.disk;
+in
 {
   zramSwap = {
-    enable = true;
-    memoryPercent = 25;
+    inherit (zram) enable memoryPercent;
   };
 
-  swapDevices = [
+  swapDevices = lib.optionals disk.enable [
     {
-      device = "/var/lib/swapfile";
-      size = 4 * 1024;
+      device = disk.path;
+      size = disk.sizeMiB;
     }
   ];
 
-  boot.kernel.sysctl."vm.swappiness" = 10;
+  boot.kernel.sysctl."vm.swappiness" = v.features.swap.swappiness;
+
+  assertions = [
+    {
+      assertion = !disk.enable || (disk.path != "/" && !(lib.hasPrefix "/nix/store/" disk.path));
+      message = "features.swap.disk.path must name a swap file on writable persistent storage.";
+    }
+  ];
 }

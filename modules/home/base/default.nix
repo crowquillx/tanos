@@ -19,6 +19,8 @@ let
   zenEnabled = get [ "desktop" "browser" "zen" "enable" ] false;
   heliumEnabled = get [ "desktop" "browser" "helium" "enable" ] false;
   mullvadBrowserEnabled = get [ "desktop" "browser" "mullvadBrowser" "enable" ] false;
+  alacrittyEnabled = get [ "features" "terminals" "alacritty" "enable" ] true;
+  footEnabled = get [ "features" "terminals" "foot" "enable" ] true;
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
   noctaliaEnabled = get [ "desktop" "noctalia" "enable" ] false;
 
@@ -144,8 +146,6 @@ in
     packages =
       (with pkgs; [
         # General user tooling should be HM-managed.
-        alacritty
-        foot
         fuzzel
         wl-clipboard
         cliphist
@@ -173,6 +173,8 @@ in
         wget
         curl
       ])
+      ++ lib.optionals alacrittyEnabled [ pkgs.alacritty ]
+      ++ lib.optionals footEnabled [ pkgs.foot ]
       ++ lib.optionals (thunarEnabled && thunarPkg != null) [ thunarPkg ]
       ++ lib.optionals (thunarEnabled && xfconfPkg != null) [ xfconfPkg ]
       ++ lib.optionals (thunarEnabled && archiveManagerPkg != null) [ archiveManagerPkg ]

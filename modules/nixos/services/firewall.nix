@@ -1,6 +1,5 @@
 {
   lib,
-  config,
   ...
 }:
 {
@@ -29,7 +28,7 @@
   # │ tandesk│ 10400│ udp                      │ features.gaming.steam.remotePlay.openFirewall                    │
   # │ tandesk│ 10401│ udp                      │ features.gaming.steam.remotePlay.openFirewall                    │
   # │ tandesk│ 27031-27035│ udp range           │ features.gaming.steam.remotePlay.openFirewall                    │
-  # │ tandesk│ 53317│ tcp + udp                │ localsend in users.extraPackages (modules/nixos/services/localsend) │
+  # │ tandesk│ 53317│ tcp + udp                │ features.localsend.openFirewall (modules/nixos/services/localsend) │
   # └────────┴──────┴──────────────────────────┴──────────────────────────────────────────────────────────────────┘
   #
   # Notes:

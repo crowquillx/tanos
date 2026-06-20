@@ -1,15 +1,22 @@
 { lib, config, pkgs, ... }:
 let
-  v = config.tanos.variables;
-  get = path: default: lib.attrByPath path default v;
-  extraPackages = get [ "users" "extraPackages" ] [ ];
-  enabled = builtins.elem "mullvad-vpn" extraPackages;
+  cfg = config.tanos.variables.features.mullvad;
 in
 {
-  config = lib.mkIf enabled {
-    services.mullvad-vpn = {
-      enable = true;
-      package = lib.getAttr "mullvad-vpn" pkgs;
-    };
-  };
+  config = lib.mkMerge [
+    {
+      assertions = [
+        {
+          assertion = !cfg.service.enable || cfg.package == "gui";
+          message = "features.mullvad.service.enable requires features.mullvad.package = \"gui\".";
+        }
+      ];
+    }
+    (lib.mkIf cfg.service.enable {
+      services.mullvad-vpn = {
+        enable = true;
+        package = lib.getAttr "mullvad-vpn" pkgs;
+      };
+    })
+  ];
 }

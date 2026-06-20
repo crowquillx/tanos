@@ -81,7 +81,7 @@ Detailed command behavior and resolution logic: `docs/TCLI.md`.
 
 ## Installing New Apps
 
-Most user-facing apps in this repo should be installed through Home Manager by adding package names to the host's `users.extraPackages` list in `hosts/<host>/variables.nix`.
+Most user-facing apps in this repo should be installed through Home Manager by adding package names to the host's `users.extraPackages` list in `hosts/<host>/variables.nix`. Use dedicated feature variables where available, including LocalSend, Mullvad, browsers, editors, and terminals.
 
 Example:
 

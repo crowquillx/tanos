@@ -8,6 +8,11 @@
   get = path: default: lib.attrByPath path default v;
   codingToolsEnabled = get ["features" "codingTools" "enable"] true;
   editorsEnabled = get ["features" "codingTools" "editors" "enable"] codingToolsEnabled;
+  vscodeEnabled = editorsEnabled && get ["features" "codingTools" "editors" "vscode" "enable"] true;
+  antigravityEnabled = editorsEnabled && get ["features" "codingTools" "editors" "antigravity" "enable"] true;
+  t3codeEnabled = editorsEnabled && get ["features" "codingTools" "editors" "t3code" "enable"] true;
+  cursorEnabled = editorsEnabled && get ["features" "codingTools" "editors" "cursor" "enable"] true;
+  zedEnabled = editorsEnabled && get ["features" "codingTools" "editors" "zed" "enable"] true;
   aiCliEnabled = get ["features" "codingTools" "aiCli" "enable"] codingToolsEnabled;
   geminiEnabled = get ["features" "codingTools" "aiCli" "gemini" "enable"] aiCliEnabled;
   nixToolsEnabled = get ["features" "codingTools" "nixTools" "enable"] codingToolsEnabled;
@@ -55,7 +60,7 @@
 in {
   assertions = [
     {
-      assertion = !(editorsEnabled && vscodePkg == null);
+      assertion = !(vscodeEnabled && vscodePkg == null);
       message = "features.codingTools.editors.enable is true, but nixpkgs package 'vscode' could not be resolved.";
     }
     {
@@ -63,7 +68,7 @@ in {
       message = "features.codingTools.aiCli.gemini.enable is true, but nixpkgs package 'gemini-cli' (or gemini-cli-bin fallback) could not be resolved.";
     }
     {
-      assertion = !(editorsEnabled && antigravityPkg == null);
+      assertion = !(antigravityEnabled && antigravityPkg == null);
       message = "features.codingTools.editors.enable is true, but nixpkgs package 'antigravity-fhs' (preferred) or 'antigravity' could not be resolved.";
     }
     {
@@ -91,7 +96,7 @@ in {
       message = "features.codingTools.nixTools.enable is true, but no Nix language server (nixd or nil) could be resolved.";
     }
     {
-      assertion = !(editorsEnabled && t3DesktopPkg == null);
+      assertion = !(t3codeEnabled && t3DesktopPkg == null);
       message = "features.codingTools.editors.enable is true, but nixpkgs package 't3code' could not be resolved.";
     }
     {
@@ -103,35 +108,35 @@ in {
       message = "features.codingTools.aiCli.enable is true, but nixpkgs package 'skills' could not be resolved.";
     }
     {
-      assertion = !(editorsEnabled && cursorPkg == null);
+      assertion = !(cursorEnabled && cursorPkg == null);
       message = "features.codingTools.editors.enable is true, but nixpkgs package 'code-cursor' could not be resolved.";
     }
     {
-      assertion = !(editorsEnabled && cursorCliPkg == null);
+      assertion = !(cursorEnabled && cursorCliPkg == null);
       message = "features.codingTools.editors.enable is true, but nixpkgs package 'cursor-cli' could not be resolved.";
     }
   ];
 
   home.packages =
-    lib.optionals (editorsEnabled && vscodePkg != null) [vscodePkg]
+    lib.optionals (vscodeEnabled && vscodePkg != null) [vscodePkg]
     ++ lib.optionals (geminiEnabled && geminiCliPkg != null) [geminiCliPkg]
     ++ lib.optionals (aiCliEnabled && uvPkg != null) [uvPkg]
-    ++ lib.optionals (editorsEnabled && antigravityPkg != null) [antigravityPkg]
+    ++ lib.optionals (antigravityEnabled && antigravityPkg != null) [antigravityPkg]
     ++ lib.optionals (aiCliEnabled && bubblewrapPkg != null) [bubblewrapPkg]
     ++ lib.optionals (nixToolsEnabled && statixPkg != null) [statixPkg]
     ++ lib.optionals (nixToolsEnabled && deadnixPkg != null) [deadnixPkg]
     ++ lib.optionals (nixToolsEnabled && alejandraPkg != null) [alejandraPkg]
     ++ lib.optionals (nixToolsEnabled && nixfmtPkg != null) [nixfmtPkg]
     ++ lib.optionals (nixToolsEnabled && nixLspPkg != null) [nixLspPkg]
-    ++ lib.optionals (editorsEnabled && t3DesktopPkg != null) [t3DesktopPkg]
+    ++ lib.optionals (t3codeEnabled && t3DesktopPkg != null) [t3DesktopPkg]
     ++ lib.optionals (nixToolsEnabled && ghPkg != null) [ghPkg]
     ++ lib.optionals (aiCliEnabled && skillsPkg != null) [skillsPkg]
-    ++ lib.optionals (editorsEnabled && cursorPkg != null) [cursorPkg]
-    ++ lib.optionals (editorsEnabled && cursorCliPkg != null) [cursorCliPkg]
-    ++ lib.optionals (editorsEnabled && zedEditorPkg != null) [zedEditorPkg]
+    ++ lib.optionals (cursorEnabled && cursorPkg != null) [cursorPkg]
+    ++ lib.optionals (cursorEnabled && cursorCliPkg != null) [cursorCliPkg]
+    ++ lib.optionals (zedEnabled && zedEditorPkg != null) [zedEditorPkg]
     ++ lib.optionals (nixToolsEnabled && nilPkg != null) [nilPkg];
 
-  xdg.desktopEntries = lib.optionalAttrs (editorsEnabled && t3DesktopPkg != null) {
+  xdg.desktopEntries = lib.optionalAttrs (t3codeEnabled && t3DesktopPkg != null) {
     t3code = {
       name = "T3 Code";
       comment = "T3 Code desktop build";

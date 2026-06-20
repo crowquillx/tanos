@@ -45,9 +45,7 @@
       "yubikey-manager"
       "pinentry-bemenu"
       "qbittorrent"
-      "localsend"
       "proton-vpn"
-      "mullvad-vpn"
       "brave"
     ];
     git = {
@@ -191,10 +189,48 @@
       };
     };
 
+    swap = {
+      zram = {
+        enable = true;
+        memoryPercent = 25;
+      };
+      disk = {
+        enable = true;
+        path = "/var/lib/swapfile";
+        sizeMiB = 4096;
+      };
+      swappiness = 10;
+    };
+
+    nixMaintenance = {
+      gc.enable = false;
+      optimise = {
+        enable = true;
+        dates = "weekly";
+      };
+    };
+
+    localsend = {
+      package.enable = true;
+      openFirewall = true;
+    };
+
+    mullvad = {
+      package = "gui";
+      service.enable = true;
+    };
+
     audio.enable = true;
     codingTools = {
       enable = true;
-      editors.enable = true;
+      editors = {
+        enable = true;
+        vscode.enable = true;
+        antigravity.enable = true;
+        t3code.enable = true;
+        cursor.enable = true;
+        zed.enable = true;
+      };
       aiCli = {
         enable = true;
         codex = {
@@ -209,7 +245,11 @@
     mcp.nixos.enable = true;
     tailscale.enable = true;
     fileManager.thunar.enable = true;
-    terminals.kitty.enable = true;
+    terminals = {
+      alacritty.enable = true;
+      foot.enable = true;
+      kitty.enable = true;
+    };
     theme = {
       gtk = {
         enable = true;

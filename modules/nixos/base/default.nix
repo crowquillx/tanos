@@ -9,26 +9,35 @@ let
   get = path: default: lib.attrByPath path default v;
   primaryUser = get [ "users" "primary" ] "tan";
   fishEnabled = get [ "features" "shell" "fish" "enable" ] true;
+  maintenance = v.features.nixMaintenance;
 in
 {
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    extra-trusted-public-keys = [
-      "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
-      "comfyui.cachix.org-1:33mf9VzoIjzVbp0zwj+fT51HG0y31ZTK3nzYZAX0rec="
-      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-    extra-substituters = [
-      "https://noctalia.cachix.org"
-      "https://comfyui.cachix.org"
-      "https://cache.nixos-cuda.org"
-      "https://nix-community.cachix.org"
-    ];
-    auto-optimise-store = true;
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      extra-trusted-public-keys = [
+        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+        "comfyui.cachix.org-1:33mf9VzoIjzVbp0zwj+fT51HG0y31ZTK3nzYZAX0rec="
+        "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      ];
+      extra-substituters = [
+        "https://noctalia.cachix.org"
+        "https://comfyui.cachix.org"
+        "https://cache.nixos-cuda.org"
+        "https://nix-community.cachix.org"
+      ];
+      auto-optimise-store = false;
+    };
+    gc = {
+      automatic = maintenance.gc.enable;
+      inherit (maintenance.gc) dates options;
+    };
+    optimise = {
+      automatic = maintenance.optimise.enable;
+      inherit (maintenance.optimise) dates;
+    };
   };
-
-  nix.gc.automatic = false;
 
   time.timeZone = get [ "host" "timeZone" ] "America/Chicago";
   i18n.defaultLocale = get [ "host" "locale" ] "en_US.UTF-8";

@@ -9,11 +9,10 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `desktop.displayManager = "auto" | "sddm"`
 - `desktop.sddm.wayland.enable = true | false`
 - `desktop.sddm.background = <path> | null` (SDDM astronaut theme background image; uses the embedded theme default when `null`)
-- `desktop.browser.default = "firefox" | "zen" | "chrome" | "helium"`
-- `desktop.browser.<name>.enable = true | false` for `firefox`, `zen`, `chrome`, `helium`
-- `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, "focus-at-startup", transform = { rotation, flipped; }, "variable-refresh-rate" }; ... }`
+- `desktop.browser.default = "zen" | "helium" | "mullvadBrowser"`
+- `desktop.browser.<name>.enable = true | false` for `zen`, `helium`, and `mullvadBrowser`
+- `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, focusAtStartup, transform = { rotation, flipped; }, variableRefreshRate }; ... }`
 - `desktop.niri.settings = { ... }`
-- `desktop.niri.useWip = true | false` (switches niri input from stable to the WIP override target in `flake.nix`, currently `niri-wm/niri` PR `#3483`)
 - `desktop.noctalia = { enable, command, systemd.enable, assistantPanel.secrets, settings, colors, plugins, pluginSettings, userTemplates }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.enable32Bit = true | false`
@@ -34,7 +33,11 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.stylix = { enable, variant }`
 - `features.shell = { fish.enable, starship.enable }`
 - `features.nh = { enable, clean.enable, clean.extraArgs }`
-- `features.terminals.kitty.enable = true | false`
+- `features.swap = { zram.enable, zram.memoryPercent, disk.enable, disk.path, disk.sizeMiB, swappiness }`
+- `features.nixMaintenance = { gc.enable, gc.dates, gc.options, optimise.enable, optimise.dates }`
+- `features.localsend = { package.enable, openFirewall }`
+- `features.mullvad = { package = "none" | "cli" | "gui"; service.enable }`
+- `features.terminals.<name>.enable = true | false` for `alacritty`, `foot`, and `kitty`
 - `features.theme.gtk = { enable, iconTheme.name, iconTheme.package }`
 - `features.theme.qt.enable = true | false`
 - `features.zoxide.enable = true | false`
@@ -42,6 +45,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.portals.enable = true | false`
 - `features.codingTools.enable = true | false`
 - `features.codingTools.editors.enable = true | false`
+- `features.codingTools.editors.<name>.enable = true | false` for `vscode`, `antigravity`, `t3code`, `cursor`, and `zed`
 - `features.codingTools.aiCli.enable = true | false`
 - `features.codingTools.aiCli.codex.enable = true | false`
 - `features.codingTools.aiCli.codex.trustedDirectories = [ "<absolute-path>" ... ]` (directories pre-trusted in `config.toml` so codex doesn't try to persist trust at runtime; required because HM manages `~/.codex/config.toml` as a read-only store symlink)
@@ -163,7 +167,7 @@ desktop.niri = {
   outputs = {
     "eDP-1" = {
       scale = 2.0;
-      "focus-at-startup" = true;
+      focusAtStartup = true;
       position = {
         x = 0;
         y = 0;
@@ -232,6 +236,67 @@ features.nh = {
   };
 };
 ```
+
+NH cleanup remains the authoritative generation/store cleanup policy. Keep
+`features.nixMaintenance.gc.enable = false` unless a host deliberately needs a
+second cleanup scheduler. Store optimisation is separate: it deduplicates
+identical store files but does not delete paths or generations. The default
+uses scheduled optimisation instead of `nix.settings.auto-optimise-store`, so
+optimisation work is not added to every store write.
+
+### Swap and Nix maintenance
+
+```nix
+features = {
+  swap = {
+    zram = {
+      enable = true;
+      memoryPercent = 25;
+    };
+    disk = {
+      enable = true;
+      path = "/var/lib/swapfile";
+      sizeMiB = 4096;
+    };
+    swappiness = 10;
+  };
+
+  nixMaintenance = {
+    gc.enable = false; # NH clean owns cleanup.
+    optimise = {
+      enable = true;
+      dates = "weekly";
+    };
+  };
+};
+```
+
+Disk swap is explicit per host. Disable it for Btrfs layouts that do not
+support a swap file at the selected path, or declare a suitable swap device in
+the host hardware configuration. Hardware swap devices remain additive.
+
+### LocalSend and Mullvad
+
+```nix
+features = {
+  localsend = {
+    package.enable = true;
+    openFirewall = true;
+  };
+
+  mullvad = {
+    package = "gui";
+    service.enable = true;
+  };
+};
+```
+
+LocalSend is installed through Home Manager; `openFirewall` independently owns
+TCP and UDP port 53317. Mullvad `package = "cli"` installs `mullvad` without
+starting the system daemon. The daemon requires `package = "gui"` and uses
+`mullvad-vpn`, preventing both package variants from being installed together.
+Remove legacy `localsend`, `mullvad`, and `mullvad-vpn` entries from
+`users.extraPackages` when migrating to these variables.
 
 ### Flatpak
 
@@ -327,12 +392,13 @@ The SSH daemon is owned by `modules/nixos/services/ssh.nix` and is fully host-co
 | tandesk| 27040        | tcp            | `features.gaming.steam.localNetworkGameTransfers.openFirewall`  |
 | tandesk| 10400, 10401 | udp            | `features.gaming.steam.remotePlay.openFirewall`                 |
 | tandesk| 27031–27035  | udp range      | `features.gaming.steam.remotePlay.openFirewall`                 |
-| tandesk| 53317        | tcp + udp      | `localsend` in `users.extraPackages`                            |
+| tandesk| 53317        | tcp + udp      | `features.localsend.openFirewall`                               |
 
 Notes:
 
 - Steam ports only take effect where `features.gaming.enable = true` (tandesk). On tanvm/tanlappy gaming is disabled, so `features.gaming.steam.*.openFirewall` is inert and should be set `false` to reflect honest intent.
-- mullvad-vpn, ollama, open-webui, and comfyui bind to `127.0.0.1` and open no firewall ports.
+- The Mullvad daemon does not require a manually declared inbound firewall port.
+- ollama, open-webui, and comfyui bind to `127.0.0.1` and open no firewall ports.
 - ICMP echo (`allowPing`) is left at the NixOS default (`true`) for diagnostics; it is not a TCP/UDP port and can be tightened separately.
 - No interface-scoped restrictions are used: NetworkManager connection names and Wi-Fi/Ethernet/VPN/Tailscale interfaces vary, so narrowing to a guessed interface name would break LAN features non-deterministically.
 
