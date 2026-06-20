@@ -47,7 +47,7 @@
       "qbittorrent"
       "localsend"
       "proton-vpn"
-      "mullvad"
+      "mullvad-vpn"
       "brave"
     ];
     git = {
@@ -235,7 +235,7 @@
     };
     virtualisation = {
       vmHost = {
-        enable = false;
+        enable = true;
         spiceUSBRedirection.enable = true;
       };
       containers = {

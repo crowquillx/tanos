@@ -35,6 +35,16 @@ Home Manager is applied through the NixOS `home-manager` module (`home-manager.u
 
 This still uses one rebuild invocation and keeps Home Manager on the NixOS-integrated path.
 
+### `tcli check`
+
+Runs three pre-build validation checks:
+
+1. **statix check** — Nix lint on the flake directory.
+2. **Orphan module scan** — finds `.nix` files under `modules/nixos` and `modules/home` that are not referenced by any other `.nix` file (not in `stacks.nix`, not imported by a parent). Catches modules that exist but were never wired into the module stack.
+3. **nix flake check --no-build** — eval-only flake validation.
+
+Exits non-zero if any check fails. Safe to run before any build or switch.
+
 ### `tcli gc [-- <nh-args...>]`
 
 Runs:
@@ -59,6 +69,24 @@ Runs:
 
 - Runs:
   - `nh clean all [nh args...]`
+
+## Hardening features
+
+### Uncommitted-state guard (`switch`, `boot`, `test`, `update`)
+
+Before activating a system, `tcli` checks `git status --porcelain`. If the working tree has uncommitted changes, it prints a warning listing the dirty files and prompts for confirmation. This prevents activating a system built from state that could be lost, leaving future rebuilds with a different closure.
+
+### Closure-diff service summarizer (`build`, `switch`, `test`)
+
+After a successful build or activation, `tcli` runs `nix store diff-closures` between the old and new system and prints a focused summary of:
+- Closure size change
+- Added/removed systemd units (`unit-*.service`, `unit-*.socket`, `unit-*.timer`, `unit-*.target`)
+
+This makes unexpected service removals immediately visible instead of buried in the full `nh` diff table.
+
+### Git build context
+
+Before every `nh os` invocation, `tcli` prints the current git HEAD sha and uncommitted-file count, so you can see exactly what state the system is being built from.
 
 ## Resolution rules
 

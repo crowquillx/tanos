@@ -22,6 +22,7 @@
     ../nixos/services/nh.nix
     ../nixos/services/steam.nix
     ../nixos/services/virtualisation.nix
+    ../nixos/services/mullvad-vpn.nix
     ../nixos/services/ai.nix
     ../nixos/services/keyring.nix
     ../nixos/services/tailscale.nix
