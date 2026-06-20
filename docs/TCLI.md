@@ -45,6 +45,48 @@ Runs three pre-build validation checks:
 
 Exits non-zero if any check fails. Safe to run before any build or switch.
 
+### `tcli doctor [host]`
+
+Comprehensive diagnostic that checks:
+
+1. **Git status** — HEAD sha, branch, and uncommitted-file count.
+2. **Orphan module scan** — same as `tcli check`.
+3. **statix check** — Nix lint.
+4. **nix flake check --no-build** — eval-only flake validation.
+5. **Stale result link** — checks if `./result` exists, is not dangling, and matches the running system.
+6. **Host check** — compares the target host with the current hostname.
+7. **Running system sync** — evaluates the flake's expected toplevel path and compares it with `/run/current-system`. If they differ, the running system may have been built from uncommitted state that has since been lost.
+
+Exits non-zero if any check fails.
+
+### `tcli rollback`
+
+Rolls back to the previous system generation and activates it. This is the standard NixOS recovery path — no rebuild, just switches to a previously-built and previously-tested system closure.
+
+Runs:
+- `sudo nix-env -p /nix/var/nix/profiles/system --rollback`
+- `sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch`
+
+Shows a closure diff after activation.
+
+### `tcli gens`
+
+Lists all system generations with dates, kernel versions, and nixpkgs revisions. Pairs with `tcli rollback` for visibility into what has been activated.
+
+### `tcli why <pkg> [host]`
+
+Traces why a package is (or is not) in the system closure. Checks three sources:
+
+1. **`/run/current-system`** — why the running system depends on the package.
+2. **`./result` link** — why the last build depends on the package (if a result link exists).
+3. **Flake target** — why `.#nixosConfigurations.<host>` depends on the package.
+
+The package name is normalized to `nixpkgs#<name>` if no flake ref is present. Example: `tcli why mullvad-vpn`.
+
+### `tcli hosts`
+
+Lists all available hosts, marking the current one with `*`. A host is defined as a directory under `hosts/` that contains both `default.nix` and `variables.nix`.
+
 ### `tcli gc [-- <nh-args...>]`
 
 Runs:
@@ -72,17 +114,29 @@ Runs:
 
 ## Hardening features
 
+### `--force` / `-f` flag
+
+Skips the uncommitted-state confirmation prompt. Can be passed anywhere in the args before `--`. Example: `tcli --force switch` or `tcli rebuild build --force`.
+
 ### Uncommitted-state guard (`switch`, `boot`, `test`, `update`)
 
-Before activating a system, `tcli` checks `git status --porcelain`. If the working tree has uncommitted changes, it prints a warning listing the dirty files and prompts for confirmation. This prevents activating a system built from state that could be lost, leaving future rebuilds with a different closure.
+Before activating a system, `tcli` checks `git status --porcelain`. If the working tree has uncommitted changes, it prints a warning listing the dirty files and prompts for confirmation. This prevents activating a system built from state that could be lost, leaving future rebuilds with a different closure. Skip with `--force`.
 
-### Closure-diff service summarizer (`build`, `switch`, `test`)
+### Auto-statix before activation (`switch`, `boot`, `test`, `update`)
 
-After a successful build or activation, `tcli` runs `nix store diff-closures` between the old and new system and prints a focused summary of:
+Before activation, `tcli` runs `statix check` silently. If it fails, a warning is printed. This catches lint errors before a long build. Use `tcli check` for full details.
+
+### Closure-diff service summarizer (`build`, `switch`, `test`, `rollback`)
+
+After a successful build, activation, or rollback, `tcli` runs `nix store diff-closures` between the old and new system and prints a focused summary of:
 - Closure size change
 - Added/removed systemd units (`unit-*.service`, `unit-*.socket`, `unit-*.timer`, `unit-*.target`)
 
 This makes unexpected service removals immediately visible instead of buried in the full `nh` diff table.
+
+### Non-current host note
+
+When building for a host that does not match the current hostname, `tcli` prints a note so cross-host builds are intentional and visible.
 
 ### Git build context
 

@@ -9,6 +9,9 @@ let
     #!/usr/bin/env bash
     set -euo pipefail
 
+    # Global: set by --force/-f to skip dirty-tree confirmation.
+    FORCE=0
+
     usage() {
       cat <<'EOF'
     tcli - tanos helper for flake updates, rebuilds, and garbage collection
@@ -19,16 +22,27 @@ let
       tcli rebuild [switch|build|test|boot] [host]
       tcli update [host] [-- <nh-args...>]
       tcli upgrade [host] [-- <nh-args...>]
+      tcli rollback
+      tcli gens
+      tcli why <pkg> [host]
+      tcli doctor [host]
+      tcli hosts
       tcli check
       tcli gc [-- <nh-args...>]
       tcli nh os [switch|build|test|boot] [host] [-- <nh-args...>]
       tcli nh home [switch|build] [host] [-- <nh-args...>]
       tcli nh clean [-- <nh-args...>]
 
+    Flags:
+      --force, -f    Skip the uncommitted-state confirmation prompt.
+
     Hardening:
       - check:             statix lint + orphan module scan + nix flake check --no-build
+      - doctor:            full diagnostic: git sync, orphans, statix, flake eval, stale result
       - switch/boot/test:  warn if working tree has uncommitted changes
       - build/switch/test: show closure diff with added/removed service units
+      - switch/boot/test:  auto-run statix check before activation
+      - why:               trace why a package is (or is not) in the system closure
 
     Notes:
       - Host defaults to current hostname.
@@ -97,6 +111,16 @@ let
       fi
     }
 
+    # Print a note if building for a host that does not match the running machine.
+    print_host_note() {
+      local host="$1"
+      local current_host
+      current_host=$(resolve_host "")
+      if [[ "$host" != "$current_host" ]]; then
+        printf '==> NOTE: building for %s, but running on %s\n' "$host" "$current_host"
+      fi
+    }
+
     # After build/switch, show added/removed systemd units prominently.
     # This makes "one-line edit nuked 1 GiB of services" immediately obvious.
     summarize_closure_diff() {
@@ -129,6 +153,8 @@ let
     check_dirty_tree() {
       local flake_dir="$1"
 
+      [[ "$FORCE" -eq 1 ]] && return 0
+
       (cd "$flake_dir" && git rev-parse --is-inside-work-tree >/dev/null 2>&1) || return 0
 
       local dirty
@@ -155,6 +181,16 @@ let
         y|Y|yes|YES) ;;
         *) die "aborted by user" ;;
       esac
+    }
+
+    # Quick statix check before activation. Warns on failure, does not block.
+    auto_statix() {
+      local flake_dir="$1"
+      if command -v statix >/dev/null 2>&1; then
+        if ! statix check "$flake_dir" >/dev/null 2>&1; then
+          printf '  ! WARNING: statix check failed. Run tcli check for details.\n'
+        fi
+      fi
     }
 
     # Find .nix files under modules/ not referenced by any other .nix file.
@@ -230,11 +266,13 @@ let
 
       case "$action" in
         switch|boot|test)
+          auto_statix "$flake_ref"
           check_dirty_tree "$flake_ref"
           ;;
       esac
 
       print_git_context "$flake_ref"
+      print_host_note "$host"
       printf '==> nh os %s for host %s\n' "$action" "$host"
       printf '==> Home Manager is applied via NixOS module integration (single build path)\n'
       nh os "$action" "$flake_ref" -H "$host" "$@"
@@ -280,9 +318,11 @@ let
         old_system="$(readlink -f /run/current-system)"
       fi
 
+      auto_statix "$flake_ref"
       check_dirty_tree "$flake_ref"
 
       print_git_context "$flake_ref"
+      print_host_note "$host"
       printf '==> nh os switch --update for host %s\n' "$host"
       printf '==> Updating flake inputs through nh before activation\n'
       nh os switch "$flake_ref" -H "$host" --update "$@"
@@ -317,13 +357,230 @@ let
       nh home "$action" "$flake_ref" -c "$host" "$@"
     }
 
+    # Roll back to the previous system generation and activate it.
+    # This is the standard NixOS recovery path: no rebuild, just switches
+    # to a previously-built and previously-tested system closure.
+    run_rollback() {
+      local old_system=""
+      if [[ -e /run/current-system ]]; then
+        old_system="$(readlink -f /run/current-system)"
+      fi
+
+      printf '==> Rolling back to previous system generation\n'
+
+      # Roll the system profile to the previous generation.
+      if ! sudo nix-env -p /nix/var/nix/profiles/system --rollback; then
+        die "rollback failed: could not roll system profile"
+      fi
+
+      # Activate the rolled-back generation.
+      local new_system
+      new_system="$(readlink -f /nix/var/nix/profiles/system)"
+      printf '==> Activating %s\n' "$new_system"
+      sudo "$new_system/bin/switch-to-configuration" switch
+
+      summarize_closure_diff "$old_system" "$new_system"
+    }
+
+    # List all system generations with dates and nixpkgs revisions.
+    run_gens() {
+      printf '==> System generations\n\n'
+      nixos-rebuild list-generations 2>/dev/null || \
+        nix-env -p /nix/var/nix/profiles/system --list-generations
+    }
+
+    # Trace why a package is (or is not) in the system closure.
+    # Checks both the running system and the flake's target build.
+    run_why() {
+      local pkg="$1"
+      local host="$2"
+      local flake_ref="$3"
+
+      [[ -n "$pkg" ]] || die "why: package name required (e.g., tcli why mullvad-vpn)"
+
+      # Normalize to nixpkgs#<name> if no flake ref is present.
+      case "$pkg" in
+        *#*) ;;
+        *) pkg="nixpkgs#$pkg" ;;
+      esac
+
+      printf '==> Why does /run/current-system depend on %s?\n' "$pkg"
+      if [[ -e /run/current-system ]]; then
+        nix why-depends /run/current-system "$pkg" 2>&1 || \
+          printf '  (not found in running system)\n'
+      else
+        printf '  (no running system)\n'
+      fi
+
+      if [[ -L "$flake_ref/result" ]]; then
+        local built
+        built="$(readlink -f "$flake_ref/result" 2>/dev/null || true)"
+        if [[ -n "$built" && -e "$built" ]]; then
+          printf '\n==> Why does the last build (result link) depend on %s?\n' "$pkg"
+          nix why-depends "$built" "$pkg" 2>&1 || \
+            printf '  (not found in last build)\n'
+        fi
+      fi
+
+      printf '\n==> Why does .#nixosConfigurations.%s depend on %s?\n' "$host" "$pkg"
+      nix why-depends \
+        ".#nixosConfigurations.''${host}.config.system.build.toplevel" \
+        "$pkg" 2>&1 || \
+        printf '  (not found in flake target)\n'
+    }
+
+    # Comprehensive diagnostic: git sync, orphans, statix, flake eval,
+    # stale result link, host check, running system vs flake output.
+    run_doctor() {
+      local flake_dir="$1"
+      local host="$2"
+      local rc=0
+
+      printf '==> tcli doctor\n\n'
+
+      # 1. Git status
+      printf -- '--- git ---\n'
+      if (cd "$flake_dir" && git rev-parse --is-inside-work-tree >/dev/null 2>&1); then
+        local sha branch dirty_count
+        sha=$(cd "$flake_dir" && git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+        branch=$(cd "$flake_dir" && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached")
+        dirty_count=$(cd "$flake_dir" && git status --porcelain 2>/dev/null | wc -l || echo 0)
+        printf '  HEAD: %s (%s)\n' "$sha" "$branch"
+        if [[ "$dirty_count" -eq 0 ]]; then
+          printf '  working tree: clean\n'
+        else
+          printf '  working tree: %d uncommitted change(s)\n' "$dirty_count"
+        fi
+      else
+        printf '  not a git repository\n'
+      fi
+      printf '\n'
+
+      # 2. Orphan scan
+      printf -- '--- orphan modules ---\n'
+      scan_orphan_modules "$flake_dir" || rc=1
+      printf '\n'
+
+      # 3. Statix
+      printf -- '--- statix ---\n'
+      if command -v statix >/dev/null 2>&1; then
+        statix check "$flake_dir" && printf '  ok\n' || { printf '  issues found\n'; rc=1; }
+      else
+        printf '  statix not installed\n'
+      fi
+      printf '\n'
+
+      # 4. Flake check (eval only)
+      printf -- '--- nix flake check --no-build ---\n'
+      nix flake check "$flake_dir" --no-build && printf '  ok\n' || { printf '  eval failed\n'; rc=1; }
+      printf '\n'
+
+      # 5. Stale result link
+      printf -- '--- result link ---\n'
+      if [[ -L "$flake_dir/result" ]]; then
+        local result_target
+        result_target="$(readlink -f "$flake_dir/result" 2>/dev/null || true)"
+        if [[ -n "$result_target" && -e "$result_target" ]]; then
+          local current_system
+          current_system="$(readlink -f /run/current-system 2>/dev/null || true)"
+          if [[ "$result_target" == "$current_system" ]]; then
+            printf '  result -> %s (matches running system)\n' "$result_target"
+          else
+            printf '  result -> %s (stale: does not match running system)\n' "$result_target"
+          fi
+        else
+          printf '  result -> %s (dangling: target missing)\n' "''${result_target:-?}"
+        fi
+      else
+        printf '  no result link\n'
+      fi
+      printf '\n'
+
+      # 6. Host check
+      printf -- '--- host ---\n'
+      local current_host
+      current_host=$(resolve_host "")
+      printf '  current hostname: %s\n' "$current_host"
+      printf '  target host: %s\n' "$host"
+      if [[ "$current_host" != "$host" ]]; then
+        printf '  note: building for a different host than this machine\n'
+      fi
+      printf '\n'
+
+      # 7. Running system vs current flake output
+      printf -- '--- running system sync ---\n'
+      if [[ -e /run/current-system ]]; then
+        local expected_path
+        expected_path=$(nix eval --raw \
+          ".#nixosConfigurations.''${host}.config.system.build.toplevel.outPath" \
+          2>/dev/null || echo "")
+        if [[ -n "$expected_path" ]]; then
+          local running_path
+          running_path="$(readlink -f /run/current-system)"
+          if [[ "$expected_path" == "$running_path" ]]; then
+            printf '  running system matches current flake output\n'
+          else
+            printf '  WARNING: running system differs from current flake\n'
+            printf '    running:  %s\n' "$running_path"
+            printf '    flake:    %s\n' "$expected_path"
+            printf '    this may indicate the running system was built from\n'
+            printf '    uncommitted state that has since been lost\n'
+          fi
+        else
+          printf '  could not evaluate expected toplevel path\n'
+        fi
+      else
+        printf '  no running system found\n'
+      fi
+
+      printf '\n==> doctor %s\n' "$([[ $rc -eq 0 ]] && echo 'passed' || echo 'found issues')"
+      return "$rc"
+    }
+
+    # List available hosts, marking the current one.
+    run_hosts() {
+      local flake_dir="$1"
+      local current_host
+      current_host=$(resolve_host "")
+      printf 'Available hosts:\n'
+      local found=0
+      for d in "$flake_dir"/hosts/*/; do
+        [[ -d "$d" ]] || continue
+        local name
+        name=$(basename "$d")
+        # Skip hosts/common — it has no variables.nix.
+        [[ -f "$d/variables.nix" ]] || continue
+        if [[ "$name" == "$current_host" ]]; then
+          printf '  * %s (current)\n' "$name"
+        else
+          printf '    %s\n' "$name"
+        fi
+        found=$((found + 1))
+      done
+      [[ "$found" -eq 0 ]] && printf '  (none found)\n'
+    }
+
+    # Parse --force/-f from args before dispatching.
+    extract_force() {
+      local filtered=()
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --force|-f) FORCE=1 ;;
+          *) filtered+=("$1") ;;
+        esac
+        shift
+      done
+      set -- "''${filtered[@]}"
+    }
+
     main() {
+      extract_force "$@"
       local cmd="''${1-switch}"
       if [[ $# -gt 0 ]]; then
         shift || true
       fi
 
-      local flake_dir flake_ref host action nh_scope
+      local flake_dir flake_ref host action nh_scope pkg
       flake_dir="$(resolve_flake_dir)"
       flake_ref="''${flake_dir}"
 
@@ -362,6 +619,37 @@ let
           ;;
         check)
           run_check "$flake_dir"
+          ;;
+        doctor)
+          if [[ -n "''${1-}" && "$1" != "--" ]]; then
+            host="$(resolve_host "$1")"
+            shift || true
+          else
+            host="$(resolve_host "")"
+          fi
+          run_doctor "$flake_dir" "$host"
+          ;;
+        rollback)
+          run_rollback
+          ;;
+        gens)
+          run_gens
+          ;;
+        why)
+          pkg="''${1-}"
+          [[ -n "$pkg" ]] || die "why: package name required (e.g., tcli why mullvad-vpn)"
+          shift || true
+          if [[ -n "''${1-}" && "$1" != "--" ]]; then
+            host="$(resolve_host "$1")"
+            shift || true
+          else
+            host="$(resolve_host "")"
+          fi
+          [[ -d "''${flake_dir}/hosts/''${host}" ]] || die "unknown host ''${host} in ''${flake_dir}/hosts"
+          run_why "$pkg" "$host" "$flake_ref"
+          ;;
+        hosts)
+          run_hosts "$flake_dir"
           ;;
         update|upgrade)
           if [[ -n "''${1-}" && "$1" != "--" ]]; then
