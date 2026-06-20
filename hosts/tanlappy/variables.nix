@@ -75,7 +75,7 @@
     shellStartupCommand = null;
     startup.apps = [
       "spotify"
-      "equibop"
+      "sleep 5 && equibop"
     ];
     startup.backend = "niri";
   };
