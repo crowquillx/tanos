@@ -235,7 +235,11 @@
         enable = true;
         codex = {
           enable = true;
-          trustedDirectories = [ "/home/tan/tanos" ];
+          trustedDirectories = [
+            "/home/tan/tanos"
+            "/home/tan/REPOS"
+            "/home/tan/REPOS/Bloom"
+          ];
         };
         opencode.enable = true;
         gemini.enable = true;
