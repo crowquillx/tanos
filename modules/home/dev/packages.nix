@@ -15,16 +15,23 @@
   zedEnabled = editorsEnabled && get ["features" "codingTools" "editors" "zed" "enable"] true;
   aiCliEnabled = get ["features" "codingTools" "aiCli" "enable"] codingToolsEnabled;
   geminiEnabled = get ["features" "codingTools" "aiCli" "gemini" "enable"] aiCliEnabled;
+  droidEnabled = get ["features" "codingTools" "aiCli" "droid" "enable"] aiCliEnabled;
   nixToolsEnabled = get ["features" "codingTools" "nixTools" "enable"] codingToolsEnabled;
+
+  llmAgent = name: lib.attrByPath ["llm-agents" name] null pkgs;
 
   vscodePkg = lib.attrByPath ["vscode"] null pkgs;
   geminiCliPkg = let
+    llmPkg = llmAgent "gemini-cli";
     sourcePkg = lib.attrByPath ["gemini-cli"] null pkgs;
     binPkg = lib.attrByPath ["gemini-cli-bin"] null pkgs;
   in
-    if sourcePkg != null
+    if llmPkg != null
+    then llmPkg
+    else if sourcePkg != null
     then sourcePkg
     else binPkg;
+  droidPkg = llmAgent "droid";
   antigravityPkg = let
     fhsPkg = lib.attrByPath ["antigravity-fhs"] null pkgs;
     nativePkg = lib.attrByPath ["antigravity"] null pkgs;
@@ -65,7 +72,11 @@ in {
     }
     {
       assertion = !(geminiEnabled && geminiCliPkg == null);
-      message = "features.codingTools.aiCli.gemini.enable is true, but nixpkgs package 'gemini-cli' (or gemini-cli-bin fallback) could not be resolved.";
+      message = "features.codingTools.aiCli.gemini.enable is true, but package 'gemini-cli' could not be resolved from llm-agents.nix, nixpkgs, or gemini-cli-bin fallback.";
+    }
+    {
+      assertion = !(droidEnabled && droidPkg == null);
+      message = "features.codingTools.aiCli.droid.enable is true, but package 'droid' could not be resolved from llm-agents.nix.";
     }
     {
       assertion = !(antigravityEnabled && antigravityPkg == null);
@@ -120,6 +131,7 @@ in {
   home.packages =
     lib.optionals (vscodeEnabled && vscodePkg != null) [vscodePkg]
     ++ lib.optionals (geminiEnabled && geminiCliPkg != null) [geminiCliPkg]
+    ++ lib.optionals (droidEnabled && droidPkg != null) [droidPkg]
     ++ lib.optionals (aiCliEnabled && uvPkg != null) [uvPkg]
     ++ lib.optionals (antigravityEnabled && antigravityPkg != null) [antigravityPkg]
     ++ lib.optionals (aiCliEnabled && bubblewrapPkg != null) [bubblewrapPkg]

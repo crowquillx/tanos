@@ -12,8 +12,18 @@
   codexEnabled = get ["features" "codingTools" "aiCli" "codex" "enable"] aiCliEnabled;
   opencodeEnabled = get ["features" "codingTools" "aiCli" "opencode" "enable"] aiCliEnabled;
   nixosMcpEnabled = get ["features" "mcp" "nixos" "enable"] aiCliEnabled;
+
+  llmAgent = name: lib.attrByPath ["llm-agents" name] null pkgs;
+
+  # Prefer llm-agents.nix for codex because it tracks upstream closely.
+  codexPkg = let
+    llmPkg = llmAgent "codex";
+  in
+    if llmPkg != null then llmPkg else lib.attrByPath ["codex"] null pkgs;
+  # Keep opencode from nixpkgs: llm-agents.nix's opencode is a different
+  # project (anomalyco/opencode) than the one the Home Manager module
+  # configures (opencode.sh/opencode.com).
   opencodePkg = lib.attrByPath ["opencode"] null pkgs;
-  codexPkg = lib.attrByPath ["codex"] null pkgs;
 
   codexTrustedDirs = get ["features" "codingTools" "aiCli" "codex" "trustedDirectories"] [];
   codexModel = get ["features" "codingTools" "aiCli" "codex" "model"] "gpt-5.5";

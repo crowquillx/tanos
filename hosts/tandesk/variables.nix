@@ -243,6 +243,7 @@
         };
         opencode.enable = true;
         gemini.enable = true;
+        droid.enable = true;
       };
       nixTools.enable = true;
     };

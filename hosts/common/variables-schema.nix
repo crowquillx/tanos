@@ -216,6 +216,28 @@ in
                 };
                 default = { };
               };
+              aiCli = mkOption {
+                type = looseSubmodule {
+                  enable = enableOption "Enable AI CLI agents." true;
+                  codex = mkOption {
+                    type = packageToggle "OpenAI Codex CLI";
+                    default = { };
+                  };
+                  opencode = mkOption {
+                    type = packageToggle "OpenCode CLI";
+                    default = { };
+                  };
+                  gemini = mkOption {
+                    type = packageToggle "Gemini CLI";
+                    default = { };
+                  };
+                  droid = mkOption {
+                    type = packageToggle "Factory AI Droid";
+                    default = { };
+                  };
+                };
+                default = { };
+              };
             };
             default = { };
           };

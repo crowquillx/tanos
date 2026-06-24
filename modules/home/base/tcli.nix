@@ -11,6 +11,8 @@ let
 
     # Global: set by --force/-f to skip dirty-tree confirmation.
     FORCE=0
+    # Global: set by --accept-flake-config to trust flake nixConfig.
+    ACCEPT_FLAKE_CONFIG=0
 
     usage() {
       cat <<'EOF'
@@ -34,7 +36,8 @@ let
       tcli nh clean [-- <nh-args...>]
 
     Flags:
-      --force, -f    Skip the uncommitted-state confirmation prompt.
+      --force, -f              Skip the uncommitted-state confirmation prompt.
+      --accept-flake-config    Trust flake-configured substituters and public keys.
 
     Hardening:
       - check:             statix lint + orphan module scan + nix flake check --no-build
@@ -243,7 +246,9 @@ let
       scan_orphan_modules "$flake_dir" || rc=1
 
       printf '==> nix flake check --no-build\n'
-      nix flake check "$flake_dir" --no-build || rc=1
+      local nix_args=()
+      mapfile -t nix_args < <(nix_extra_args)
+      nix flake check "$flake_dir" --no-build "''${nix_args[@]}" || rc=1
 
       return "$rc"
     }
@@ -275,7 +280,9 @@ let
       print_host_note "$host"
       printf '==> nh os %s for host %s\n' "$action" "$host"
       printf '==> Home Manager is applied via NixOS module integration (single build path)\n'
-      nh os "$action" "$flake_ref" -H "$host" "$@"
+      local extra_args=()
+      mapfile -t extra_args < <(build_nh_extra_args "$@")
+      nh os "$action" "$flake_ref" -H "$host" "''${extra_args[@]}"
       local nh_rc=$?
 
       if [[ $nh_rc -eq 0 ]]; then
@@ -325,7 +332,9 @@ let
       print_host_note "$host"
       printf '==> nh os switch --update for host %s\n' "$host"
       printf '==> Updating flake inputs through nh before activation\n'
-      nh os switch "$flake_ref" -H "$host" --update "$@"
+      local extra_args=()
+      mapfile -t extra_args < <(build_nh_extra_args "$@")
+      nh os switch "$flake_ref" -H "$host" --update "''${extra_args[@]}"
       local nh_rc=$?
 
       if [[ $nh_rc -eq 0 ]]; then
@@ -354,7 +363,9 @@ let
       esac
 
       printf '==> nh home %s for host %s\n' "$action" "$host"
-      nh home "$action" "$flake_ref" -c "$host" "$@"
+      local extra_args=()
+      mapfile -t extra_args < <(build_nh_extra_args "$@")
+      nh home "$action" "$flake_ref" -c "$host" "''${extra_args[@]}"
     }
 
     # Roll back to the previous system generation and activate it.
@@ -423,7 +434,9 @@ let
       fi
 
       printf '\n==> Why does .#nixosConfigurations.%s depend on %s?\n' "$host" "$pkg"
-      nix why-depends \
+      local nix_args=()
+      mapfile -t nix_args < <(nix_extra_args)
+      nix why-depends "''${nix_args[@]}" \
         ".#nixosConfigurations.''${host}.config.system.build.toplevel" \
         "$pkg" 2>&1 || \
         printf '  (not found in flake target)\n'
@@ -472,7 +485,9 @@ let
 
       # 4. Flake check (eval only)
       printf -- '--- nix flake check --no-build ---\n'
-      nix flake check "$flake_dir" --no-build && printf '  ok\n' || { printf '  eval failed\n'; rc=1; }
+      local nix_args=()
+      mapfile -t nix_args < <(nix_extra_args)
+      nix flake check "$flake_dir" --no-build "''${nix_args[@]}" && printf '  ok\n' || { printf '  eval failed\n'; rc=1; }
       printf '\n'
 
       # 5. Stale result link
@@ -511,7 +526,9 @@ let
       printf -- '--- running system sync ---\n'
       if [[ -e /run/current-system ]]; then
         local expected_path
-        expected_path=$(nix eval --raw \
+        local nix_args=()
+        mapfile -t nix_args < <(nix_extra_args)
+        expected_path=$(nix eval --raw "''${nix_args[@]}" \
           ".#nixosConfigurations.''${host}.config.system.build.toplevel.outPath" \
           2>/dev/null || echo "")
         if [[ -n "$expected_path" ]]; then
@@ -560,12 +577,13 @@ let
       [[ "$found" -eq 0 ]] && printf '  (none found)\n'
     }
 
-    # Parse --force/-f from args before dispatching.
-    extract_force() {
+    # Parse global flags from args before dispatching.
+    extract_global_flags() {
       local filtered=()
       while [[ $# -gt 0 ]]; do
         case "$1" in
           --force|-f) FORCE=1 ;;
+          --accept-flake-config) ACCEPT_FLAKE_CONFIG=1 ;;
           *) filtered+=("$1") ;;
         esac
         shift
@@ -573,8 +591,31 @@ let
       set -- "''${filtered[@]}"
     }
 
+    # Build an array of extra args for `nh` commands, inserting
+    # --accept-flake-config after the nh/-- separator when requested.
+    build_nh_extra_args() {
+      local accept_args=()
+      if [[ "$ACCEPT_FLAKE_CONFIG" -eq 1 ]]; then
+        accept_args=("--accept-flake-config")
+      fi
+      if [[ $# -eq 0 ]]; then
+        printf '%s\n' "--" "''${accept_args[@]}"
+      elif [[ "$1" == "--" ]]; then
+        printf '%s\n' "--" "''${accept_args[@]}" "''${@:2}"
+      else
+        printf '%s\n' "$@" "--" "''${accept_args[@]}"
+      fi
+    }
+
+    # Extra args for plain `nix` commands (flake check, eval, why-depends).
+    nix_extra_args() {
+      if [[ "$ACCEPT_FLAKE_CONFIG" -eq 1 ]]; then
+        printf '%s\n' "--accept-flake-config"
+      fi
+    }
+
     main() {
-      extract_force "$@"
+      extract_global_flags "$@"
       local cmd="''${1-switch}"
       if [[ $# -gt 0 ]]; then
         shift || true

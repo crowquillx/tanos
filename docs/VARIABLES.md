@@ -54,6 +54,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.codingTools.aiCli.codex.planModeReasoningEffort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh"` (defaults to `high`)
 - `features.codingTools.aiCli.opencode.enable = true | false`
 - `features.codingTools.aiCli.gemini.enable = true | false`
+- `features.codingTools.aiCli.droid.enable = true | false`
 - `features.codingTools.nixTools.enable = true | false`
 - `features.mcp.nixos.enable = true | false`
 - `features.tailscale = { enable, exitNode }`

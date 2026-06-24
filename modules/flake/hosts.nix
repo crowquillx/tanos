@@ -107,6 +107,9 @@
     });
   };
 
+  # Use llm-agents.nix's default overlay so packages come from its binary
+  # cache instead of being rebuilt against our nixpkgs revision.
+  llmAgentsOverlay = lib.attrByPath ["llm-agents" "overlays" "default"] null inputs;
   sharedOverlays = vars:
     lib.optionals (niriOverlay != null) [niriOverlay]
     ++ lib.optional (millenniumEnabled vars) inputs.millennium.overlays.default
@@ -114,7 +117,8 @@
       inputs.cheatengine-flake.overlays.default
       cheatengineShimOverlay
     ]
-    ++ lib.optionals (nixosMcpEnabled vars) [mcpNixosOverlay];
+    ++ lib.optionals (nixosMcpEnabled vars) [mcpNixosOverlay]
+    ++ lib.optional (llmAgentsOverlay != null) llmAgentsOverlay;
   sharedHomeModules = vars:
     lib.optionals (niriHmConfigModule != null) [niriHmConfigModule]
     ++ lib.optionals (noctaliaHmModule != null) [noctaliaHmModule];
