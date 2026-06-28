@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   inputs,
   vars,
   ...
@@ -76,6 +77,7 @@ let
   context = {
     inherit
       lib
+      pkgs
       vars
       inputs
       node

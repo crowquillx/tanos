@@ -20,9 +20,22 @@ let
   ];
   startupBackend = get [ "desktop" "startup" "backend" ] "systemd";
   startupApps = get [ "desktop" "startup" "apps" ] defaultStartupApps;
+  chatClient = get [ "features" "chat" "client" ] "none";
+  chatStartupEnable = get [ "features" "chat" "startup" "enable" ] (chatClient != "none");
+  equicordEnabled = get [ "features" "chat" "discord" "equicord" "enable" ] false;
+  chatCommands =
+    if chatClient == "discord" then
+      [ "sleep 5 && discord" ]
+    else if chatClient == "equibop" then
+      [ "sleep 5 && equibop" ]
+    else
+      [ ];
+  effectiveStartupApps =
+    startupApps
+    ++ lib.optionals chatStartupEnable chatCommands;
   effectiveShellStartupCommand = startupCommand;
   shellStartupEnable = effectiveShellStartupCommand != null;
-  appStartupEnable = startupApps != [ ];
+  appStartupEnable = effectiveStartupApps != [ ];
   appStartupSystemdEnable = appStartupEnable && startupBackend == "systemd";
 
   mkStartupService = index: command: {
@@ -44,7 +57,7 @@ let
     };
   };
 
-  startupAppServices = builtins.listToAttrs (lib.imap0 mkStartupService startupApps);
+  startupAppServices = builtins.listToAttrs (lib.imap0 mkStartupService effectiveStartupApps);
 
   lockScript = pkgs.writeShellScript "tanos-lock-session" ''
     exec ${lockCommand}
@@ -87,6 +100,10 @@ in
         {
           assertion = builtins.elem startupBackend [ "systemd" "niri" ];
           message = "desktop.startup.backend must be one of: systemd, niri.";
+        }
+        {
+          assertion = !equicordEnabled || chatClient == "discord";
+          message = "features.chat.discord.equicord.enable requires features.chat.client = \"discord\"; Equicord cannot be used with Equibop.";
         }
         {
           assertion = !(appStartupEnable && startupBackend == "niri") || compositor == "niri";

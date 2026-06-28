@@ -152,6 +152,43 @@ in
             default = { };
           };
 
+          chat = mkOption {
+            type = looseSubmodule {
+              client = mkOption {
+                type = types.enum [ "none" "discord" "equibop" ];
+                default = "none";
+                description = "Chat client package and Niri mute integration.";
+              };
+              startup = mkOption {
+                type = looseSubmodule {
+                  enable = enableOption "Start the selected chat client with the desktop session." true;
+                };
+                default = { };
+              };
+              discord = mkOption {
+                type = looseSubmodule {
+                  forceXwayland =
+                    enableOption
+                      "Run official Discord through XWayland so Discord's keybind recorder can receive focused key events."
+                      true;
+                  equicord = mkOption {
+                    type = looseSubmodule {
+                      enable = enableOption "Patch the official Discord package with Equicord." false;
+                      startupDelaySeconds = mkOption {
+                        type = types.ints.unsigned;
+                        default = 4;
+                        description = "Deprecated; Equicord is applied at build time rather than run before Discord.";
+                      };
+                    };
+                    default = { };
+                  };
+                };
+                default = { };
+              };
+            };
+            default = { };
+          };
+
           mullvad = mkOption {
             type = looseSubmodule {
               package = mkOption {

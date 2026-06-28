@@ -1,8 +1,14 @@
 { plain, leaf, flag, rgbaApps, vars ? { }, ... }:
 let
-  equibopElectronMatch = {
+  discordElectronMatch = {
     app-id = "(?i)^electron$";
     title = "(?i)^.*discord.*$";
+  };
+  discordAppMatch = {
+    app-id = "(?i)^(discord|com\\.discordapp\\.Discord)$";
+  };
+  equibopAppMatch = {
+    app-id = "(?i)^equibop$";
   };
   hostName = vars.host.name or "";
   isTandesk = hostName == "tandesk";
@@ -11,9 +17,10 @@ let
     (leaf "open-on-output" "DP-2")
     (leaf "open-maximized" true)
   ];
-  equibopRule = plain "window-rule" [
-    (leaf "match" { app-id = "(?i)^equibop$"; })
-    (leaf "match" equibopElectronMatch)
+  chatRule = plain "window-rule" [
+    (leaf "match" discordAppMatch)
+    (leaf "match" equibopAppMatch)
+    (leaf "match" discordElectronMatch)
     (leaf "open-on-output" "DP-1")
     (leaf "open-maximized" true)
   ];
@@ -58,7 +65,7 @@ in
     (leaf "match" { app-id = rgbaApps.chats; })
     (leaf "match" { app-id = rgbaApps.editors; })
     (leaf "match" { app-id = rgbaApps.mediaPlayers; })
-    (leaf "match" equibopElectronMatch)
+    (leaf "match" discordElectronMatch)
     (leaf "opacity" 0.90)
     (leaf "draw-border-with-background" false)
     (plain "background-effect" [
@@ -73,7 +80,7 @@ in
     (leaf "match" { app-id = rgbaApps.chats; is-focused = true; })
     (leaf "match" { app-id = rgbaApps.editors; is-focused = true; })
     (leaf "match" { app-id = rgbaApps.mediaPlayers; is-focused = true; })
-    (leaf "match" (equibopElectronMatch // { is-focused = true; }))
+    (leaf "match" (discordElectronMatch // { is-focused = true; }))
     (leaf "opacity" 0.96)
   ])
 
@@ -99,7 +106,7 @@ in
     (leaf "min-height" 225)
   ])
 
-  (if isTandesk then equibopRule else null)
+  (if isTandesk then chatRule else null)
 
   (if isTandesk then spotifyRule else null)
 

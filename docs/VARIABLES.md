@@ -35,6 +35,7 @@ Primary host configuration is in `hosts/<host>/variables.nix`.
 - `features.nh = { enable, clean.enable, clean.extraArgs }`
 - `features.swap = { zram.enable, zram.memoryPercent, disk.enable, disk.path, disk.sizeMiB, swappiness }`
 - `features.nixMaintenance = { gc.enable, gc.dates, gc.options, optimise.enable, optimise.dates }`
+- `features.chat = { client = "none" | "discord" | "equibop"; startup.enable; discord.forceXwayland; discord.equicord = { enable; startupDelaySeconds; } }`
 - `features.localsend = { package.enable, openFirewall }`
 - `features.mullvad = { package = "none" | "cli" | "gui"; service.enable }`
 - `features.terminals.<name>.enable = true | false` for `alacritty`, `foot`, and `kitty`
@@ -140,7 +141,6 @@ desktop.startup = {
   apps = [
     "wl-paste --watch cliphist store"
     "spotify"
-    "equibop"
   ];
 };
 ```
@@ -154,12 +154,29 @@ desktop.startup = {
   backend = "niri";
   apps = [
     "spotify"
-    "equibop"
   ];
 };
 ```
 
 This uses Niri `spawn-at-startup`, so the apps start when the session starts but are not bounced by Home Manager user-service reloads during rebuilds.
+Use `features.chat.startup.enable` to start the selected chat client instead of adding it directly to `desktop.startup.apps`.
+
+### Chat client and Niri mute
+
+```nix
+features.chat = {
+  client = "discord";
+  startup.enable = true;
+  discord = {
+    forceXwayland = true;
+    equicord = {
+      enable = false;
+    };
+  };
+};
+```
+
+`client = "discord"` installs the official Discord package and binds `MouseForward` in Niri to a PipeWire microphone mute toggle using `wpctl`. This mutes the default microphone source system-wide, so Discord's in-app mute indicator may not change. `discord.forceXwayland = true` wraps Discord so its keybind recorder can receive focused key events under Niri if you still want to configure Discord keybinds. `discord.equicord.enable = true` patches the official Discord package with Equicord at build time; Equicord does not provide a runnable `equicord` binary. `client = "equibop"` installs Equibop and uses `equibop --toggle-mic` for the same Niri bind; Equicord is rejected with Equibop.
 
 ### Niri monitor configuration
 

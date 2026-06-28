@@ -127,8 +127,10 @@ If you want an installed app to launch automatically in your session, add its co
 ```nix
 desktop.startup.apps = [
   "spotify"
-  "equibop"
 ];
+
+features.chat.client = "discord";
+features.chat.startup.enable = true;
 ```
 
 ## Documentation

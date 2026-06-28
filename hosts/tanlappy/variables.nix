@@ -20,7 +20,6 @@
   users = {
     primary = "tan";
     extraPackages = [
-      "equibop"
       "spotify"
       "mpv"
       "pywalfox-native"
@@ -74,7 +73,6 @@
     shellStartupCommand = null;
     startup.apps = [
       "spotify"
-      "sleep 5 && equibop"
     ];
     startup.backend = "niri";
   };
@@ -122,6 +120,18 @@
     localsend = {
       package.enable = false;
       openFirewall = false;
+    };
+
+    chat = {
+      client = "discord";
+      startup.enable = true;
+      discord = {
+        forceXwayland = true;
+        equicord = {
+          enable = false;
+          startupDelaySeconds = 4;
+        };
+      };
     };
 
     mullvad = {

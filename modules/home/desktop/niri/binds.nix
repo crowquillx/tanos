@@ -1,7 +1,43 @@
-{ lib, vars, node, leaf, flag, ... }:
+{
+  lib,
+  pkgs,
+  vars,
+  node,
+  leaf,
+  flag,
+  ...
+}:
 let
   get = path: default: lib.attrByPath path default vars;
   noctaliaCommand = get [ "desktop" "noctalia" "command" ] "noctalia";
+  chatClient = get [ "features" "chat" "client" ] "none";
+  microphoneMuteScript = pkgs.writeShellApplication {
+    name = "tanos-toggle-microphone-mute";
+    runtimeInputs = [
+      pkgs.libnotify
+      pkgs.wireplumber
+    ];
+    text = ''
+      set -euo pipefail
+
+      source="@DEFAULT_AUDIO_SOURCE@"
+
+      wpctl set-mute "$source" toggle
+
+      if wpctl get-volume "$source" | grep -q '\[MUTED\]'; then
+        notify-send "Microphone" "Muted"
+      else
+        notify-send "Microphone" "Unmuted"
+      fi
+    '';
+  };
+  chatMuteAction =
+    if chatClient == "equibop" then
+      [ (leaf "spawn" [ "equibop" "--toggle-mic" ]) ]
+    else if chatClient != "none" then
+      [ (leaf "spawn" [ "${microphoneMuteScript}/bin/tanos-toggle-microphone-mute" ]) ]
+    else
+      [ (leaf "spawn" [ "notify-send" "Chat mute" "No chat client is configured." ]) ];
 in
 [
   (node "binds" [ ] [
@@ -42,9 +78,7 @@ in
     (node "Mod+Shift+Z" { "hotkey-overlay-title" = "Mullvad Browser"; } [
       (leaf "spawn" [ "mullvad-browser" ])
     ])
-    (node "MouseForward" { "hotkey-overlay-title" = "Equibop: Toggle"; } [
-      (leaf "spawn" [ "equibop" "--toggle-mic" ])
-    ])
+    (node "MouseForward" { "hotkey-overlay-title" = "Chat: Toggle Mute"; } chatMuteAction)
     (node "Super+B" { "hotkey-overlay-title" = "Assistant Panel: Toggle"; } [
       (leaf "spawn-sh" "${noctaliaCommand} msg panel-toggle control-center")
     ])
