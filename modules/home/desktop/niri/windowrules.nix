@@ -94,7 +94,6 @@ in
 
   (plain "window-rule" [
     (leaf "match" { app-id = "^thunar$"; })
-    (leaf "opacity" 0.95)
     (leaf "open-floating" true)
     (leaf "min-width" 450)
     (leaf "min-height" 225)

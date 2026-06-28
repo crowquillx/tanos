@@ -11,8 +11,8 @@ let
 
     # Global: set by --force/-f to skip dirty-tree confirmation.
     FORCE=0
-    # Global: set by --accept-flake-config to trust flake nixConfig.
-    ACCEPT_FLAKE_CONFIG=0
+    # Global: trust repo-declared cache settings by default.
+    ACCEPT_FLAKE_CONFIG=1
 
     usage() {
       cat <<'EOF'
@@ -37,7 +37,7 @@ let
 
     Flags:
       --force, -f              Skip the uncommitted-state confirmation prompt.
-      --accept-flake-config    Trust flake-configured substituters and public keys.
+      --accept-flake-config    Trust flake-configured substituters and public keys (default).
 
     Hardening:
       - check:             statix lint + orphan module scan + nix flake check --no-build
@@ -140,7 +140,7 @@ let
 
       printf '\n==> Closure diff (service units)\n'
 
-      echo "$diff_output" | grep -iE 'Size:' | head -1 | sed 's/^[[:space:]]*/  /'
+      echo "$diff_output" | grep -iE '^SIZE[[:space:]]*:|Size:' | head -1 | sed 's/^[[:space:]]*/  /' || true
 
       local units
       units=$(echo "$diff_output" | grep -E 'unit-.*\.(service|socket|timer|target)' || true)
@@ -190,9 +190,12 @@ let
     auto_statix() {
       local flake_dir="$1"
       if command -v statix >/dev/null 2>&1; then
-        if ! statix check "$flake_dir" >/dev/null 2>&1; then
-          printf '  ! WARNING: statix check failed. Run tcli check for details.\n'
-        fi
+        local output=""
+        output="$(statix check "$flake_dir" 2>&1)" || {
+          printf '  ! WARNING: statix check failed. Run `tcli check` for details.\n'
+          # Show the first few lines of statix output to make debugging easier.
+          printf '%s\n' "$output" | head -5 | sed 's/^/      /'
+        }
       fi
     }
 
