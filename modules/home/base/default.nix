@@ -194,6 +194,7 @@ in
     home-manager.enable = true;
     git = {
       enable = true;
+      settings.push.autoSetupRemote = true;
     }
     // lib.optionalAttrs (gitUserName != null && gitUserEmail != null) {
       settings.user = {
