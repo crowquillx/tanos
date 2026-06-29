@@ -65,10 +65,6 @@
         beforeSleep = true;
         onLidClose = true;
       };
-      idle = {
-        screenOffSeconds = 600;
-        suspendSeconds = null;
-      };
     };
     shellStartupCommand = null;
     startup.apps = [

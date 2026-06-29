@@ -158,5 +158,5 @@ features.chat.startup.enable = true;
   - The NixOS module keeps `niri-flake.cache.enable = true`, so `niri.cachix.org` is used by default.
   - Per-host monitor layout lives under `desktop.niri.outputs` in `hosts/<host>/variables.nix`.
 - Noctalia setup:
-  - Noctalia is managed through Home Manager with `programs.noctalia-shell.systemd.enable = true`.
-  - Per-host Noctalia settings live under `desktop.noctalia` in `hosts/<host>/variables.nix`.
+  - Noctalia is managed through Home Manager with `programs.noctalia`.
+  - Per-host Noctalia toggles live under `desktop.noctalia` in `hosts/<host>/variables.nix`.

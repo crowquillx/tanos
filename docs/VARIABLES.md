@@ -25,7 +25,7 @@ scalar values.
 - `desktop.browser.<name>.enable = true | false` for `zen`, `helium`, and `mullvadBrowser`
 - `desktop.niri.outputs = { "<output-name>" = { scale, position = { x, y; }, mode = { width, height, refresh; }, focusAtStartup, transform = { rotation, flipped; }, variableRefreshRate }; ... }`
 - `desktop.niri.settings = { ... }`
-- `desktop.noctalia = { enable, command, systemd.enable, assistantPanel.secrets, settings, colors, plugins, pluginSettings, userTemplates }`
+- `desktop.noctalia = { enable, command, systemd.enable, assistantPanel.secrets }`
 - `graphics.profile = "auto" | "none" | "amd" | "intel" | "nvidia" | "vm"`
 - `graphics.enable32Bit = true | false`
 - `graphics.nvidia = { modesetting.enable, powerManagement.enable, open, nvidiaSettings, useLatestDriver }`
@@ -38,7 +38,6 @@ scalar values.
 - `desktop.session.polkit.enable = true | false`
 - `desktop.session.keyring.enable = true | false`
 - `desktop.session.lock = { enable, command, idleSeconds, beforeSleep, onLidClose }`
-- `desktop.session.idle = { screenOffSeconds, suspendSeconds }` (`suspendSeconds = null` disables auto-suspend while keeping lock and screen-off)
 - `users.git = { name, email }`
 - `users.extraPackages = [ "pkgName" "python3Packages.pip" ... ]`
 - `desktop.enable = true | false`
@@ -230,24 +229,16 @@ desktop = {
 ```nix
 desktop.noctalia = {
   enable = true;
-  command = "noctalia-shell";
-  systemd.enable = true;
+  command = "tanos-noctalia-shell";
+  systemd.enable = false;
   assistantPanel.secrets = {
     googleApiKey = "noctalia-ap-google-api-key";
   };
-  settings = { };
-  colors = { };
-  plugins = { };
-  pluginSettings = { };
-  userTemplates = { };
 };
 ```
 
-This is passed directly to Home Manager's `programs.noctalia-shell.*` options, so the shell stays fully HM-managed.
-When `desktop.noctalia.command` is set to a wrapper such as `tanos-noctalia-shell`, Niri startup and Noctalia IPC keybinds will use that command instead of plain `noctalia-shell`.
-On Noctalia-enabled Niri hosts, Noctalia is also the idle manager. Use `desktop.session.lock.command`, `desktop.session.lock.idleSeconds`, `desktop.session.idle.screenOffSeconds`, and `desktop.session.idle.suspendSeconds` as the source of truth instead of configuring `swayidle`. Set `desktop.session.idle.suspendSeconds = null` if you want lock + screen-off with no automatic suspend.
-
-For per-monitor wallpaper rotation, set `desktop.noctalia.settings.wallpaper.setWallpaperOnAllMonitors = false;` and keep `wallpaperChangeMode = "random"`.
+This enables Home Manager's current `programs.noctalia.*` module. Only `enable` and `systemd.enable` are forwarded directly; `desktop.noctalia.command` is used by Niri startup and Noctalia IPC keybinds.
+When `desktop.noctalia.command` is set to a wrapper such as `tanos-noctalia-shell`, Niri startup and keybinds use that command instead of plain `noctalia`.
 
 `desktop.noctalia.assistantPanel.secrets` names optional `sops-nix` secrets that are exposed to the plugin through its documented environment variables. Set only the ones you actually use:
 
