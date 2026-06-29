@@ -23,7 +23,7 @@
       "spotify"
       "mpv"
       "pywalfox-native"
-      #      "sops"
+      "sops"
       "qbittorrent"
     ];
     git = {
@@ -39,7 +39,7 @@
   desktop = {
     enable = true;
     compositor = "niri";
-    extraCompositors = [];
+    extraCompositors = [ ];
     displayManager = "auto";
     sddm.wayland.enable = false;
     sddm.background = ../../wallpapers/1.png;
@@ -47,11 +47,11 @@
       default = "zen";
       zen.enable = true;
       helium.enable = true;
-      mullvadBrowser.enable = true;
+      mullvadBrowser.enable = false;
     };
     niri = {
-      outputs = {};
-      settings = {};
+      outputs = { };
+      settings = { };
     };
     noctalia = import ./noctalia;
     session = {

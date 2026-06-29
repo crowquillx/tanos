@@ -11,7 +11,7 @@
       discord = {
         forceXwayland = true;
         equicord = {
-          enable = false;
+          enable = true;
           startupDelaySeconds = 4;
         };
       };
@@ -27,7 +27,7 @@
       editors = {
         enable = true;
         vscode.enable = true;
-        antigravity.enable = true;
+        antigravity.enable = false;
         t3code.enable = true;
         cursor.enable = true;
         zed.enable = true;
@@ -39,8 +39,8 @@
           trustedDirectories = [ "/home/tan/tanos" ];
         };
         opencode.enable = true;
-        gemini.enable = true;
-        droid.enable = true;
+        gemini.enable = false;
+        droid.enable = false;
       };
       nixTools.enable = true;
     };
@@ -99,7 +99,7 @@
         spiceUSBRedirection.enable = true;
       };
       containers = {
-        podman.enable = true;
+        podman.enable = false;
         docker.enable = false;
       };
     };
