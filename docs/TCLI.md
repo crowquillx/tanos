@@ -85,7 +85,7 @@ The package name is normalized to `nixpkgs#<name>` if no flake ref is present. E
 
 ### `tcli hosts`
 
-Lists all available hosts, marking the current one with `*`. A host is defined as a directory under `hosts/` that contains both `default.nix` and `variables.nix`.
+Lists all available hosts, marking the current one with `*`. A host is defined as a directory under `hosts/` that contains both `default.nix` and `variables.nix`. Optional host-local variable fragments such as `advanced.nix` are registered in `modules/flake/hosts.nix`.
 
 ### `tcli gc [-- <nh-args...>]`
 

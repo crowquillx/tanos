@@ -9,17 +9,26 @@
     tandesk = {
       system = "x86_64-linux";
       module = ../../hosts/tandesk/default.nix;
-      variables = ../../hosts/tandesk/variables.nix;
+      variables = [
+        ../../hosts/tandesk/variables.nix
+        ../../hosts/tandesk/advanced.nix
+      ];
     };
     tanvm = {
       system = "x86_64-linux";
       module = ../../hosts/tanvm/default.nix;
-      variables = ../../hosts/tanvm/variables.nix;
+      variables = [
+        ../../hosts/tanvm/variables.nix
+        ../../hosts/tanvm/advanced.nix
+      ];
     };
     tanlappy = {
       system = "x86_64-linux";
       module = ../../hosts/tanlappy/default.nix;
-      variables = ../../hosts/tanlappy/variables.nix;
+      variables = [
+        ../../hosts/tanlappy/variables.nix
+        ../../hosts/tanlappy/advanced.nix
+      ];
     };
   };
   users = {
@@ -27,7 +36,9 @@
   };
   noctaliaHmModule = lib.attrByPath ["noctalia" "homeModules" "default"] null inputs;
   hostPlatforms = lib.mapAttrs (_: spec: spec.system) hosts;
-  hostVars = lib.mapAttrs (_: spec: import spec.variables) hosts;
+  importVariables = files:
+    lib.foldl' lib.recursiveUpdate { } (map import files);
+  hostVars = lib.mapAttrs (_: spec: importVariables spec.variables) hosts;
   nixosHostModules = lib.mapAttrs (_: spec: import spec.module) hosts;
   homeUserModules = lib.mapAttrs (_: import) users;
 

@@ -14,8 +14,10 @@ Edit `hosts/<newhost>/variables.nix` and at minimum set:
 
 - `host.name = "<newhost>"`
 - `host.isVm = true|false`
-- desktop, graphics, feature toggles for that machine
+- core desktop, graphics, and maintenance toggles for that machine
 - `security.sops.defaultSopsFile = ../../secrets/<newhost>.yaml` (if using sops)
+
+Put niche or optional feature toggles in `hosts/<newhost>/advanced.nix`.
 
 Detailed variable reference: `docs/VARIABLES.md`.
 
@@ -33,7 +35,18 @@ Option B: manually generate and place `hosts/<newhost>/hardware-configuration.ni
 
 ## 4) Register host in the flake host registry
 
-Add `<newhost>` in the `hosts` attrset in `modules/flake/hosts.nix` with its system, host module path, and variables path so both outputs are generated:
+Add `<newhost>` in the `hosts` attrset in `modules/flake/hosts.nix` with its system, host module path, and ordered variable fragment list so both outputs are generated:
+
+```nix
+<newhost> = {
+  system = "x86_64-linux";
+  module = ../../hosts/<newhost>/default.nix;
+  variables = [
+    ../../hosts/<newhost>/variables.nix
+    ../../hosts/<newhost>/advanced.nix
+  ];
+};
+```
 
 - `nixosConfigurations.<newhost>`
 - `homeConfigurations.<newhost>`

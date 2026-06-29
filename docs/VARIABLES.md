@@ -1,6 +1,18 @@
 # Host Variables Reference
 
-Primary host configuration is in `hosts/<host>/variables.nix`.
+Primary host configuration is composed from `hosts/<host>/variables.nix` and
+`hosts/<host>/advanced.nix`.
+
+- `variables.nix` is for core host identity, boot, graphics, desktop/session,
+  users, core maintenance toggles, and security settings.
+- `advanced.nix` is for niche or optional feature toggles such as chat,
+  coding tools, Flatpak, gaming, virtualisation, AI, MCP, LocalSend, Mullvad,
+  terminals, theme extras, portals, Tailscale, laptop extras, printing,
+  Bluetooth, networking, and service toggles.
+
+The files are merged into the same `config.tanos.variables` attrset before
+modules consume them. Later fragments override earlier fragments for duplicate
+scalar values.
 
 ## Key switches
 
