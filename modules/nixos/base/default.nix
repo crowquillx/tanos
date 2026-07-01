@@ -44,10 +44,6 @@ in
   time.timeZone = get [ "host" "timeZone" ] "America/Chicago";
   i18n.defaultLocale = get [ "host" "locale" ] "en_US.UTF-8";
 
-  # linuxPackages_zen currently installs vmlinuz instead of the default
-  # x86_64-linux kernel target name, bzImage.
-  system.boot.loader.kernelFile = lib.mkIf ((get [ "boot" "kernel" ] "default") == "zen") "vmlinuz";
-
   boot = {
     loader = {
       systemd-boot = {
